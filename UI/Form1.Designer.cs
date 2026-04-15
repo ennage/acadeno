@@ -1,4 +1,4 @@
-﻿namespace Acadeño
+﻿namespace Acadeño.UI
 {
     partial class Form1
     {
