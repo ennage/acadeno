@@ -9,11 +9,17 @@
 0:00:00 Tab1 PageLoad
 0:00:00 Tab1 StartNav2 #typed
 0:00:00 Tab1 FinishNav2
-0:00:00 Tab1 PageLoad
-0:01:49 Tab1 StartNav3 #renderer-user #link
-0:01:49 Tab1 FinishNav3
-0:01:51 Tab1 StartNav4 #renderer-user #link
-0:01:51 Tab1 FinishNav4
-0:01:51 Tab1 StartNav5 #renderer-user #link
-0:01:51 Tab1 FinishNav5
-0:03:14 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp
+0:00:01 Tab1 PageLoad
+0:00:23 Tab1 StartNav3 #renderer-user #link
+0:00:23 Tab1 FinishNav3
+0:00:28 Tab1 StartNav4 #renderer-user #link
+0:00:28 Tab1 FinishNav4
+0:00:30 Tab1 StartNav5 #renderer-user #link
+0:00:30 Tab1 FinishNav5
+0:00:30 Tab1 StartNav6 #renderer-user #link
+0:00:30 Tab1 FinishNav6
+0:00:31 Tab1 StartNav7 #renderer-user #link
+0:00:31 Tab1 FinishNav7
+0:00:32 Tab1 StartNav8 #renderer-user #link
+0:00:32 Tab1 FinishNav8
+0:00:42 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp

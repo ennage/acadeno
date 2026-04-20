@@ -4,13 +4,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Acadeno.styles.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"jf0b9ypqub"},{"Name":"integrity","Value":"sha256-EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU="},{"Name":"label","Value":"Acadeno.styles.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"5439"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Apr 2026 05:29:35 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"5439"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Apr 2026 05:57:26 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="Acadeno.styles.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\Acadeno.styles.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"5439"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Apr 2026 05:29:35 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"5439"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022EaiC0CofvCXc4JYRoLnadbcslCHfxM4H7aAgiFDzvwU=\u0022"},{"Name":"Last-Modified","Value":"Mon, 20 Apr 2026 05:57:26 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="app.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\app.css'))</AssetFile>
