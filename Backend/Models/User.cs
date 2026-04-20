@@ -1,6 +1,6 @@
-using Acadeno.Models.Enums;
+using Acadeno.Backend.Models.Enums;
 
-namespace Acadeno.Models;
+namespace Acadeno.Backend.Models;
 
 public class User
 {

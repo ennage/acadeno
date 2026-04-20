@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Acadeno.Models;
+using Acadeno.Backend.Models;
 
-namespace Acadeno.Tools;
+namespace Acadeno.Backend.Tools;
 
 public class AppDbContext : DbContext
 {

@@ -1,8 +1,8 @@
-using Acadeno.Tools;
-using Acadeno.Models;
+using Acadeno.Backend.Tools;
+using Acadeno.Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Acadeno.Services;
+namespace Acadeno.Backend.Services;
 
 public class AuthService
 {
