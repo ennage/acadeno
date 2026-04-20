@@ -1,14 +1,21 @@
-# Source Control ignore for .NET / MAUI
+# --- Build Outputs ---
 [Bb]in/
 [Oo]bj/
+Generated\ Files/
+
+# --- SQLite Database (CRITICAL) ---
+*.db
+*.db-shm
+*.db-wal
+
+# --- IDE & OS Files ---
 .vs/
 .vscode/
+.DS_Store
 *.user
+*.userprefs
 *.suo
-*.userosscache
-*.sln.docstates
 
-# Windows specific
-Thumbs.db
-ehthumbs.db
-Desktop.ini
+# --- MAUI Specific ---
+AppPackages/
+BundleArtifacts/
