@@ -1,4 +1,4 @@
-namespace Acadeno.Models.Enums;
+namespace Acadeno.Backend.Models.Enums;
 
 public enum GradeScaleType
 {

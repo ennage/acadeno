@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Acadeno.Services;
+using Acadeno.Backend.Services;
 namespace Acadeno;
 
 public static class MauiProgram
@@ -22,7 +22,7 @@ public static class MauiProgram
 			builder.Logging.AddDebug();
 	#endif
 		// This tells the app: "Whenever I ask for the Database, use this specific file."
-		builder.Services.AddDbContext<Acadeno.Tools.AppDbContext>();
+		builder.Services.AddDbContext<Acadeno.Backend.Tools.AppDbContext>();
 		return builder.Build();
 	}
 }
