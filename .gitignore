@@ -1,0 +1,14 @@
+# Source Control ignore for .NET / MAUI
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
