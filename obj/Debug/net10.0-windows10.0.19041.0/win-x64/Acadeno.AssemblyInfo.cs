@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Acadeno")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+7c5327f6bfba5a79e4218a1d64b4f37faafcd458")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+fdf3a53560204b008535defd29fa82aabac734ce")]
 [assembly: System.Reflection.AssemblyProductAttribute("Acadeno")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Acadeno")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
