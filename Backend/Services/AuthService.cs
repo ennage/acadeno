@@ -15,12 +15,19 @@ public class AuthService
 
     public async Task<bool> RegisterUser(string username, string password)
     {
-        // OOP Check: Does the user already exist?
         if (await _db.Users.AnyAsync(u => u.Name == username)) return false;
 
         var newUser = new User { Name = username, Password = password };
         _db.Users.Add(newUser);
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<bool> LoginUser(string username, string password)
+    {
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Name == username && u.Password == password);
+
+        return user != null;
     }
 }

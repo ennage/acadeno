@@ -67,7 +67,10 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
 App.xaml.cs
 Backend/Models/
  AcademicTask.cs
+ AcademicYear.cs
  Admin/User.cs
+ Course.cs
+ CourseTimeTable.cs
  Education/
   AcademicTask.cs
   AcademicTaskType.cs
@@ -76,12 +79,17 @@ Backend/Models/
   Grade.cs
   Term.cs
  Enums/
+  DayOfWeek.cs
   GradeScaleType.cs
   RiskLevel.cs
   Status.cs
+ Grade.cs
  Schedule/
   BaseTask.cs
   ScheduleEntry.cs
+ ScheduleEntry.cs
+ Term.cs
+ User.cs
 Backend/Services/
  AuthService.cs
  ThisFileForLogicDev.cs

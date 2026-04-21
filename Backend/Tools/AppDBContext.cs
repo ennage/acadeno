@@ -19,6 +19,5 @@ namespace Acadeno.Backend.Tools
         public DbSet<AcademicTaskType> AcademicTaskTypes {get; set;}
         public DbSet<BaseTask> Tasks {get; set;}
         public DbSet<ScheduleEntry> ScheduleEntries {get; set;}
-        
     }
 }
