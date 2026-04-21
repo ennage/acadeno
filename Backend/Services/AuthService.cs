@@ -7,6 +7,7 @@ namespace Acadeno.Backend.Services;
 public class AuthService
 {
     private readonly AppDbContext _db;
+    public User? CurrentUser { get; private set; }
 
     public AuthService(AppDbContext db)
     {
@@ -28,6 +29,12 @@ public class AuthService
         var user = await _db.Users
             .FirstOrDefaultAsync(u => u.Name == username && u.Password == password);
 
-        return user != null;
+        if (user != null)
+        {
+            CurrentUser = user;
+            return true;
+        }
+
+        return false;
     }
 }
