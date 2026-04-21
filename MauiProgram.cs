@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Acadeno.Backend.Services;
+using Acadeno.Backend.Tools;
 namespace Acadeno;
 
 public static class MauiProgram
@@ -21,7 +22,7 @@ public static class MauiProgram
 			builder.Services.AddBlazorWebViewDeveloperTools();
 			builder.Logging.AddDebug();
 	#endif
-		// This tells the app: "Whenever I ask for the Database, use this specific file."
+		//	This tells the app: "Whenever I ask for the Database, use this specific file."
 		builder.Services.AddDbContext<Acadeno.Backend.Tools.AppDbContext>();
 		return builder.Build();
 	}
