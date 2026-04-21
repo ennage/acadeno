@@ -92,6 +92,8 @@ Backend/Models/
  User.cs
 Backend/Services/
  AuthService.cs
+ ScheduleSevice.cs
+ TaskService.cs
  ThisFileForLogicDev.cs
 Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
