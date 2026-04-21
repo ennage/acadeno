@@ -14,7 +14,7 @@ namespace Acadeno.Backend.Models.Admin
         public GradeScaleType PreferredScale {get; set;}
         public double TargetGenAve {get; set;}
 
-        //  Holds many Academi Years:
+        //  Holds many Academic Years:
         public List<AcademicYear> Years {get; set;} = new List<AcademicYear>();
     }
 }
