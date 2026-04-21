@@ -67,11 +67,25 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
 App.xaml.cs
 Backend/Models/
  AcademicTask.cs
- Enums/GradeScaleType.cs
- User.cs
-Backend/
- Services/AuthService.cs
- Tools/AppDBContext.cs
+ Admin/User.cs
+ Education/
+  AcademicTask.cs
+  AcademicTaskType.cs
+  AcademicYear.cs
+  Course.cs
+  Grade.cs
+  Term.cs
+ Enums/
+  GradeScaleType.cs
+  RiskLevel.cs
+  Status.cs
+ Schedule/
+  BaseTask.cs
+  ScheduleEntry.cs
+Backend/Services/
+ AuthService.cs
+ ThisFileForLogicDev.cs
+Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
 obj/Debug/net10.0-windows10.0.19041.0/win-x64/
@@ -81,6 +95,7 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/
  EmbeddedAttribute.cs
  ValidatableTypeAttribute.cs
 Platforms/Windows/App.xaml.cs
+Tests/ThisFileForTester.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.6/ref/net10.0/
@@ -259,21 +274,21 @@ Platforms/Windows/App.xaml.cs
  microsoft.aspnetcore.components.webview/10.0.0/lib/net10.0/Microsoft.AspNetCore.Components.WebView.dll
  microsoft.aspnetcore.components/10.0.0/lib/net10.0/Microsoft.AspNetCore.Components.dll
  microsoft.aspnetcore.metadata/10.0.0/lib/net10.0/Microsoft.AspNetCore.Metadata.dll
- microsoft.data.sqlite.core/10.0.0/lib/net8.0/Microsoft.Data.Sqlite.dll
- microsoft.entityframeworkcore.abstractions/10.0.0/lib/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll
- microsoft.entityframeworkcore.relational/10.0.0/lib/net10.0/Microsoft.EntityFrameworkCore.Relational.dll
- microsoft.entityframeworkcore.sqlite.core/10.0.0/lib/net10.0/Microsoft.EntityFrameworkCore.Sqlite.dll
- microsoft.entityframeworkcore/10.0.0/lib/net10.0/Microsoft.EntityFrameworkCore.dll
- microsoft.extensions.caching.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.Caching.Abstractions.dll
- microsoft.extensions.caching.memory/10.0.0/lib/net10.0/Microsoft.Extensions.Caching.Memory.dll
- microsoft.extensions.configuration.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll
+ microsoft.data.sqlite.core/10.0.6/lib/net8.0/Microsoft.Data.Sqlite.dll
+ microsoft.entityframeworkcore.abstractions/10.0.6/lib/net10.0/Microsoft.EntityFrameworkCore.Abstractions.dll
+ microsoft.entityframeworkcore.relational/10.0.6/lib/net10.0/Microsoft.EntityFrameworkCore.Relational.dll
+ microsoft.entityframeworkcore.sqlite.core/10.0.6/lib/net10.0/Microsoft.EntityFrameworkCore.Sqlite.dll
+ microsoft.entityframeworkcore/10.0.6/lib/net10.0/Microsoft.EntityFrameworkCore.dll
+ microsoft.extensions.caching.abstractions/10.0.6/lib/net10.0/Microsoft.Extensions.Caching.Abstractions.dll
+ microsoft.extensions.caching.memory/10.0.6/lib/net10.0/Microsoft.Extensions.Caching.Memory.dll
+ microsoft.extensions.configuration.abstractions/10.0.6/lib/net10.0/Microsoft.Extensions.Configuration.Abstractions.dll
  microsoft.extensions.configuration.binder/10.0.0/lib/net10.0/Microsoft.Extensions.Configuration.Binder.dll
  microsoft.extensions.configuration.fileextensions/10.0.0/lib/net10.0/Microsoft.Extensions.Configuration.FileExtensions.dll
  microsoft.extensions.configuration.json/10.0.0/lib/net10.0/Microsoft.Extensions.Configuration.Json.dll
  microsoft.extensions.configuration/10.0.0/lib/net10.0/Microsoft.Extensions.Configuration.dll
- microsoft.extensions.dependencyinjection.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
- microsoft.extensions.dependencyinjection/10.0.0/lib/net10.0/Microsoft.Extensions.DependencyInjection.dll
- microsoft.extensions.dependencymodel/10.0.0/lib/net10.0/Microsoft.Extensions.DependencyModel.dll
+ microsoft.extensions.dependencyinjection.abstractions/10.0.6/lib/net10.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+ microsoft.extensions.dependencyinjection/10.0.6/lib/net10.0/Microsoft.Extensions.DependencyInjection.dll
+ microsoft.extensions.dependencymodel/10.0.6/lib/net10.0/Microsoft.Extensions.DependencyModel.dll
  microsoft.extensions.diagnostics.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.Diagnostics.Abstractions.dll
  microsoft.extensions.diagnostics/10.0.0/lib/net10.0/Microsoft.Extensions.Diagnostics.dll
  microsoft.extensions.fileproviders.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.FileProviders.Abstractions.dll
@@ -282,12 +297,12 @@ Platforms/Windows/App.xaml.cs
  microsoft.extensions.fileproviders.physical/10.0.0/lib/net10.0/Microsoft.Extensions.FileProviders.Physical.dll
  microsoft.extensions.filesystemglobbing/10.0.0/lib/net10.0/Microsoft.Extensions.FileSystemGlobbing.dll
  microsoft.extensions.hosting.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.Hosting.Abstractions.dll
- microsoft.extensions.logging.abstractions/10.0.0/lib/net10.0/Microsoft.Extensions.Logging.Abstractions.dll
+ microsoft.extensions.logging.abstractions/10.0.6/lib/net10.0/Microsoft.Extensions.Logging.Abstractions.dll
  microsoft.extensions.logging.debug/10.0.0/lib/net10.0/Microsoft.Extensions.Logging.Debug.dll
- microsoft.extensions.logging/10.0.0/lib/net10.0/Microsoft.Extensions.Logging.dll
+ microsoft.extensions.logging/10.0.6/lib/net10.0/Microsoft.Extensions.Logging.dll
  microsoft.extensions.options.configurationextensions/10.0.0/lib/net10.0/Microsoft.Extensions.Options.ConfigurationExtensions.dll
- microsoft.extensions.options/10.0.0/lib/net10.0/Microsoft.Extensions.Options.dll
- microsoft.extensions.primitives/10.0.0/lib/net10.0/Microsoft.Extensions.Primitives.dll
+ microsoft.extensions.options/10.0.6/lib/net10.0/Microsoft.Extensions.Options.dll
+ microsoft.extensions.primitives/10.0.6/lib/net10.0/Microsoft.Extensions.Primitives.dll
  microsoft.extensions.validation/10.0.0/lib/net10.0/Microsoft.Extensions.Validation.dll
  microsoft.graphics.win2d/1.3.2/lib/net6.0-windows10.0.19041.0/Microsoft.Graphics.Canvas.Interop.dll
  microsoft.io.recyclablememorystream/3.0.1/lib/net6.0/Microsoft.IO.RecyclableMemoryStream.dll
@@ -349,9 +364,12 @@ Platforms/Windows/App.xaml.cs
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 <NUGET>/
  microsoft.aspnetcore.components.analyzers/10.0.0/analyzers/dotnet/cs/Microsoft.AspNetCore.Components.Analyzers.dll
- microsoft.entityframeworkcore.analyzers/10.0.0/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
- microsoft.extensions.logging.abstractions/10.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
- microsoft.extensions.options/10.0.0/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
+ microsoft.codeanalysis.analyzers/3.11.0/analyzers/dotnet/cs/
+  Microsoft.CodeAnalysis.Analyzers.dll
+  Microsoft.CodeAnalysis.CSharp.Analyzers.dll
+ microsoft.entityframeworkcore.analyzers/10.0.6/analyzers/dotnet/cs/Microsoft.EntityFrameworkCore.Analyzers.dll
+ microsoft.extensions.logging.abstractions/10.0.6/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Logging.Generators.dll
+ microsoft.extensions.options/10.0.6/analyzers/dotnet/roslyn4.4/cs/Microsoft.Extensions.Options.SourceGeneration.dll
  microsoft.extensions.validation/10.0.0/analyzers/dotnet/cs/Microsoft.Extensions.Validation.ValidationsGenerator.dll
  microsoft.maui.controls.build.tasks/10.0.20/buildTransitive/netstandard2.0/
   Microsoft.Maui.Controls.BindingSourceGen.dll
