@@ -1,0 +1,43 @@
+
+/*LOGIN CSS*/
+body { margin: 0; font-family: sans-serif; height: 100vh; display: flex; }
+
+.login-container { display: flex; width: 100%; }
+
+.left-panel { 
+    background: #a09393; 
+    flex: 3; 
+    position: relative;
+}
+.copyright { position: absolute; bottom: 20px; left: 20px; color: #fff; }
+
+.right-panel { 
+    background: #d8d8d8; 
+    flex: 2; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    padding: 40px;
+}
+
+    /* Form Styles */
+h1 { font-size: 3rem; margin-bottom: 30px; }
+form { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; }
+
+input { 
+    padding: 15px; border-radius: 10px; border: none; 
+    background: #a09393; color: white; 
+}
+input::placeholder { color: #eee; }
+
+.form-options { display: flex; justify-content: space-between; font-size: 0.8rem; }
+button { padding: 15px; border-radius: 10px; border: none; background: #a09393; color: white; cursor: pointer; }
+
+    /* Social & Footer */
+.social-login { margin-top: 20px; text-align: center; }
+.social-icons { display: flex; gap: 15px; justify-content: center; font-weight: bold; cursor: pointer; }
+.google { color: #4285F4; }
+.facebook { color: #3b5998; }
+.signup-link { margin-top: 20px; font-size: 0.9rem; }
+
