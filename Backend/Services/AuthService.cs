@@ -1,6 +1,8 @@
 using Acadeno.Backend.Tools;
 using Acadeno.Backend.Models.Admin;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Acadeno.Backend.Services;
 
@@ -14,27 +16,50 @@ public class AuthService
         _db = db;
     }
 
-    public async Task<bool> RegisterUser(string username, string password)
+    public async Task<bool> RegisterUser(User newUser, string password)
     {
-        if (await _db.Users.AnyAsync(u => u.Name == username)) return false;
+        if (await _db.Users.AnyAsync(u => u.UserID == newUser.UserID)) return false;
 
-        var newUser = new User { Name = username, Password = password };
+        newUser.Password = HashPassword(password);
+       
         _db.Users.Add(newUser);
         await _db.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> LoginUser(string username, string password)
+    public async Task<User?> LoginUser(string username, string password)
     {
+        string hashedInput =HashPassword(password);
+        
         var user = await _db.Users
-            .FirstOrDefaultAsync(u => u.Name == username && u.Password == password);
+            .FirstOrDefaultAsync(u => u.Name == username && u.Password == hashedInput);
 
         if (user != null)
         {
             CurrentUser = user;
-            return true;
+            return user;
         }
 
-        return false;
+        return null;
+    }
+
+    public async Task<bool> UpdateProfile(User updatedUser)
+    {
+        var user = await _db.Users.FindAsync(updatedUser.UserID);
+        if (user == null) return false;
+
+        user.University = updatedUser.University;
+        user.TargetGenAve = updatedUser.TargetGenAve;
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
+    private string HashPassword(string password)
+    {
+        using var sha256 = SHA256.Create();
+        var bytes = Encoding.UTF8.GetBytes(password);
+        var hash = sha256.ComputeHash(bytes);
+        return Convert.ToBase64String(hash);
     }
 }
