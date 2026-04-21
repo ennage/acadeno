@@ -1,5 +1,5 @@
 using Acadeno.Backend.Tools;
-using Acadeno.Backend.Models;
+using Acadeno.Backend.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 
 namespace Acadeno.Backend.Services;
