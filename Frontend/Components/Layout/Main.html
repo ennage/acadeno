@@ -3,24 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Content Page</title>
+    <title>Acadeno Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <main class="login-container">
+        <div class="left-panel">
+            <span class="copyright">© 2025 Acadeno</span>
+        </div>
+        <div class="right-panel">
+            <h1>Acadeno</h1>
+            <form action="dashboard/dashboard.html">
+                <input type="email" placeholder="Enter your Email" required>
+                <input type="password" placeholder="Enter your password" required>
+                
+                <div class="form-options">
+                    <label><input type="checkbox"> Remember Me</label>
+                    <a href="#">Forget Password</a>
+                </div>
 
-    <header>
-        <h1>Welcome to My Website</h1>
-    </header>
+                <button type="submit">LOGIN</button>
+            </form>
 
-    <main>
-        <article>
-            <h2>Main Content Heading</h2>
-            <p>This is the primary content of the page, contained within the <code>&lt;main&gt;</code> tag.</p>
-        </article>
+            <div class="social-login">
+                <p>or sign in with:</p>
+                <div class="social-icons">
+                    <span class="google">Google</span>
+                    <span class="facebook">facebook</span>
+                </div>
+            </div>
+
+            <p class="signup-link">don’t have an account? <a href="#">signup now.</a></p>
+        </div>
     </main>
-
-    <footer>
-        <p>&copy; 2026 My Website</p>
-    </footer>
-
 </body>
 </html>
