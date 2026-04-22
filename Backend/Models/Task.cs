@@ -12,6 +12,8 @@ namespace Acadeno.Backend.Models
         public DateTime DueDate { get; set; }
         public Status taskStatus { get; set; }
         public RiskLevel riskLevel { get; set; }
+        public double ImportanceWeight { get; set; }
+        public int PriorityScore { get; set; }
         
         public string GetName() => Name;
         public void SetName(string name) => Name = name;
