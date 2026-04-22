@@ -41,7 +41,7 @@ namespace Acadeno.Backend.Services
         public int CalculateRiskLevel(string taskid)
         {
             var task = _db.AcademicTasks.Find(taskid);
-            if (task == null || task.DueDate == null) return 1;
+            if (task == null) return 1;
 
            int score = 1;
            var timeReamaining = (DateTime)task.DueDate - DateTime.Now;
@@ -49,6 +49,10 @@ namespace Acadeno.Backend.Services
            if (timeReamaining.TotalDays <= 1) score += 3;
            else if (timeReamaining.TotalDays <= 3) score += 2;
            else if (timeReamaining.TotalDays <= 7) score += 1;
+
+           if (task.RiskLevel == "Criticlal") score += 5;
+           else if (task.RiskLevel == "Moderate") score += 3;
+              else if (task.RiskLevel == "Stable") score += 1;
 
            return Math.Clamp(score, 1, 5);
         }

@@ -88,6 +88,7 @@ Backend/Models/
   BaseTask.cs
   ScheduleEntry.cs
  ScheduleEntry.cs
+ Task.cs
  Term.cs
  User.cs
 Backend/Services/
