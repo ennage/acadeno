@@ -13,6 +13,7 @@ namespace Acadeno.Backend.Tools
         }
         public DbSet<User> Users {get; set;}
         public DbSet<AcademicYear> AcademicYears {get; set;}
+        public DbSet<AcademicTask> AcademicTasks {get; set;}
         public DbSet<Term> Terms {get; set;}
         public DbSet<Course> Courses {get; set;}
         public DbSet<Grade> Grades {get; set;}
