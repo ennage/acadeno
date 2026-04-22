@@ -1,0 +1,48 @@
+@page "/"
+@inject NavigationManager NavManager
+
+<!-- HTML -->
+
+<main class="login-container">
+    <div class="left-panel">
+        <span class="copyright">© 2025 Acadeno</span>
+    </div>
+
+    <div class="right-panel">
+        <h1>Acadeno</h1>
+
+        @* ADDED: @onsubmit="HandleLogin" - This links the form to C# *@
+        @* REMOVED: action="..." - Because we handle it in C# now *@
+        <form @onsubmit="HandleLogin">
+            <input type="email" placeholder="Enter your Email" required>
+            <input type="password" placeholder="Enter your password" required>
+            
+            <div class="form-options">
+                <label><input type="checkbox"> Remember Me</label>
+                <a href="#">Forget Password</a>
+            </div>
+
+            <button type="submit">LOGIN</button>
+        </form>
+
+        <div class="social-login">
+            <p>or sign in with:</p>
+            <div class="social-icons">
+                <span class="google">Google</span>
+                <span class="facebook">facebook</span>
+            </div>
+        </div>
+
+        <p class="signup-link">Don’t have an account? <a href="#">Sign up now.</a></p>
+    </div>
+</main>
+
+<!-- CONNECTOR -->
+
+@code {
+    void HandleLogin()
+    {
+        // This is the "Engine" that kicks in when the button is pressed
+        NavManager.NavigateTo("/dashboard");
+    }
+}
