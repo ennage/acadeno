@@ -1,4 +1,4 @@
-using Acadeno.Backend.Models;
+using Acadeno.Backend.Models.Education;
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Tools;
 
@@ -13,7 +13,7 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
-        public async Task<List<AcademicTask>> GetAllTasks(string userId)
+        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAllTasks(string userId)
         {
             return await _db.AcademicTasks
                 .Where(t => t.UserID == userId)
@@ -21,7 +21,7 @@ namespace Acadeno.Backend.Services
                 .ToListAsync();
         }
 
-        public async Task<List<AcademicTask>> GetAcademicTasks(string UserId)
+        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAcademicTasks(string UserId)
         {
             return await _db.AcademicTasks
                 .Where(t => t.UserID == UserId)
@@ -29,7 +29,7 @@ namespace Acadeno.Backend.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> CreateTask(AcademicTask task)
+        public async System.Threading.Tasks.Task<bool> CreateTask(AcademicTask task)
         {
             if (task == null) return false;
 
@@ -50,9 +50,9 @@ namespace Acadeno.Backend.Services
            else if (timeReamaining.TotalDays <= 3) score += 2;
            else if (timeReamaining.TotalDays <= 7) score += 1;
 
-           if (task.RiskLevel == "Criticlal") score += 5;
-           else if (task.RiskLevel == "Moderate") score += 3;
-              else if (task.RiskLevel == "Stable") score += 1;
+           if (task.RiskLevel == Models.Enums.RiskLevel.Critical) score += 5;
+           else if (task.RiskLevel == Models.Enums.RiskLevel.Warning) score += 3;
+              else if (task.RiskLevel == Models.Enums.RiskLevel.Stable) score += 1;
 
            return Math.Clamp(score, 1, 5);
         }

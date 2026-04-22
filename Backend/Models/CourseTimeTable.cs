@@ -7,7 +7,7 @@ public class CourseTimeTable
     public List<ScheduleEntry> GenerateWeeklyView()
     {
         return ScheduleEntries
-            .OrderBy(e => (int)e.DayOfWeek)
+            .OrderBy(e => (int)Enum.Parse<DayOfWeek>(e.DayOfWeek))
             .ThenBy(e => e.StartTime)
             .ToList();
     }

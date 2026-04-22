@@ -4,7 +4,7 @@ namespace Backend.Models
     {
         public class Course
         {
-            public string CourseId { get; set; } = string.Empty;
+            public string CourseID { get; set; } = string.Empty;
             public string CourseCode { get; set; } = string.Empty;
             public string CourseName { get; set; } = string.Empty;
             
