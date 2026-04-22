@@ -1,5 +1,5 @@
 using Acadeno.Backend.Models.Enums;
-namespace Acadeno.Backend.Models.Schedule
+namespace Acadeno.Backend.Models.Education
 {
     public class BaseTask
     {

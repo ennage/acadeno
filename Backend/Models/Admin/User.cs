@@ -1,7 +1,7 @@
 using Acadeno.Backend.Models.Education;
 using Acadeno.Backend.Models.Enums;
 
-namespace Acadeno.Backend.Models.Admin
+namespace Acadeno.Backend.Models.Admin.User
 {
     public class User
     {

@@ -1,4 +1,4 @@
-namespace Acadeno.Backend.Models.Education
+namespace Acadeno.Backend.Models.Education.AcademicYear
 {
     public class AcademicYear
     {

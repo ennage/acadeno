@@ -1,6 +1,6 @@
 using Acadeno.Backend.Models;
 
-using Task = Acadeno.Backend.Models.Task;
+using Task = Acadeno.Backend.Models.Education.Tasks.Task;
 
 namespace Acadeno.Backend.Services;
 

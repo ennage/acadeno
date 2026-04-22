@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Acadeno.Backend.Models;
+namespace Acadeno.Backend.Models.Education.Tasks;
 
 public class AcademicTask
 {

@@ -1,6 +1,6 @@
 using Acadeno.Backend.Models.Enums;
 
-namespace Acadeno.Backend.Models   
+namespace Acadeno.Backend.Models.Education.Tasks
 {
     public class Task
     {

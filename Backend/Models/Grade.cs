@@ -1,4 +1,4 @@
-namespace Acadeno.Backend.Models
+namespace Acadeno.Backend.Models.Education.Grades
 {
     public class Grade
     {

@@ -1,11 +1,10 @@
-namespace Acadeno.Backend.Models
-{
-    public class AcademicYear
-    {
-        public string YearID { get; set; } = string.Empty;
-        public string Year { get; set; } = string.Empty;
-        public bool IsCurrent { get; set; }
+namespace Acadeno.Backend.Models.Admin;
 
-        public string GetYear() => Year;
-    }
+public class AcademicYear
+{
+    public string YearID { get; set; } = string.Empty;
+    public string Year { get; set; } = string.Empty;
+    public bool IsCurrent { get; set; }
+
+    public string GetYear() => Year;
 }
