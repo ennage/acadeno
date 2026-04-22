@@ -1,5 +1,5 @@
 using Acadeno.Backend.Tools;
-using Acadeno.Backend.Models.Admin;
+using Acadeno.Backend.Models.Education;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
