@@ -1,0 +1,49 @@
+/* --- DASHBOARD THEME --- */
+:root {
+    --brand-navy: #0d1b3e;
+    --bg-light: #f8fafc;
+    --card-bg: #ffffff;
+}
+
+body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-light); }
+
+.dashboard-container { display: flex; height: 100vh; }
+
+/* Sidebar: Consistent with login branding */
+.sidebar { 
+    width: 280px; 
+    background: var(--brand-navy); 
+    color: white; 
+    padding: 40px; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+/* Main Layout Grid */
+.content { flex: 1; padding: 40px; overflow-y: auto; }
+
+.grid { 
+    display: grid; 
+    grid-template-columns: 1fr 2fr; 
+    gap: 24px; 
+    margin-top: 24px; 
+}
+
+/* Card Styling: Consistent with your refined login components */
+.card { 
+    background: var(--card-bg); 
+    padding: 30px; 
+    border-radius: 12px; 
+    border: 1px solid #e2e8f0; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.welcome-card { 
+    background: white; 
+    padding: 40px; 
+    border-radius: 12px; 
+    border-left: 6px solid var(--brand-navy); 
+}
+
+/* Typography */
+h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; color: var(--brand-navy); margin: 0; }
