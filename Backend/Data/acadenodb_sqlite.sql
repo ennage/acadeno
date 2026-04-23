@@ -1,83 +1,100 @@
-CREATE TABLE IF NOT EXISTS "users" (
-  "UserID" TEXT NOT NULL PRIMARY KEY,
-  "Name" TEXT NOT NULL,
-  "University" TEXT NOT NULL,
-  "Program" TEXT NOT NULL,
-  "PreferredScale" INTEGER NOT NULL,
-  "TargetGeneralAverage" REAL NOT NULL
+-- 1. USERS
+CREATE TABLE "users" (
+  "UserID" varchar(5) PRIMARY KEY NOT NULL,
+  "Name" varchar(50) NOT NULL,
+  "University" varchar(100) NOT NULL,
+  "Program" varchar(100) NOT NULL,
+  "PreferredScale" integer NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "academicyears" (
-  "YearID" TEXT NOT NULL PRIMARY KEY,
-  "UserID" TEXT NOT NULL,
-  "YearSpan" TEXT NOT NULL,
-  "isCurrent" INTEGER NOT NULL,
+-- 2. ACADEMIC YEARS
+CREATE TABLE "academicyears" (
+  "YearID" varchar(5) PRIMARY KEY NOT NULL,
+  "UserID" varchar(5) NOT NULL,
+  "YearSpan" varchar(20) NOT NULL,
+  "IsCurrent" integer NOT NULL, -- SQLite uses integer for booleans (0 or 1)
+  "AYTargetGenAve" double DEFAULT NULL,
+  "AYCalculatedGenAve" double DEFAULT NULL,
   FOREIGN KEY ("UserID") REFERENCES "users" ("UserID")
 );
 
-CREATE TABLE IF NOT EXISTS "terms" (
-  "TermID" TEXT NOT NULL PRIMARY KEY,
-  "YearID" TEXT NOT NULL,
-  "Name" TEXT NOT NULL,
-  "isCurrent" INTEGER NOT NULL,
+-- 3. TERMS
+CREATE TABLE "terms" (
+  "TermID" varchar(5) PRIMARY KEY NOT NULL,
+  "YearID" varchar(5) NOT NULL,
+  "Name" varchar(20) NOT NULL,
+  "IsCurrent" integer NOT NULL,
+  "TermTargetGenAve" double DEFAULT NULL,
+  "TermCalculatedGenAve" double DEFAULT NULL,
   FOREIGN KEY ("YearID") REFERENCES "academicyears" ("YearID")
 );
 
-CREATE TABLE IF NOT EXISTS "courses" (
-  "CourseID" TEXT NOT NULL PRIMARY KEY,
-  "TermID" TEXT NOT NULL,
-  "CourseCode" TEXT NOT NULL,
-  "Name" TEXT NOT NULL,
-  "Units" INTEGER NOT NULL,
-  "TargetGrade" REAL NOT NULL,
+-- 4. COURSES
+CREATE TABLE "courses" (
+  "CourseID" varchar(5) PRIMARY KEY NOT NULL,
+  "TermID" varchar(5) NOT NULL,
+  "CourseCode" varchar(10) NOT NULL,
+  "Name" varchar(100) NOT NULL,
+  "Units" integer NOT NULL,
   FOREIGN KEY ("TermID") REFERENCES "terms" ("TermID") ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "grades" (
-  "GradeID" TEXT NOT NULL PRIMARY KEY,
-  "CourseID" TEXT NOT NULL,
-  "RawGrade" REAL NOT NULL,
+-- 5. GRADES
+CREATE TABLE "grades" (
+  "GradeID" varchar(5) PRIMARY KEY NOT NULL,
+  "CourseID" varchar(5) NOT NULL,
+  "TargetCourseGrade" double DEFAULT NULL,
+  "CourseGrade" double DEFAULT NULL,
   FOREIGN KEY ("CourseID") REFERENCES "courses" ("CourseID")
 );
 
-CREATE TABLE IF NOT EXISTS "academictasktypes" (
-  "TypeID" TEXT NOT NULL PRIMARY KEY,
-  "GradeID" TEXT NOT NULL,
-  "Name" TEXT NOT NULL,
-  "Weight" REAL NOT NULL,
-  "TargetScore" REAL NOT NULL,
+-- 6. ACADEMIC TASK TYPES
+CREATE TABLE "academictasktypes" (
+  "TypeID" varchar(5) PRIMARY KEY NOT NULL,
+  "GradeID" varchar(5) DEFAULT NULL,
+  "Name" varchar(100) NOT NULL,
+  "Description" text DEFAULT NULL,
+  "Weight" double NOT NULL,
   FOREIGN KEY ("GradeID") REFERENCES "grades" ("GradeID")
 );
 
-CREATE TABLE IF NOT EXISTS "tasks" (
-  "TaskID" TEXT NOT NULL PRIMARY KEY,
-  "UserID" TEXT NOT NULL,
-  "TypeID" TEXT NOT NULL,
-  "CourseID" TEXT,
-  "Name" TEXT NOT NULL,
-  "Description" TEXT,
-  "Difficulty" INTEGER NOT NULL,
-  "StartDate" TEXT NOT NULL,
-  "DueDate" TEXT NOT NULL,
-  "Status" INTEGER NOT NULL,
-  "RiskLevel" INTEGER NOT NULL,
-  "Score" REAL,
-  "MaxScore" REAL,
+-- 7. SCHEDULE ENTRIES
+CREATE TABLE "scheduleentries" (
+  "EntryID" varchar(5) PRIMARY KEY NOT NULL,
+  "CourseID" varchar(5) NOT NULL,
+  "Label" varchar(50) NOT NULL,
+  "Description" text DEFAULT NULL,
+  "Day" integer NOT NULL,
+  "StartTime" datetime NOT NULL,
+  "EndTime" datetime NOT NULL,
+  "Session" varchar(20) NOT NULL,
+  "Room" varchar(50) NOT NULL,
+  "Building" varchar(50) NOT NULL,
+  FOREIGN KEY ("CourseID") REFERENCES "courses" ("CourseID")
+);
+
+-- 8. TASKS
+CREATE TABLE "tasks" (
+  "TaskID" varchar(5) PRIMARY KEY NOT NULL,
+  "UserID" varchar(5) NOT NULL,
+  "TypeID" varchar(5) NOT NULL,
+  "CourseID" varchar(5) DEFAULT NULL,
+  "Name" varchar(100) NOT NULL,
+  "Description" text DEFAULT NULL,
+  "Difficulty" integer NOT NULL,
+  "StartDate" datetime NOT NULL,
+  "DueDate" datetime NOT NULL,
+  "Status" integer NOT NULL,
+  "RiskLevel" integer NOT NULL,
+  "TargetScore" double DEFAULT NULL,
+  "Score" double DEFAULT NULL,
+  "MaxScore" double DEFAULT NULL,
   FOREIGN KEY ("UserID") REFERENCES "users" ("UserID"),
   FOREIGN KEY ("TypeID") REFERENCES "academictasktypes" ("TypeID"),
   FOREIGN KEY ("CourseID") REFERENCES "courses" ("CourseID")
 );
 
-CREATE TABLE IF NOT EXISTS "scheduleentries" (
-  "EntryID" TEXT NOT NULL PRIMARY KEY,
-  "CourseID" TEXT NOT NULL,
-  "Label" TEXT NOT NULL,
-  "Description" TEXT,
-  "Day" INTEGER NOT NULL,
-  "StartTime" TEXT NOT NULL,
-  "EndTime" TEXT NOT NULL,
-  "Session" TEXT NOT NULL,
-  "Room" TEXT NOT NULL,
-  "Building" TEXT NOT NULL,
-  FOREIGN KEY ("CourseID") REFERENCES "courses" ("CourseID")
-);
+-- SEED DATA
+INSERT INTO "academictasktypes" ("TypeID", "GradeID", "Name", "Description", "Weight") 
+VALUES ('TYP00', NULL, 'Unallocated', 'Default category for items not yet assigned a syllabus type.', 0.0);
+
