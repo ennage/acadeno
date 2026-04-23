@@ -84,13 +84,13 @@ Backend/Models/
   ScheduleEntry.cs
 Backend/Services/
  AuthService.cs
+ ScheduleService.cs
+ TaskService.cs
+Backend/Tools/
+ AppDBContext.cs
  GenAveSimulator.cs
  GradingEngine.cs
  PriorityEngine.cs
- ScheduleSevice.cs
- TaskService.cs
- ThisFileForLogicDev.cs
-Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
 obj/Debug/net10.0-windows10.0.19041.0/win-x64/
@@ -100,7 +100,7 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/
  EmbeddedAttribute.cs
  ValidatableTypeAttribute.cs
 Platforms/Windows/App.xaml.cs
-Tests/ThisFileForTester.cs
+Tests/ThisFileForLogicDev.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.6/ref/net10.0/
@@ -388,12 +388,13 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/Acadeno.GeneratedMSBuildEditorConf
 [additionalFiles]
 App.xaml
 Frontend/Components/Layout/
+ Login.razor
  MainLayout.razor
  NavMenu.razor
 Frontend/Components/Pages/
  Counter.razor
- Home.razor
  NotFound.razor
+ OldHome.razor
  Weather.razor
 Frontend/Components/
  Routes.razor
@@ -402,12 +403,13 @@ MainPage.xaml
 
 [dynamicFiles]
 Frontend/Components/Layout/
+ Login.razor
  MainLayout.razor
  NavMenu.razor
 Frontend/Components/Pages/
  Counter.razor
- Home.razor
  NotFound.razor
+ OldHome.razor
  Weather.razor
 Frontend/Components/
  Routes.razor
