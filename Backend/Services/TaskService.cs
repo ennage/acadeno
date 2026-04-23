@@ -1,6 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Models.Education;
 using Acadeno.Backend.Tools;
-using Microsoft.EntityFrameworkCore;
+
 namespace Acadeno.Backend.Services
 {
     public class TaskService
