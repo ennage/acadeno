@@ -1,4 +1,5 @@
 using Acadeno.Backend.Tools;
+using Acadeno.Backend.Models.Admin;
 using Acadeno.Backend.Models.Education;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -21,7 +22,7 @@ public class AuthService
         if (await _db.Users.AnyAsync(u => u.UserID == newUser.UserID)) return false;
 
         newUser.Password = HashPassword(password);
-       
+
         _db.Users.Add(newUser);
         await _db.SaveChangesAsync();
         return true;
@@ -49,7 +50,7 @@ public class AuthService
         if (user == null) return false;
 
         user.University = updatedUser.University;
-        user.TargetGenAve = updatedUser.TargetGenAve;
+        // user.TargetGenAve = updatedUser.TargetGenAve;
 
         await _db.SaveChangesAsync();
         return true;

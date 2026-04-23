@@ -8,7 +8,7 @@ namespace Acadeno.Backend.Models.Education
 
         public double? TermTargetGenAve {get; set;}
         public double? TermCalculatedGenAve {get; set;} 
-      
+
         //  Foreign Key
         public string YearID {get; set;} = string.Empty;
         
