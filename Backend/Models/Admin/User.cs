@@ -10,6 +10,7 @@ namespace Acadeno.Backend.Models.Admin
         public string Name {get; set;} = string.Empty;
         public string University {get; set;} = string.Empty;
         public string Program {get; set;} = string.Empty;
+        public string Email {get; set;} = string.Empty;
         public string Password {get; set;} = string.Empty;
         public GradeScaleType PreferredScale {get; set;}
         public double TargetGenAve {get; set;}

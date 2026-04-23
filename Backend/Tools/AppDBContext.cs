@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Models.Admin;
-using Acadeno.Backend.Models;
 using Acadeno.Backend.Models.Education;
+using Acadeno.Backend.Models.Schedule;
 
 namespace Acadeno.Backend.Tools
 {
