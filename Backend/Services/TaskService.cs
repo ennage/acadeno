@@ -1,6 +1,5 @@
-using Acadeno.Backend.Models.Education;
-using Acadeno.Backend.Models.Enums;
 using Microsoft.EntityFrameworkCore;
+using Acadeno.Backend.Models.Education;
 using Acadeno.Backend.Tools;
 namespace Acadeno.Backend.Services
 {
