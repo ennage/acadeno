@@ -1,4 +1,7 @@
 @page "/"
+@using Acadeno.Backend.Services
+
+@inject AuthService AuthEngine
 @inject NavigationManager NavManager
 
 <!-- HTML -->
@@ -14,8 +17,8 @@
         @* ADDED: @onsubmit="HandleLogin" - This links the form to C# *@
         @* REMOVED: action="..." - Because we handle it in C# now *@
         <form @onsubmit="HandleLogin">
-            <input type="email" placeholder="Enter your Email" required>
-            <input type="password" placeholder="Enter your password" required>
+            <input type="email" placeholder="Enter your Email" @bind=loginEmail required>
+            <input type="password" placeholder="Enter your password" @bind=loginPassword required>
             
             <div class="form-options">
                 <label><input type="checkbox"> Remember Me</label>
@@ -42,19 +45,32 @@
 @code {
     private string loginEmail = "";
     private string loginPassword = "";
-    void HandleLogin()
+    private string errorMsg = "";
+
+    async Task HandleLogin()
     {
-        // demo logic:
-        if (loginEmail == "student@acadeno.edu" && loginPassword == "password123")
+        // 1. Debug check: Did the UI actually capture the text?
+        Console.WriteLine($"Login attempt for: {loginEmail}");
+
+        try 
         {
-            NavManager.NavigateTo("/dashboard");
+            // 2. Call the Logic Dev's fixed engine
+            var user = await AuthEngine.LoginUser(loginEmail, loginPassword);
+
+            if (user != null)
+            {
+                Console.WriteLine("Success! Redirecting...");
+                NavManager.NavigateTo("/dashboard");
+            }
+            else
+            {
+                errorMsg = "Invalid Email or Password.";
+            }
         }
-        else
+        catch (Exception ex)
         {
-            // "Wrong Password" alert here later
+            errorMsg = "Critical Error: " + ex.Message;
+            Console.WriteLine($"CRASH: {ex}");
         }
-        
-        // goes to the dashboard when LOGIN button is pressed
-        NavManager.NavigateTo("/dashboard");
     }
 }

@@ -26,12 +26,12 @@ namespace Acadeno.Backend.Services
             return true;
         }
 
-        public async Task<User?> LoginUser(string username, string password)
+        public async Task<User?> LoginUser(string email, string password)
         {
             string hashedInput = HashPassword(password);
             
             var user = await _db.Users
-                .FirstOrDefaultAsync(u => u.Name == username && u.Password == hashedInput);
+                .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedInput);
 
             if (user != null)
             {
