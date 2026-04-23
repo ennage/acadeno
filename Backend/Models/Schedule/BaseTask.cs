@@ -12,7 +12,6 @@ namespace Acadeno.Backend.Models.Education
         public Status TaskStatus {get; set;} = Status.Pending;
         public RiskLevel RiskLevel {get; set;}
 
-        //  Foreign Key
         public string UserID {get; set;} = string.Empty;
     }
 }

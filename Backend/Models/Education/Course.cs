@@ -8,10 +8,8 @@ namespace Acadeno.Backend.Models.Education
         public int Units {get; set;}
         public double TargetGrade {get; set;}
 
-        //  Foreign Key
         public string TermID {get; set;} = string.Empty;
         
-        //  Holds one Grade
         public Grade ActualGrade {get; set;} = new Grade();
 
         

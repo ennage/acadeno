@@ -7,10 +7,7 @@ namespace Acadeno.Backend.Models.Education
         public double Weight {get; set;}
         public double TargetScore {get; set;}
 
-        //  Foreign Key
         public string GradeID { get; set; } = string.Empty;
-
-        //  Holds many Academic Tasks
         public List<AcademicTask> AcademicTasks {get; set;} = new List<AcademicTask>();
     }
 }
