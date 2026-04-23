@@ -51,7 +51,6 @@ namespace Acadeno.Backend.Services
             if (user == null) return false;
 
             user.University = updatedUser.University;
-            // user.TargetGenAve = updatedUser.TargetGenAve;
 
             await _db.SaveChangesAsync();
             return true;
