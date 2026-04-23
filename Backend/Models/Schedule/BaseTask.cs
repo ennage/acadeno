@@ -1,5 +1,5 @@
 using Acadeno.Backend.Models.Enums;
-namespace Acadeno.Backend.Models.Schedule
+namespace Acadeno.Backend.Models.Education
 {
     public class BaseTask
     {
@@ -12,7 +12,6 @@ namespace Acadeno.Backend.Models.Schedule
         public Status TaskStatus {get; set;} = Status.Pending;
         public RiskLevel RiskLevel {get; set;}
 
-        //  Foreign Key
         public string UserID {get; set;} = string.Empty;
     }
 }
