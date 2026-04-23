@@ -14,7 +14,6 @@ namespace Acadeno.Backend.Models.Admin
         //  Login purposes
         public string Email {get; set;} = string.Empty;
         public string Password {get; set;} = string.Empty;
-
         public GradeScaleType PreferredScale {get; set;}
 
         //  Holds many Academic Years:
