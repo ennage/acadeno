@@ -28,8 +28,12 @@ namespace Acadeno.Backend.Services
 
         public async Task<User?> LoginUser(string email, string password)
         {
-            string hashedInput = HashPassword(password);
-            
+            string cleanEmail = email.Trim().ToLower();               // removes accidental spaces
+            string hashedInput = HashPassword(password);    // encrypted password
+
+            System.Diagnostics.Debug.WriteLine($"DEBUG: Email: {email}");
+            System.Diagnostics.Debug.WriteLine($"DEBUG: Computed Hash: {hashedInput}");
+
             var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedInput);
 

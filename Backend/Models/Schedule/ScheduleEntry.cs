@@ -1,10 +1,12 @@
-using Acadeno.Backend.Models.Admin;
+using System.ComponentModel.DataAnnotations;
 
 namespace Acadeno.Backend.Models.Schedule
 {
     public class ScheduleEntry
     {
+        [Key]
         public string UserID {get; set;} = string.Empty;
+
         public string EntryID {get; set;} = string.Empty;
         public string CourseID {get; set;} = string.Empty;
 

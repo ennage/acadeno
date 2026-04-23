@@ -8,17 +8,21 @@
 
 <main class="login-container">
     <div class="left-panel">
-        <span class="copyright">© 2025 Acadeno</span>
+        <span class="copyright">© @DateTime.Now.Year ACADENO</span>
     </div>
 
     <div class="right-panel">
-        <h1>Acadeno</h1>
+        <h1>ACADENO</h1>
 
+        @if (!string.IsNullOrEmpty(errorMsg))
+        {
+            <p style="color:rgb(255, 100, 100); font-weight:bold;">@errorMsg</p>
+        }
+        
         @* ADDED: @onsubmit="HandleLogin" - This links the form to C# *@
-        @* REMOVED: action="..." - Because we handle it in C# now *@
         <form @onsubmit="HandleLogin">
-            <input type="email" placeholder="Enter your Email" @bind=loginEmail required>
-            <input type="password" placeholder="Enter your password" @bind=loginPassword required>
+            <input type="email" placeholder="Enter your Email" @bind="loginEmail" @bind:event="oninput" required>
+            <input type="password" placeholder="Enter your password" @bind="loginPassword" @bind:event="oninput" required>
             
             <div class="form-options">
                 <label><input type="checkbox"> Remember Me</label>
@@ -49,8 +53,8 @@
 
     async Task HandleLogin()
     {
-        // 1. Debug check: Did the UI actually capture the text?
-        Console.WriteLine($"Login attempt for: {loginEmail}");
+        errorMsg = "Login button was pressed!"; // If you see this on screen, the button works!
+        StateHasChanged();                      // Forces the UI to refresh immediately
 
         try 
         {

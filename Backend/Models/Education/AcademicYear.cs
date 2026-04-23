@@ -1,8 +1,11 @@
+using System.ComponentModel.DataAnnotations;
 namespace Acadeno.Backend.Models.Education
 {
     public class AcademicYear
     {
+        [Key]
         public string YearID {get; set;} = string.Empty;
+        
         public string YearSpan {get; set;} = string.Empty;
         public bool IsCurrent {get; set;}
         public double? AYTargetGenAve {get; set;}
