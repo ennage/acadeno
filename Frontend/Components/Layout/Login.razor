@@ -40,9 +40,21 @@
 <!-- CONNECTOR -->
 
 @code {
+    private string loginEmail = "";
+    private string loginPassword = "";
     void HandleLogin()
     {
-        // This is the "Engine" that kicks in when the button is pressed
+        // demo logic:
+        if (loginEmail == "student@acadeno.edu" && loginPassword == "password123")
+        {
+            NavManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            // "Wrong Password" alert here later
+        }
+        
+        // goes to the dashboard when LOGIN button is pressed
         NavManager.NavigateTo("/dashboard");
     }
 }

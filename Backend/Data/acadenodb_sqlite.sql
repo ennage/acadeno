@@ -97,3 +97,4 @@ CREATE TABLE "tasks" (
 -- SEED DATA
 INSERT INTO "academictasktypes" ("TypeID", "GradeID", "Name", "Description", "Weight") 
 VALUES ('TYP00', NULL, 'Unallocated', 'Default category for items not yet assigned a syllabus type.', 0.0);
+
