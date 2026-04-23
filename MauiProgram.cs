@@ -27,6 +27,7 @@ namespace Acadeno
 
 			//	SERVICES
 			builder.Services.AddScoped<AuthService>();
+			builder.Services.AddScoped<IdService>();
 			builder.Services.AddScoped<ScheduleService>();
 			builder.Services.AddScoped<TaskService>();
 

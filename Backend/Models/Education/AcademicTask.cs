@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Acadeno.Backend.Models.Enums;
-
 namespace Acadeno.Backend.Models.Education
 {
     public class AcademicTask : BaseTask

@@ -1,5 +1,6 @@
 @page "/"
 @using Acadeno.Backend.Services
+@using Acadeno.Backend.Models.Admin
 
 @inject AuthService AuthEngine
 @inject NavigationManager NavManager
@@ -13,68 +14,99 @@
 
     <div class="right-panel">
         <h1>ACADENO</h1>
+        <h3>@(isRegisterMode ? "Create Account" : "Welcome Back")</h3>
 
         @if (!string.IsNullOrEmpty(errorMsg))
         {
             <p style="color:rgb(255, 100, 100); font-weight:bold;">@errorMsg</p>
         }
-        
-        @* ADDED: @onsubmit="HandleLogin" - This links the form to C# *@
-        <form @onsubmit="HandleLogin">
-            <input type="email" placeholder="Enter your Email" @bind="loginEmail" @bind:event="oninput" required>
-            <input type="password" placeholder="Enter your password" @bind="loginPassword" @bind:event="oninput" required>
-            
-            <div class="form-options">
-                <label><input type="checkbox"> Remember Me</label>
-                <a href="#">Forget Password</a>
-            </div>
 
-            <button type="submit">LOGIN</button>
+        @* One form to rule them all *@
+        <form @onsubmit="HandleSubmit">
+            @if (isRegisterMode)
+            {
+                <div class="input-group">
+                    <input type="text" placeholder="Full Name" @bind="fullName" required />
+                </div>
+            }
+
+            <input type="email" placeholder="Enter your Email" @bind="loginEmail" required>
+            <input type="password" placeholder="Enter your password" @bind="loginPassword" required>
+            
+            @if (!isRegisterMode)
+            {
+                <div class="form-options">
+                    <label><input type="checkbox"> Remember Me</label>
+                    <a href="#">Forget Password</a>
+                </div>
+            }
+
+            <button type="submit">@(isRegisterMode ? "REGISTER" : "LOGIN")</button>
         </form>
 
         <div class="social-login">
             <p>or sign in with:</p>
             <div class="social-icons">
                 <span class="google">Google</span>
-                <span class="facebook">facebook</span>
+                <span class="facebook">Facebook</span>
             </div>
         </div>
 
-        <p class="signup-link">Don’t have an account? <a href="#">Sign up now.</a></p>
+        <p class="signup-link">
+            @(isRegisterMode ? "Already have an account?" : "Don’t have an account?")
+            <a href="javascript:void(0)" @onclick="ToggleMode">
+                @(isRegisterMode ? " Login now." : " Sign up now.")
+            </a>
+        </p>
     </div>
 </main>
 
 <!-- CONNECTOR -->
 
-@code {
-    private string loginEmail = "";
-    private string loginPassword = "";
-    private string errorMsg = "";
+@code 
+{
+    private bool isRegisterMode = false;    // false=Login, true=Register
+    private string fullName = string.Empty; // Only needed for Register
+    private string loginEmail = string.Empty;
+    private string loginPassword = string.Empty;
+    private string errorMsg = string.Empty;
 
-    async Task HandleLogin()
+    private void ToggleMode() 
     {
-        errorMsg = "Login button was pressed!"; // If you see this on screen, the button works!
-        StateHasChanged();                      // Forces the UI to refresh immediately
+        isRegisterMode = !isRegisterMode;
+        errorMsg = string.Empty;    // clear errors when switching
+    }
 
+    async Task HandleSubmit()
+    {
+        errorMsg = "";
         try 
         {
-            // 2. Call the Logic Dev's fixed engine
-            var user = await AuthEngine.LoginUser(loginEmail, loginPassword);
-
-            if (user != null)
+            if (isRegisterMode)
             {
-                Console.WriteLine("Success! Redirecting...");
-                NavManager.NavigateTo("/dashboard");
+                var newUser = new User { Name = fullName, Email = loginEmail };
+                bool success = await AuthEngine.RegisterUser(newUser, loginPassword);
+                
+                if (success) 
+                {
+                    isRegisterMode = false; 
+                    errorMsg = "Success! Please login.";
+                }
+                else 
+                {
+                    errorMsg = "Registration failed. Email might be taken.";
+                }
             }
             else
             {
-                errorMsg = "Invalid Email or Password.";
+                var user = await AuthEngine.LoginUser(loginEmail, loginPassword);
+                if (user != null) NavManager.NavigateTo("/dashboard");
+                else errorMsg = "Invalid Email or Password.";
             }
         }
         catch (Exception ex)
         {
-            errorMsg = "Critical Error: " + ex.Message;
-            Console.WriteLine($"CRASH: {ex}");
+            errorMsg = "ERROR:\n" + ex.Message;
         }
     }
 }

@@ -1,24 +1,31 @@
-using Acadeno.Backend.Tools;
-using Acadeno.Backend.Models.Admin;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Acadeno.Backend.Tools;
+using Acadeno.Backend.Models.Admin;
+
 namespace Acadeno.Backend.Services
 {
     public class AuthService
     {
         private readonly AppDbContext _db;
-        public User? CurrentUser { get; private set; }
+        private readonly IdService _idService;
+        public User? CurrentUser {get; private set;}
 
-        public AuthService(AppDbContext db)
+        public AuthService(AppDbContext db, IdService idService)
         {
             _db = db;
+            _idService = idService;
         }
 
         public async Task<bool> RegisterUser(User newUser, string password)
         {
-            if (await _db.Users.AnyAsync(u => u.UserID == newUser.UserID)) return false;
+            string cleanEmail = newUser.Email.Trim().ToLower();
+            bool exists = await _db.Users.AnyAsync(u => u.Email == cleanEmail);
+            if (exists) return false; // account exists, don't create
 
+            newUser.Email = cleanEmail;
+            newUser.UserID = await _idService.GenerateNextUserID();
             newUser.Password = HashPassword(password);
 
             _db.Users.Add(newUser);
@@ -28,7 +35,7 @@ namespace Acadeno.Backend.Services
 
         public async Task<User?> LoginUser(string email, string password)
         {
-            string cleanEmail = email.Trim().ToLower();               // removes accidental spaces
+            string cleanEmail = email.Trim().ToLower();     // removes accidental spaces
             string hashedInput = HashPassword(password);    // encrypted password
 
             System.Diagnostics.Debug.WriteLine($"DEBUG: Email: {email}");
@@ -49,9 +56,7 @@ namespace Acadeno.Backend.Services
         {
             var user = await _db.Users.FindAsync(updatedUser.UserID);
             if (user == null) return false;
-
             user.University = updatedUser.University;
-            // user.TargetGenAve = updatedUser.TargetGenAve;
 
             await _db.SaveChangesAsync();
             return true;

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace Acadeno.Backend.Models.Education
 {
     public class Term
