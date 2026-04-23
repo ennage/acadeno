@@ -9,6 +9,10 @@
 
 <main class="login-container">
     <div class="left-panel">
+        <div class="welcome-note">
+            <h1>WELCOME.</h1>
+            <p>Your personal academic command center. Track your progress, manage upcoming deadlines, and connect with your resources—all in one place</p>
+        </div>
         <span class="copyright">© @DateTime.Now.Year ACADENO</span>
     </div>
 
@@ -29,7 +33,6 @@
                     <input type="text" placeholder="Full Name" @bind="fullName" required />
                 </div>
             }
-
             <input type="email" placeholder="Enter your Email" @bind="loginEmail" required>
             <input type="password" placeholder="Enter your password" @bind="loginPassword" required>
             

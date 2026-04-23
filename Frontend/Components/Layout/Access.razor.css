@@ -1,0 +1,98 @@
+/* --- SHARED & LAYOUT STYLES --- */
+* { box-sizing: border-box; }
+
+/* We move the 'body' logic to the container so it doesn't break the whole app */
+.login-container { 
+    display: flex; 
+    width: 100vw; 
+    height: 100vh; 
+    position: fixed; /* Ensures it covers the screen without messing with <body> */
+    top: 0;
+    left: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* --- LEFT PANEL --- */
+.left-panel { 
+    flex: 3; 
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    background-color: #0d1b3e; 
+    background-image: 
+        linear-gradient(
+            220deg, 
+            rgba(255, 239, 213, 0.2) 0%, 
+            rgba(135, 206, 235, 0.4) 20%, 
+            rgba(100, 149, 237, 0.6) 40%, 
+            rgba(13, 27, 62, 1) 70% 
+        );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; 
+    padding: 60px;
+}
+
+.welcome-note { color: #ffffff !important; margin-bottom: 60px; max-width: 560px; z-index: 2; }
+.welcome-note h1 { font-size: 5rem; margin-bottom: 20px; font-weight: 750; color: #ffffff; }
+.welcome-note p { font-size: 1.2rem; line-height: 1.6; opacity: 0.9; color: #ffffff; }
+.copyright { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-bottom: 20px; }
+
+/* --- RIGHT PANEL --- */
+.right-panel { 
+    flex: 2; 
+    flex-shrink: 0;
+    background: #ffffff; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    padding: 40px;
+}
+
+/* Branding Tweak */
+.right-panel h1 { 
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 10px; /* Reduced to make space for the h3 subtitle */
+    color: #0d1b3e;
+}
+
+.right-panel h3 {
+    margin-bottom: 30px;
+    font-weight: 400;
+    color: #666;
+}
+
+/* FORM LOGIC */
+form { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 20px; }
+
+input { 
+    padding: 16px; 
+    border-radius: 8px; 
+    border: 1px solid #d1d5db; 
+    background: #f9fafb; 
+    color: #1a1a1a; 
+    width: 100%; /* Ensure full width */
+}
+
+.form-options { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; }
+
+button { 
+    padding: 16px; 
+    border-radius: 8px; 
+    border: none; 
+    background: #0d1b3e; 
+    color: white; 
+    cursor: pointer; 
+    font-weight: 600;
+    transition: background 0.3s;
+    text-transform: uppercase;
+}
+button:hover { background: #2a4d8c; }
+
+.signup-link { margin-top: 20px; font-size: 0.9rem; color: #666; }
+.signup-link a { color: #0d1b3e; font-weight: 600; text-decoration: none; cursor: pointer; }
