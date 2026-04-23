@@ -7,10 +7,9 @@ namespace Acadeno.Backend.Tools
 {
     public class AppDbContext : DbContext
     {
-        //  Constructor that accepts settings from MauiProgram.cs
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            Database.EnsureCreated(); // This ensures the file and tables are created
+            Database.EnsureCreated();
         }
         public DbSet<User> Users { get; set; }
         public DbSet<AcademicYear> AcademicYears { get; set; }
