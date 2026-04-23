@@ -7,10 +7,8 @@ namespace Acadeno.Backend.Models.Education
         public string Name {get; set;} = string.Empty;
         public int? Units {get; set;}
 
-        //  Foreign Key
         public string TermID {get; set;} = string.Empty;
         
-        //  Holds one Grade
         public Grade ActualGrade {get; set;} = new Grade();
 
         
