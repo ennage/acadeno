@@ -84,7 +84,6 @@ Backend/Models/
   ScheduleEntry.cs
 Backend/Services/
  AuthService.cs
- PriorityEngine.cs
  ScheduleService.cs
  TaskService.cs
 Backend/Tools/
