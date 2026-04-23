@@ -4,17 +4,17 @@ namespace Acadeno.Backend.Models.Schedule
 {
     public class ScheduleEntry
     {
-        public string UserID { get; set; } = string.Empty;
-        public string EntryID { get; set; } = string.Empty;
-        public string CourseID { get; set; } = string.Empty;
+        public string UserID {get; set;} = string.Empty;
+        public string EntryID {get; set;} = string.Empty;
+        public string CourseID {get; set;} = string.Empty;
 
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
-        public string DayOfWeek { get; set; } = string.Empty;
+        public TimeSpan StartTime {get; set;}
+        public TimeSpan EndTime {get; set;}
+        public string DayOfWeek {get; set;} = string.Empty;
 
-        public string Session { get; set; } = string.Empty; 
-        public string Room { get; set; } = string.Empty;
-        public string Building { get; set; } = string.Empty;
+        public string Session {get; set;} = string.Empty; 
+        public string Room {get; set;} = string.Empty;
+        public string Building {get; set;} = string.Empty;
 
         public double GetDurationInHours() => (EndTime - StartTime).TotalHours;
         public string FormattedTime() => $"{StartTime:hh\\:mm} - {EndTime:hh\\:mm}";

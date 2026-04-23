@@ -13,7 +13,6 @@ namespace Acadeno.Backend.Models.Admin
         public string Email {get; set;} = string.Empty;
         public string Password {get; set;} = string.Empty;
         public GradeScaleType PreferredScale {get; set;}
-        public double TargetGenAve {get; set;}
 
         //  Holds many Academic Years:
         public List<AcademicYear> Years {get; set;} = new List<AcademicYear>();
