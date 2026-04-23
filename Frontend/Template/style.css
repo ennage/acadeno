@@ -1,72 +1,19 @@
-/* --- SHARED & LAYOUT STYLES --- */
-* { box-sizing: border-box; } /* Critical fix for layout stability */
 
-body { 
-    margin: 0; 
-    font-family: 'Plus Jakarta Sans', sans-serif; 
-    height: 100vh; 
-    display: flex; 
-    overflow: hidden; /* Keeps the view locked */
-}
+/*LOGIN CSS*/
+body { margin: 0; font-family: sans-serif; height: 100vh; display: flex; }
 
-.login-container { 
-    display: flex; 
-    width: 100vw; 
-    height: 100vh; 
-}
+.login-container { display: flex; width: 100%; }
 
-/* --- LEFT PANEL: COMPLEMENTARY GRADIENT --- */
 .left-panel { 
+    background: #a09393; 
     flex: 3; 
-    flex-shrink: 0; /* ADDED: Prevents layout breaking */
     position: relative;
-    overflow: hidden;
-    
-    /* YOUR SPECIFIC GRADIENT */
-    background-color: #0d1b3e; 
-    background-image: 
-        linear-gradient(
-            220deg, 
-            rgba(255, 239, 213, 0.2) 0%, 
-            rgba(135, 206, 235, 0.4) 20%, 
-            rgba(100, 149, 237, 0.6) 40%, 
-            rgba(13, 27, 62, 1) 70% 
-        );
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; 
-    padding: 60px;
 }
+.copyright { position: absolute; bottom: 20px; left: 20px; color: #fff; }
 
-.welcome-note { 
-    color: #ffffff !important; 
-    margin-bottom: 60px; 
-    max-width: 560px; 
-    z-index: 2; 
-}
-
-.welcome-note h1 { 
-    font-size: 5rem; 
-    margin-bottom: 20px; 
-    font-weight: 750; 
-    color: #ffffff; 
-}
-
-.welcome-note p { 
-    font-size: 1.2rem; 
-    line-height: 1.6; 
-    opacity: 0.9; 
-    color: #ffffff; 
-}
-
-.copyright { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-bottom: 20px; }
-
-/* --- RIGHT PANEL: CLEAN WHITE --- */
 .right-panel { 
+    background: #d8d8d8; 
     flex: 2; 
-    flex-shrink: 0; /* ADDED: Prevents layout breaking */
-    background: #ffffff; 
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
@@ -74,42 +21,23 @@ body {
     padding: 40px;
 }
 
-/* --- BOLD BRANDING: MONTSERRAT --- */
-.right-panel h1 { 
-    font-family: 'Montserrat', sans-serif;
-    font-size: 2.8rem;             /* Increased for impact */
-    font-weight: 800;              /* Extra Bold */
-    text-transform: uppercase;     /* Professional wordmark style */
-    letter-spacing: 0.2em;         /* Slightly wider spacing for elegance */
-    margin-bottom: 30px; 
-    color: #0d1b3e;                /* Brand Navy */
-    line-height: 1;                /* Tight for a compact feel */
-}
-
-form { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 20px; }
+    /* Form Styles */
+h1 { font-size: 3rem; margin-bottom: 30px; }
+form { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; }
 
 input { 
-    padding: 16px; 
-    border-radius: 8px; 
-    border: 1px solid #d1d5db; 
-    background: #f9fafb; 
-    color: #1a1a1a; 
+    padding: 15px; border-radius: 10px; border: none; 
+    background: #a09393; color: white; 
 }
-input::placeholder { color: #9ca3af; }
+input::placeholder { color: #eee; }
 
-.form-options { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; }
+.form-options { display: flex; justify-content: space-between; font-size: 0.8rem; }
+button { padding: 15px; border-radius: 10px; border: none; background: #a09393; color: white; cursor: pointer; }
 
-button { 
-    padding: 16px; 
-    border-radius: 8px; 
-    border: none; 
-    background: #0d1b3e; 
-    color: white; 
-    cursor: pointer; 
-    font-weight: 600;
-    transition: background 0.3s;
-}
-button:hover { background: #2a4d8c; }
+    /* Social & Footer */
+.social-login { margin-top: 20px; text-align: center; }
+.social-icons { display: flex; gap: 15px; justify-content: center; font-weight: bold; cursor: pointer; }
+.google { color: #4285F4; }
+.facebook { color: #3b5998; }
+.signup-link { margin-top: 20px; font-size: 0.9rem; }
 
-.signup-link { margin-top: 20px; font-size: 0.9rem; color: #666; }
-.signup-link a { color: #0d1b3e; font-weight: 600; text-decoration: none; }
