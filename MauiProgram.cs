@@ -1,28 +1,38 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Services;
-namespace Acadeno;
-
-public static class MauiProgram
+using Acadeno.Backend.Tools;
+namespace Acadeno
 {
-	public static MauiApp CreateMauiApp()
+	public static class MauiProgram
 	{
-		var builder = MauiApp.CreateBuilder();
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-			});
+		public static MauiApp CreateMauiApp()
+		{
+			var builder = MauiApp.CreateBuilder();
+			builder
+				.UseMauiApp<App>()
+				.ConfigureFonts(fonts =>
+				{
+					fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				});
 
-		builder.Services.AddMauiBlazorWebView();
-		builder.Services.AddScoped<AuthService>();	// Existence of AuthService | put on top of .razor files : @inject AuthService AuthService
+			builder.Services.AddMauiBlazorWebView();
 
-	#if DEBUG
-			builder.Services.AddBlazorWebViewDeveloperTools();
-			builder.Logging.AddDebug();
-	#endif
-		// This tells the app: "Whenever I ask for the Database, use this specific file."
-		builder.Services.AddDbContext<Acadeno.Backend.Tools.AppDbContext>();
-		return builder.Build();
+			//	DATABASE CONFIGURATION
+			string dbPath = Path.Combine(FileSystem.AppDataDirectory, "acadenodb.db");	//	Path to SQLite file
+
+			/*	Register the DbContext with the SQLite connection string
+			This tells the app: "Whenever I ask for the Database, use this specific file." */
+			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
+
+			//	SERVICES
+			builder.Services.AddScoped<AuthService>();		//	Existence of AuthService | put on top of .razor files : @inject AuthService AuthService
+
+		#if DEBUG
+				builder.Services.AddBlazorWebViewDeveloperTools();
+				builder.Logging.AddDebug();
+		#endif
+			return builder.Build();
+		}
 	}
 }

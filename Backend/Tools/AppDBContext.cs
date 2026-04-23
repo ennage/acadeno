@@ -1,18 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using Acadeno.Backend.Models;
+using Acadeno.Backend.Models.Admin;
+using Acadeno.Backend.Models.Education;
+using Acadeno.Backend.Models.Schedule;
 
-namespace Acadeno.Backend.Tools;
-
-public class AppDbContext : DbContext
+namespace Acadeno.Backend.Tools
 {
-    // This creates the "Users" table in your SQLite file
-    public DbSet<User> Users { get; set; }
-
-    // This tells EF Core to use SQLite and where the file is
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
+    public class AppDbContext : DbContext
     {
-        // "Data Source" is the filename. 
-        // It will look for acadeno.db in your project folder.
-        options.UseSqlite("Data Source=acadeno.db");
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+        public DbSet<User> Users { get; set; }
+        public DbSet<AcademicYear> AcademicYears { get; set; }
+        public DbSet<AcademicTask> AcademicTasks { get; set; }
+        public DbSet<Term> Terms { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Grade> Grades { get; set; }
+        public DbSet<BaseTask> Tasks { get; set; }
+        public DbSet<AcademicTaskType> AcademicTaskTypes { get; set; }
+        public DbSet<ScheduleEntry> ScheduleEntries { get; set; }
     }
 }

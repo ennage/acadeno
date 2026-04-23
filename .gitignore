@@ -3,10 +3,11 @@
 [Oo]bj/
 Generated\ Files/
 
-# --- SQLite Database (CRITICAL) ---
-*.db
-*.db-shm
-*.db-wal
+# --- SQLite Database ---
+# We leave these commented out for the 5-day sprint so the team shares the initial .db file.
+# *.db
+# *.db-shm
+# *.db-wal
 
 # --- IDE & OS Files ---
 .vs/
@@ -15,7 +16,15 @@ Generated\ Files/
 *.user
 *.userprefs
 *.suo
+*.sln.docstates
 
-# --- MAUI Specific ---
+# --- MAUI / Dotnet Specific ---
 AppPackages/
 BundleArtifacts/
+publish/
+.utp/
+.nxt/
+
+# --- User Secrets & Config ---
+secrets.json
+appsettings.Development.json
