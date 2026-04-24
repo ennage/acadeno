@@ -14,6 +14,7 @@ body {
     background: var(--main-bg); 
     color: var(--text-on-light);
 }
+
 .dashboard-wrapper { 
     display: flex; 
     height: 100vh; 
@@ -30,6 +31,7 @@ body {
     display: flex; 
     flex-direction: column; 
 }
+
 .logo { 
     font-family: 'Montserrat'; 
     font-weight: 800; 
@@ -47,10 +49,10 @@ body {
 .avatar { 
     width: 90px; 
     height: 90px;
-     background: #cbd5e1; 
-     border-radius: 50%; 
-     margin: 0 auto 15px; 
-     border: 4px solid rgba(255,255,255,0.2); }
+    background: #cbd5e1; 
+    border-radius: 50%; 
+    margin: 0 auto 15px; 
+    border: 4px solid rgba(255,255,255,0.2); }
 
 nav a { 
     color: rgba(255,255,255,0.7); 
@@ -86,6 +88,7 @@ nav a.active {
     font-size: 0.75rem; 
 }
 
+
 /* Main Area */
 .main-content { 
     flex: 1; 
@@ -94,6 +97,7 @@ nav a.active {
     display: flex; 
     flex-direction: column; 
 }
+
 .welcome-card { 
     margin-bottom: 24px;
     border-left: 6px solid #38bdf8; 
@@ -132,6 +136,8 @@ nav a.active {
     gap: 20px;
     margin-top: 20px;
 }
+
+/* PANEL 1 */
 
 .pomodoro-card {
     grid-column: 2 / 2;
@@ -229,6 +235,7 @@ nav a.active {
     border-radius: 8px;
     margin-bottom: 10px;
 }
+
 /* --- DATE & GRADE CARD STYLING --- */
 .date-grade-card {
     background: var(--navy); 

@@ -1,4 +1,54 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿<aside class="sidebar">
+    <div class="logo">ACADENO</div>
+    <div class="user-info">
+        <div class="avatar"></div>
+            <h3>Lance Buenviaje</h3>
+        <p>Student</p>
+    </div>
+    <nav>
+        <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
+            Dashboard
+        </NavLink>
+        <NavLink class="nav-link" href="courses">
+            Courses
+        </NavLink>
+        <NavLink class="nav-link" href="calendar">
+            Calendar
+        </NavLink>
+        <NavLink class="nav-link" href="about">
+            About
+        </NavLink>
+    </nav>
+    
+    <div class="sidebar-footer">
+        <div class="theme-toggle">
+            <span>Dark</span> 
+            <input type="checkbox" id="theme-switch" @onchange="ToggleTheme"> 
+            <span>Light</span>
+        </div>
+        <a href="javascript:void(0)" @onclick="HandleLogout">Logout</a>
+        <p class="copyright">© @DateTime.Now.Year Acadeno</p>
+    </div>
+</aside>
+
+@code {
+    // You can move your logic for theme switching and logout here!
+    private void ToggleTheme(ChangeEventArgs e)
+    {
+        // Placeholder for your Light/Dark mode logic
+    }
+
+    private void HandleLogout()
+    {
+        // AuthEngine.Logout();
+    }
+}
+
+
+
+
+
+@* <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Acadeno</a>
     </div>
@@ -34,4 +84,4 @@
         </div>
         
     </nav>
-</div>
+</div> *@

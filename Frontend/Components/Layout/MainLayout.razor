@@ -1,17 +1,7 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager NavManager
 
 <div class="page">
-    @if (NavManager.Uri != NavManager.BaseUri) 
-    {
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-    }
-
     <main>
-        <article class="content">
-            @Body
-        </article>
+        @Body
     </main>
 </div>
