@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Acadeno.Backend.Models.Enums;
-namespace Acadeno.Backend.Models.Education
+using Acadeno.Backend.Enums;
+
+namespace Acadeno.Backend.Models
 {
     public class BaseTask
     {

@@ -1,5 +1,5 @@
-using Acadeno.Backend.Models.Education;
-using Acadeno.Backend.Models.Enums;
+using Acadeno.Backend.Models;
+using Acadeno.Backend.Enums;
 
 namespace Acadeno.Backend.Tools
 {

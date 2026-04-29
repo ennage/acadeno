@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Acadeno.Backend.Models.Schedule
+namespace Acadeno.Backend.Models
 {
     public class ScheduleEntry
     {

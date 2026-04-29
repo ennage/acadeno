@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Tools;
-using Acadeno.Backend.Models.Admin;
+using Acadeno.Backend.Models;
 
 namespace Acadeno.Backend.Services
 {

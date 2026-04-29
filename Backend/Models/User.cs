@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Acadeno.Backend.Models.Education;
-using Acadeno.Backend.Models.Enums;
+using Acadeno.Backend.Enums;
 
-namespace Acadeno.Backend.Models.Admin
+namespace Acadeno.Backend.Models
 {
     public class User
     {

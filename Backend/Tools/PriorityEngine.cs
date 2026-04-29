@@ -1,4 +1,4 @@
-using Task = Acadeno.Backend.Models.Education.AcademicTask;
+using Task = Acadeno.Backend.Models.AcademicTask;
 
 namespace Acadeno.Backend.Tools
 {

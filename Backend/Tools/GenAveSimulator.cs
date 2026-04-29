@@ -1,5 +1,4 @@
-using Acadeno.Backend.Models.Admin;
-using Acadeno.Backend.Models.Education;
+using Acadeno.Backend.Models;
 
 namespace Acadeno.Backend.Tools;
 
