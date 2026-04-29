@@ -65,34 +65,34 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
  UndockedRegFreeWinRT-AutoInitializer.cs
  WindowsAppRuntimeAutoInitializer.cs
 App.xaml.cs
-Backend/Models/
- Admin/User.cs
- Education/
-  AcademicTask.cs
-  AcademicTaskType.cs
-  AcademicYear.cs
-  Course.cs
-  Grade.cs
-  Term.cs
- Enums/
-  DayOfWeek.cs
-  GradeScaleType.cs
-  RiskLevel.cs
-  Status.cs
- Schedule/
-  BaseTask.cs
-  ScheduleEntry.cs
-Backend/Services/
- AuthService.cs
- MockDataService.cs
- ScheduleService.cs
- TaskService.cs
- ValidationService.cs
-Backend/Tools/
- AppDBContext.cs
+Backend/Core/
  GenAveSimulator.cs
  GradingEngine.cs
  PriorityEngine.cs
+Backend/Enums/
+ DayOfWeek.cs
+ GradeScaleType.cs
+ RiskLevel.cs
+ Status.cs
+Backend/Models/
+ AcademicTask.cs
+ AcademicTaskType.cs
+ AcademicYear.cs
+ BaseTask.cs
+ Course.cs
+ Grade.cs
+ ScheduleEntry.cs
+ Term.cs
+ User.cs
+Backend/Services/
+ AuthService.cs
+ IdService.cs
+ MockDataService.cs
+ ScheduleService.cs
+ TaskService.cs
+ UserService.cs
+ ValidationService.cs
+Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
 obj/Debug/net10.0-windows10.0.19041.0/win-x64/
@@ -389,30 +389,24 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/Acadeno.GeneratedMSBuildEditorConf
 
 [additionalFiles]
 App.xaml
-Frontend/Components/Layout/
- Login.razor
+Frontend/Components/Pages/
+ Access.razor
+ Dashboard.razor
  MainLayout.razor
  NavMenu.razor
-Frontend/Components/Pages/
- Counter.razor
  NotFound.razor
- OldHome.razor
- Weather.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
 MainPage.xaml
 
 [dynamicFiles]
-Frontend/Components/Layout/
- Login.razor
+Frontend/Components/Pages/
+ Access.razor
+ Dashboard.razor
  MainLayout.razor
  NavMenu.razor
-Frontend/Components/Pages/
- Counter.razor
  NotFound.razor
- OldHome.razor
- Weather.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
