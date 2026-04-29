@@ -33,10 +33,32 @@
     padding: 60px;
 }
 
-.welcome-note { color: #ffffff !important; margin-bottom: 60px; max-width: 560px; z-index: 2; }
-.welcome-note h1 { font-size: 5rem; margin-bottom: 20px; font-weight: 750; color: #ffffff; }
-.welcome-note p { font-size: 1.2rem; line-height: 1.6; opacity: 0.9; color: #ffffff; }
-.copyright { color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; margin-bottom: 20px; }
+.welcome-note { 
+    color: #ffffff !important; 
+    margin-bottom: 60px; 
+    max-width: 560px; 
+    z-index: 2; 
+}
+
+.welcome-note h1 { 
+    font-size: 5rem; 
+    margin-bottom: 20px; 
+    font-weight: 750; 
+    color: #ffffff; 
+}
+
+.welcome-note p { 
+    font-size: 1.2rem; 
+    line-height: 1.6; 
+    opacity: 0.9; 
+    color: #ffffff; 
+}
+
+.copyright { 
+    color: rgba(255, 255, 255, 0.6); 
+    font-size: 0.9rem; 
+    margin-bottom: 20px; 
+}
 
 /* --- RIGHT PANEL --- */
 .right-panel { 
@@ -68,7 +90,13 @@
 }
 
 /* FORM LOGIC */
-form { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 20px; }
+form { 
+    width: 100%; 
+    max-width: 350px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+}
 
 input { 
     padding: 16px; 
@@ -79,7 +107,21 @@ input {
     width: 100%; /* Ensure full width */
 }
 
-.form-options { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; }
+.form-options label {
+    display: flex;          /* Force horizontal layout */
+    align-items: center;    /* Vertically center the checkbox with the text */
+    white-space: nowrap;    /* ABSOLUTELY prevents text from wrapping to a new line */
+    gap: 8px;               /* Space between box and text */
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.form-options input[type="checkbox"] {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
 
 button { 
     padding: 16px; 
@@ -92,7 +134,19 @@ button {
     transition: background 0.3s;
     text-transform: uppercase;
 }
-button:hover { background: #2a4d8c; }
+button:hover { 
+    background: #2a4d8c; 
+}
 
-.signup-link { margin-top: 20px; font-size: 0.9rem; color: #666; }
-.signup-link a { color: #0d1b3e; font-weight: 600; text-decoration: none; cursor: pointer; }
+.signup-link { 
+    margin-top: 20px; 
+    font-size: 0.9rem; 
+    color: #666; 
+}
+
+.signup-link a { 
+    color: #0d1b3e; 
+    font-weight: 600; 
+    text-decoration: none; 
+    cursor: pointer; 
+}

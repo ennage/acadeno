@@ -11,14 +11,18 @@
     <div class="left-panel">
         <div class="welcome-note">
             <h1>WELCOME.</h1>
-            <p>Your personal academic command center. Track your progress, manage upcoming deadlines, and connect with your resources—all in one place</p>
+            <p>
+                Your personal academic command center.
+                Track your progress, manage upcoming deadlines, 
+                and connect with your resources—all in one place.
+            </p>
         </div>
         <span class="copyright">© @DateTime.Now.Year ACADENO</span>
     </div>
 
     <div class="right-panel">
         <h1>ACADENO</h1>
-        <h3>@(isRegisterMode ? "Create Account" : "Welcome Back")</h3>
+        <h3>@(isRegisterMode ? "Create Account" : "Welcome Back!")</h3>
 
         @if (!string.IsNullOrEmpty(errorMsg))
         {
@@ -33,27 +37,29 @@
                     <input type="text" placeholder="Full Name" @bind="fullName" required />
                 </div>
             }
-            <input type="email" placeholder="Enter your Email" @bind="loginEmail" required>
-            <input type="password" placeholder="Enter your password" @bind="loginPassword" required>
+            <input type="email" placeholder="Enter email" @bind="loginEmail" required>
+            <input type="password" placeholder="Enter password" @bind="loginPassword" required>
             
             @if (!isRegisterMode)
             {
                 <div class="form-options">
-                    <label><input type="checkbox"> Remember Me</label>
-                    <a href="#">Forget Password</a>
+                    <label>
+                        <input type="checkbox" checked="@isRemembered" @onchange="ToggleRememberMe"> Remember Me
+                    </label>
+                    @* <a href="#">Forget Password</a> *@
                 </div>
             }
 
             <button type="submit">@(isRegisterMode ? "REGISTER" : "LOGIN")</button>
         </form>
 
-        <div class="social-login">
+        @* <div class="social-login">
             <p>or sign in with:</p>
             <div class="social-icons">
                 <span class="google">Google</span>
                 <span class="facebook">Facebook</span>
             </div>
-        </div>
+        </div> *@
 
         <p class="signup-link">
             @(isRegisterMode ? "Already have an account?" : "Don’t have an account?")
@@ -69,11 +75,17 @@
 @code 
 {
     private bool isRegisterMode = false;    // false=Login, true=Register
+    private bool isRemembered = false;
     private string fullName = string.Empty; // Only needed for Register
     private string loginEmail = string.Empty;
     private string loginPassword = string.Empty;
     private string errorMsg = string.Empty;
 
+    async void ToggleRememberMe(ChangeEventArgs remember)
+    {
+        isRemembered = Convert.ToBoolean(remember.Value);
+    }
+    
     private void ToggleMode() 
     {
         isRegisterMode = !isRegisterMode;
@@ -103,8 +115,18 @@
             else
             {
                 var user = await AuthEngine.LoginUser(loginEmail, loginPassword);
-                if (user != null) NavManager.NavigateTo("/dashboard");
-                else errorMsg = "Invalid Email or Password.";
+                if (user != null) 
+                {
+                    if (isRemembered)
+                    {
+                        Microsoft.Maui.Storage.Preferences.Default.Set("latestUser", user.Email);
+                    }
+                    NavManager.NavigateTo("/dashboard");
+                }
+                else 
+                {
+                    errorMsg = "Invalid Email or Password.";
+                }
             }
         }
         catch (Exception ex)

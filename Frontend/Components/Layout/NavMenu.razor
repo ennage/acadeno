@@ -1,46 +1,53 @@
-﻿<aside class="sidebar">
+﻿@inject NavigationManager NavManager
+
+<aside class="sidebar">
     <div class="logo">ACADENO</div>
     <div class="user-info">
         <div class="avatar"></div>
             <h3>Lance Buenviaje</h3>
         <p>Student</p>
     </div>
-    <nav>
-        <div class="nav-item">   
+    <nav class="sidebar-nav">
+        <div class="nav-button">   
             <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
                 Dashboard
             </NavLink>
         </div>
-        <div class="nav-item">
-            <NavLink class="nav-link" href="weather">
+        <div class="nav-button">
+            <NavLink class="nav-link" href="courses">
                 Courses
             </NavLink>
         </div>
-        <div class="nav-item">
-            <NavLink class="nav-link" href="weather">
+        <div class="nav-button">
+            <NavLink class="nav-link" href="calendar">
                 Calendar
             </NavLink>
         </div>
-        <div class="nav-item">
-            <NavLink class="nav-link" href="weather">
+        <div class="nav-button">
+            <NavLink class="nav-link" href="about">
                 About
             </NavLink>
         </div>
     </nav>
     
     <div class="sidebar-footer">
+        <!-- THEME -->
         <div class="theme-toggle">
             <span>Dark</span> 
             <input type="checkbox" id="theme-switch" @onchange="ToggleTheme"> 
             <span>Light</span>
         </div>
-        <a href="javascript:void(0)" @onclick="HandleLogout">Logout</a>
-        <p class="copyright">© @DateTime.Now.Year Acadeno</p>
+        <!-- LOGOUT -->
+        <button class="nav-button logout-btn" @onclick="HandleLogout">
+            Logout
+        </button>
+        <!-- COPYRIGHT -->
+        <p class="copyright">© @DateTime.Now.Year ACADENO</p>
     </div>
 </aside>
 
-@code {
-    // You can move your logic for theme switching and logout here!
+@code 
+{
     private void ToggleTheme(ChangeEventArgs e)
     {
         // Placeholder for your Light/Dark mode logic
@@ -48,48 +55,6 @@
 
     private void HandleLogout()
     {
-        // AuthEngine.Logout();
+        NavManager.NavigateTo("/");
     }
 }
-
-
-
-
-
-@* <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Acadeno</a>
-    </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Logout
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="oldhome">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Old Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-        
-    </nav>
-</div> *@
