@@ -1,12 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Acadeno.Backend.Models
+namespace Acadeno.Backend.Models.Education
 {
     public class AcademicTaskType
     {
-        [Key]
         public string TypeID {get; set;} = string.Empty;
-
         public string Name {get; set;} = string.Empty;
         public string? Description {get; set;} = string.Empty;
         public double Weight {get; set;}

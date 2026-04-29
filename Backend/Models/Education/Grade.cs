@@ -1,12 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace Acadeno.Backend.Models
+namespace Acadeno.Backend.Models.Education
 {
     public class Grade
     {
-        [Key]
         public string GradeID {get; set;} = string.Empty;
-        
         public double? TargetCourseGrade {get; set;}
         public double? CourseGrade {get; set;}
 
