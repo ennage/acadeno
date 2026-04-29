@@ -1,4 +1,6 @@
 ﻿@inject NavigationManager Nav
+@inject Acadeno.Backend.Services.UserService UserAccess
+@inject Acadeno.Backend.Services.IdService IdEngine
 
 <Router AppAssembly="typeof(MauiProgram).Assembly" NotFoundPage="typeof(Pages.NotFound)">
     <Found Context="routeData">
@@ -8,15 +10,25 @@
 </Router>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         // Use the native MAUI Preferences we talked about
-        var savedEmail = Microsoft.Maui.Storage.Preferences.Default.Get("latestUser", string.Empty);
+        var savedID = Microsoft.Maui.Storage.Preferences.Default.Get("latestUser", string.Empty);
 
-        if (!string.IsNullOrEmpty(savedEmail))
+        if (!string.IsNullOrEmpty(savedID))
         {
-            // Redirect to dashboard immediately if ID exists
-            Nav.NavigateTo("/dashboard", forceLoad: false);
+            var user = await IdEngine.GetUserById(savedID);
+
+            if (user != null)
+            {
+                UserAccess.CurrentUser = user;
+                Nav.NavigateTo("/dashboard", forceLoad: false);
+            }
+            else
+            {
+                // safety check : if the user was deleted from DB but the ID is still in Prefs
+                Microsoft.Maui.Storage.Preferences.Default.Remove("latestUserId");
+            }            
         }
     }
 }

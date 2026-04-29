@@ -1,6 +1,6 @@
 using Acadeno.Backend.Models;
 
-namespace Acadeno.Backend.Tools;
+namespace Acadeno.Backend.Core;
 
 public class GenAveSimulator
 {

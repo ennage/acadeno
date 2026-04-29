@@ -4,6 +4,7 @@
 
 @inject AuthService AuthEngine
 @inject NavigationManager NavManager
+@inject UserService UserManager
 
 <!-- HTML -->
 
@@ -119,8 +120,9 @@
                 {
                     if (isRemembered)
                     {
-                        Microsoft.Maui.Storage.Preferences.Default.Set("latestUser", user.Email);
+                        Microsoft.Maui.Storage.Preferences.Default.Set("latestUser", user.UserID);
                     }
+                    UserManager.CurrentUser = user;
                     NavManager.NavigateTo("/dashboard");
                 }
                 else 

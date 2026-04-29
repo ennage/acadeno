@@ -1,12 +1,16 @@
-﻿@inject NavigationManager NavManager
+﻿@using Acadeno.Backend.Services
+@inject NavigationManager NavManager
+@inject UserService UserAccess
 
 <aside class="sidebar">
-    <div class="logo">ACADENO</div>
+    <div class="logo"> ACADENO </div>
     <div class="user-info">
         <div class="avatar"></div>
-            <h3>Lance Buenviaje</h3>
-        <p>Student</p>
+            <h2>@(UserAccess.CurrentUser?.Name ?? "Guest")!</h2>
+            <p>@UserAccess.CurrentUser?.University</p>
     </div>
+
+    @* --- SIDEBAR --- *@
     <nav class="sidebar-nav">
         <div class="nav-button">   
             <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
@@ -30,6 +34,7 @@
         </div>
     </nav>
     
+    @* --- SIDEBAR FOOTER --- *@
     <div class="sidebar-footer">
         <!-- THEME -->
         <div class="theme-toggle">

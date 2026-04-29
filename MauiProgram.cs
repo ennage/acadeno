@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Services;
 using Acadeno.Backend.Tools;
+
 namespace Acadeno
 {
 	public static class MauiProgram
@@ -30,6 +31,7 @@ namespace Acadeno
 			builder.Services.AddScoped<IdService>();
 			builder.Services.AddScoped<ScheduleService>();
 			builder.Services.AddScoped<TaskService>();
+			builder.Services.AddScoped<UserService>();
 
 		#if DEBUG
 				builder.Services.AddBlazorWebViewDeveloperTools();

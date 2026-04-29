@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Tools;
+using Acadeno.Backend.Models;
 
 namespace Acadeno.Backend.Services
 {
@@ -29,6 +30,12 @@ namespace Acadeno.Backend.Services
                 return $"U{nextId:D4}"; // "D4" ensures it stays 4 digits (0002)
             }
             return "U0001"; 
+        }
+
+        public async Task<User?> GetUserById(string id)
+        {
+            // This tells Entity Framework: "Find the first user whose UserID matches this id"
+            return await _db.Users.FirstOrDefaultAsync(u => u.UserID == id);
         }
     }
 }

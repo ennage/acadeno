@@ -1,7 +1,7 @@
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Enums;
 
-namespace Acadeno.Backend.Tools
+namespace Acadeno.Backend.Core
 {
     public class GradingEngine
     {
