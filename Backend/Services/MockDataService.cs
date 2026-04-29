@@ -1,6 +1,5 @@
-using Acadeno.Backend.Models.Admin;
-using Acadeno.Backend.Models.Enums;
-using Acadeno.Backend.Models.Education;
+using Acadeno.Backend.Models;
+using Acadeno.Backend.Enums;
 using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
