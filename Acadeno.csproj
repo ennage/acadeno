@@ -70,10 +70,4 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.6" />
     </ItemGroup>
 
-    <ItemGroup>
-    <None Update="Data\acadeno.db">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    </ItemGroup>
-
 </Project>

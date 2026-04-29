@@ -1,6 +1,7 @@
-using Acadeno.Backend.Models;
+using Acadeno.Backend.Models.Admin;
+using Acadeno.Backend.Models.Education;
 
-namespace Acadeno.Backend.Core;
+namespace Acadeno.Backend.Tools;
 
 public class GenAveSimulator
 {

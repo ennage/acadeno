@@ -1,6 +1,6 @@
-using Task = Acadeno.Backend.Models.AcademicTask;
+using Task = Acadeno.Backend.Models.Education.AcademicTask;
 
-namespace Acadeno.Backend.Core
+namespace Acadeno.Backend.Tools
 {
     public class PriorityEngine
     {
