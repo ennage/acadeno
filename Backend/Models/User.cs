@@ -1,12 +1,13 @@
-using Acadeno.Backend.Models.Education;
-using Acadeno.Backend.Models.Enums;
+using System.ComponentModel.DataAnnotations;
+using Acadeno.Backend.Enums;
 
-namespace Acadeno.Backend.Models.Admin
+namespace Acadeno.Backend.Models
 {
     public class User
     {
-        //  Primary Key for DB
+        [Key]
         public string UserID {get; set;} = string.Empty;
+        
         public string Name {get; set;} = string.Empty;
         public string University {get; set;} = string.Empty;
         public string Program {get; set;} = string.Empty;
