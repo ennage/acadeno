@@ -1,8 +1,12 @@
-namespace Acadeno.Backend.Models.Education
+using System.ComponentModel.DataAnnotations;
+
+namespace Acadeno.Backend.Models
 {
     public class Term
     {
+        [Key]
         public string TermID {get; set;} = string.Empty;
+        
         public string Name {get; set;} = string.Empty;
         public bool IsCurrent {get; set;}
 
