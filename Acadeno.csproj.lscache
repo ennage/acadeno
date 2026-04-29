@@ -84,8 +84,10 @@ Backend/Models/
   ScheduleEntry.cs
 Backend/Services/
  AuthService.cs
+ MockDataService.cs
  ScheduleService.cs
  TaskService.cs
+ ValidationService.cs
 Backend/Tools/
  AppDBContext.cs
  GenAveSimulator.cs
