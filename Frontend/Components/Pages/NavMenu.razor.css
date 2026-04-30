@@ -1,4 +1,15 @@
 /* Sidebar Nav Container */
+.sidebar { 
+    display: flex;
+    height: 100vh;
+    width: 300px;
+    flex-shrink: 0; 
+    background: var(--navy); 
+    color: var(--text-on-dark); 
+    padding: 20px; 
+    flex-direction: column;
+}
+
 .sidebar-nav {
     display: flex;
     flex-direction: column;
@@ -19,26 +30,16 @@
 }
 
 .nav-button:hover {
-    background-color: rgba(63, 55, 199, 0.15);
+    background-color: rgba(39, 29, 230, 0.563);
     color: white;
     text-decoration: none;
 }
 
 /* The ACTIVE Button (Where you are now) */
-::deep .nav-button.active {
+::deep .nav-button:active {
     background-color: #38bdf8 !important;
     color: #0d1b3e !important;
     box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-}
-
-.sidebar { 
-    width: 300px; 
-    flex-shrink: 0; 
-    background: var(--navy); 
-    color: var(--text-on-dark); 
-    padding: 40px; 
-    display: flex; 
-    flex-direction: column;
 }
 
 .logo { 
@@ -82,6 +83,12 @@
     align-items: center; 
     gap: 10px; 
     margin-bottom: 15px; 
+}
+
+.logout-btn:hover {
+    background-color: #ff686b;
+    color: white;
+    text-decoration: none;
 }
 
 .copyright { 

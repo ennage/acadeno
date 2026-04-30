@@ -1,13 +1,13 @@
 ﻿@using Acadeno.Backend.Services
 @inject NavigationManager NavManager
-@inject UserService UserAccess
+@inject UserService UserService
 
 <aside class="sidebar">
     <div class="logo"> ACADENO </div>
     <div class="user-info">
         <div class="avatar"></div>
-            <h2>@(UserAccess.CurrentUser?.Name ?? "Guest")!</h2>
-            <p>@UserAccess.CurrentUser?.University</p>
+            <h2>@(UserService.CurrentUser?.Name ?? "Guest")!</h2>
+            <p>@UserService.CurrentUser?.University</p>
     </div>
 
     @* --- SIDEBAR --- *@
@@ -60,6 +60,7 @@
 
     private void HandleLogout()
     {
-        NavManager.NavigateTo("/");
+        UserService.Logout();
+        NavManager.NavigateTo("/", forceLoad: true);
     }
 }
