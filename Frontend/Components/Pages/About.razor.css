@@ -1,3 +1,8 @@
+.about-wrapper {
+    display: flex; 
+    height: 100vh; 
+    overflow: hidden; 
+}
 /* About Page Styling */
 .about-container {
     display: grid;
@@ -112,11 +117,10 @@
     margin-bottom: 0;
 }
 
-/* Fix for the excessive bottom space */
 .about-container {
     display: grid;
     grid-template-columns: 1fr 350px;
-    grid-template-rows: auto auto; /* Allows content to stack vertically */
+    grid-template-rows: auto auto;
     gap: 40px;
     padding: 40px;
     align-content: start;
