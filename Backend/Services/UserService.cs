@@ -9,12 +9,11 @@ namespace Acadeno.Backend.Services
         public void Logout()
         {
             CurrentUser = null;
-            if (Preferences.Default.ContainsKey("user_id"))
+            if (Preferences.Default.ContainsKey("latestUser"))
             {
-                Preferences.Default.Remove("user_id");
+                Preferences.Default.Remove("latestUser");
             }
-            
-            // 3. Clear any auth tokens if you're using them
+            // Clear any auth tokens if you're using them
             if (Preferences.Default.ContainsKey("auth_token"))
             {
                 Preferences.Default.Remove("auth_token");

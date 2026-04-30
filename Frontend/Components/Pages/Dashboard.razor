@@ -1,5 +1,7 @@
 @page "/dashboard"
 
+@implements IDisposable
+
 <div class="dashboard-wrapper">
     @* --- SIDEBAR COMPONENT --- *@
     <NavMenu />
@@ -15,12 +17,13 @@
 
         <div class="dashboard-grid-container">
             <!-- BOTTOM ROW -->
-            <div class="card-stretch date-grade-card">
+            <div class="card-stretch clock-grade-card">
                 <!-- DATE AND TIME -->
-                <div class="date-time-header">
-                    <h1>2026, APRIL 20</h1>
-                    <p class="time-display">10:38 AM</p>
+                <div class="live-clock-container">
+                    <div class="live-date">@_currentDate</div>
+                    <div class="live-time">@_currentTime</div>
                 </div>
+
                 <!-- GRADES-->
                 <div class="grade-metrics">
                     <div class="grade-item">
@@ -74,3 +77,34 @@
         </div>
     </main>
 </div>
+
+@code {
+    private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
+    private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
+    private System.Timers.Timer? _timer;
+
+    protected override void OnInitialized()
+    {
+        // Update every 1000ms (1 second)
+        _timer = new System.Timers.Timer(1000);
+        _timer.Elapsed += async (sender, e) => await UpdateClock();
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
+    }
+
+    private async Task UpdateClock()
+    {
+        _currentDate = DateTime.Now.ToString("MMMM dd,  yyyy");
+        _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
+
+        // Force the UI to re-render from the background thread
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        // Prevents memory leaks and background "ghost" timers
+        _timer?.Stop();
+        _timer?.Dispose();
+    }
+}

@@ -6,7 +6,7 @@
     <div class="logo"> ACADENO </div>
     <div class="user-info">
         <div class="avatar"></div>
-            <h2>@(UserService.CurrentUser?.Name ?? "Guest")!</h2>
+            <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
             <p>@UserService.CurrentUser?.University</p>
     </div>
 
@@ -61,6 +61,6 @@
     private void HandleLogout()
     {
         UserService.Logout();
-        NavManager.NavigateTo("/", forceLoad: true);
+        NavManager.NavigateTo("/");
     }
 }

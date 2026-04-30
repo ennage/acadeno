@@ -22,12 +22,15 @@
             if (user != null)
             {
                 UserAccess.CurrentUser = user;
-                Nav.NavigateTo("/dashboard", forceLoad: false);
+                if(Nav.Uri.EndsWith("/"))
+                {
+                    Nav.NavigateTo("/dashboard");
+                }
             }
             else
             {
                 // safety check : if the user was deleted from DB but the ID is still in Prefs
-                Microsoft.Maui.Storage.Preferences.Default.Remove("latestUserId");
+                Microsoft.Maui.Storage.Preferences.Default.Remove("latestUser");
             }            
         }
     }
