@@ -22,7 +22,7 @@
     width: 100%;
     padding: 10px 15px;
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--navy);
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     font-weight: 600;
@@ -36,7 +36,7 @@
 }
 
 /* The ACTIVE Button (Where you are now) */
-::deep .nav-button:active {
+.nav-button.active {
     background-color: #38bdf8 !important;
     color: #0d1b3e !important;
     box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
@@ -75,8 +75,8 @@
     margin-top: auto; 
     color: rgba(255, 255, 255, 0.5); 
     font-size: 0.85rem; 
-    border-top: 4px solid rgba(255, 255, 255, 0.1); 
-    padding-top: 20px; }
+    padding-top: 20px; 
+}
 
 .theme-toggle { 
     display: flex; 

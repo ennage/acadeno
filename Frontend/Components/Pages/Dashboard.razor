@@ -96,8 +96,6 @@
     {
         _currentDate = DateTime.Now.ToString("MMMM dd,  yyyy");
         _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
-
-        // Force the UI to re-render from the background thread
         await InvokeAsync(StateHasChanged);
     }
 

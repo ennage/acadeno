@@ -36,12 +36,6 @@
     
     @* --- SIDEBAR FOOTER --- *@
     <div class="sidebar-footer">
-        <!-- THEME -->
-        <div class="theme-toggle">
-            <span>Dark</span> 
-            <input type="checkbox" id="theme-switch" @onchange="ToggleTheme"> 
-            <span>Light</span>
-        </div>
         <!-- LOGOUT -->
         <button class="nav-button logout-btn" @onclick="HandleLogout">
             Logout
@@ -53,11 +47,6 @@
 
 @code 
 {
-    private void ToggleTheme(ChangeEventArgs e)
-    {
-        // Placeholder for your Light/Dark mode logic
-    }
-
     private void HandleLogout()
     {
         UserService.Logout();
