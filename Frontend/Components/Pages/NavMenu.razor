@@ -1,0 +1,55 @@
+﻿@using Acadeno.Backend.Services
+@inject NavigationManager NavManager
+@inject UserService UserService
+
+<aside class="sidebar">
+    <div class="logo"> ACADENO </div>
+    <div class="user-info">
+        <div class="avatar"></div>
+            <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
+            <p>@UserService.CurrentUser?.University</p>
+    </div>
+
+    @* --- SIDEBAR --- *@
+    <nav class="sidebar-nav">
+        <div class="nav-button">   
+            <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
+                Dashboard
+            </NavLink>
+        </div>
+        <div class="nav-button">
+            <NavLink class="nav-link" href="courses">
+                Courses
+            </NavLink>
+        </div>
+        <div class="nav-button">
+            <NavLink class="nav-link" href="calendar">
+                Calendar
+            </NavLink>
+        </div>
+        <div class="nav-button">
+            <NavLink class="nav-link" href="about">
+                About
+            </NavLink>
+        </div>
+    </nav>
+    
+    @* --- SIDEBAR FOOTER --- *@
+    <div class="sidebar-footer">
+        <!-- LOGOUT -->
+        <button class="nav-button logout-btn" @onclick="HandleLogout">
+            Logout
+        </button>
+        <!-- COPYRIGHT -->
+        <p class="copyright">© @DateTime.Now.Year ACADENO</p>
+    </div>
+</aside>
+
+@code 
+{
+    private void HandleLogout()
+    {
+        UserService.Logout();
+        NavManager.NavigateTo("/");
+    }
+}

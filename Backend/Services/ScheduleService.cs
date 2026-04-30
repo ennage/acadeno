@@ -1,6 +1,6 @@
-using Acadeno.Backend.Models.Schedule;
-using Acadeno.Backend.Tools;
 using Microsoft.EntityFrameworkCore;
+using Acadeno.Backend.Models;
+using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
 {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Acadeno.Backend.Models.Education;
+using Acadeno.Backend.Models;
 using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
@@ -43,18 +43,18 @@ namespace Acadeno.Backend.Services
             var task = _db.AcademicTasks.Find(taskid);
             if (task == null) return 1;
 
-           int score = 1;
-           var timeReamaining = (DateTime)task.DueDate - DateTime.Now;
+            int score = 1;
+            var timeReamaining = (DateTime)task.DueDate - DateTime.Now;
 
-           if (timeReamaining.TotalDays <= 1) score += 3;
-           else if (timeReamaining.TotalDays <= 3) score += 2;
-           else if (timeReamaining.TotalDays <= 7) score += 1;
+            if (timeReamaining.TotalDays <= 1) score += 3;
+            else if (timeReamaining.TotalDays <= 3) score += 2;
+            else if (timeReamaining.TotalDays <= 7) score += 1;
 
-           if (task.RiskLevel == Models.Enums.RiskLevel.Critical) score += 5;
-           else if (task.RiskLevel == Models.Enums.RiskLevel.Warning) score += 3;
-              else if (task.RiskLevel == Models.Enums.RiskLevel.Stable) score += 1;
+            if (task.RiskLevel == Enums.RiskLevel.Critical) score += 5;
+            else if (task.RiskLevel == Enums.RiskLevel.Warning) score += 3;
+                else if (task.RiskLevel == Enums.RiskLevel.Stable) score += 1;
 
-           return Math.Clamp(score, 1, 5);
+            return Math.Clamp(score, 1, 5);
         }
     }
 }
