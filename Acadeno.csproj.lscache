@@ -390,6 +390,7 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/Acadeno.GeneratedMSBuildEditorConf
 [additionalFiles]
 App.xaml
 Frontend/Components/Pages/
+ About.razor
  Access.razor
  Dashboard.razor
  MainLayout.razor
@@ -402,6 +403,7 @@ MainPage.xaml
 
 [dynamicFiles]
 Frontend/Components/Pages/
+ About.razor
  Access.razor
  Dashboard.razor
  MainLayout.razor

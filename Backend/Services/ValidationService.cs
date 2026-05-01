@@ -1,4 +1,6 @@
 using System.Text.RegularExpressions;
+using Acadeno.Backend.Models;
+using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
 {
@@ -25,6 +27,11 @@ namespace Acadeno.Backend.Services
             if (!Regex.IsMatch(user.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
             {
                 return (false, "Is the email formatted correctly.");
+            }
+
+            if (_db.Users.Any(u => u.Email == user.Email))
+            {
+                return (false, "An account with this email already exists.");
             }
 
             return (true, "The user is valid.");
