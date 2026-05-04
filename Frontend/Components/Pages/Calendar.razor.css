@@ -1,0 +1,130 @@
+/* Layout Alignment */
+.dashboard-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f8fafc;
+    overflow: hidden;
+}
+
+/* Sidebar must have a set width to not collapse */
+.sidebar {
+    width: 260px;
+    background-color: #0d1b3e; /* Navy from your dashboard */
+    height: 100%;
+}
+
+/* Calendar Main Area */
+.calendar-page {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: #0d1b3e;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+/* The White Calendar Container */
+.calendar-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.day-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.day-headers div {
+    padding: 12px;
+    text-align: right; /* Header text to right */
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-auto-rows: minmax(120px, 1fr);
+    background: #e2e8f0; /* The thin border lines */
+    gap: 1px;
+}
+
+.grid-cell {
+    background: #ffffff;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Everything pushed to the right */
+    justify-content: flex-start;
+}
+
+.cell-number {
+    font-family: 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: #1e293b;
+    margin-bottom: auto; /* This forces the number to the TOP right */
+}
+
+.muted {
+    background: #fafafa;
+}
+
+.muted .cell-number {
+    color: #cbd5e1;
+}
+
+/* Active Highlight */
+.active-day {
+    background-color: rgba(56, 189, 248, 0.05);
+}
+
+.active-day .cell-number {
+    color: #38bdf8;
+    font-weight: 800;
+}
+
+/* Task Tags */
+.event-container {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.event-tag {
+    background: #f1f5f9;
+    border-left: 4px solid #38bdf8;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    color: #0d1b3e;
+    text-align: left; /* Keep tag text readable */
+}
+
+/* Header Buttons */
+.btn-outline {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 10px;
+}

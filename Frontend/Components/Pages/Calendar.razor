@@ -1,0 +1,90 @@
+@page "/calendar"
+
+<div class="dashboard-layout">
+    <!-- Sidebar Component -->
+    <NavMenu /> 
+
+    <!-- Main Calendar Area -->
+    <main class="calendar-page">
+        <header class="calendar-header">
+            <div class="header-left">
+                <h1>[MONTH] [YEAR]</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-controls">
+                    <button class="btn-outline">Month <span class="chevron">▾</span></button>
+                    <button class="btn-outline">Today</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="calendar-container">
+            <!-- Day Labels -->
+            <div class="day-headers">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+
+            <!-- Full 6-Week Grid (42 cells) -->
+            <div class="calendar-grid">
+                <!-- Row 1: Aug 30 - Sep 5 -->
+                <div class="grid-cell muted"><span class="cell-number">30</span></div>
+                <div class="grid-cell muted"><span class="cell-number">31</span></div>
+                <div class="grid-cell"><span class="cell-number">September 1</span></div>
+                <div class="grid-cell"><span class="cell-number">2</span></div>
+                <div class="grid-cell"><span class="cell-number">3</span></div>
+                <div class="grid-cell"><span class="cell-number">4</span></div>
+                <div class="grid-cell"><span class="cell-number">5</span></div>
+
+                <!-- Row 2: Sep 6 - Sep 12 -->
+                <div class="grid-cell"><span class="cell-number">6</span></div>
+                <div class="grid-cell"><span class="cell-number">7</span></div>
+                <div class="grid-cell"><span class="cell-number">8</span></div>
+                <div class="grid-cell active-day">
+                    <span class="cell-number">9</span>
+                    <div class="event-container">
+                        <div class="event-tag">CICS - SC</div>
+                    </div>
+                </div>
+                <div class="grid-cell"><span class="cell-number">10</span></div>
+                <div class="grid-cell"><span class="cell-number">11</span></div>
+                <div class="grid-cell"><span class="cell-number">12</span></div>
+
+                <!-- Row 3: Sep 13 - Sep 19 -->
+                <div class="grid-cell"><span class="cell-number">13</span></div>
+                <div class="grid-cell"><span class="cell-number">14</span></div>
+                <div class="grid-cell"><span class="cell-number">15</span></div>
+                <div class="grid-cell"><span class="cell-number">16</span></div>
+                <div class="grid-cell"><span class="cell-number">17</span></div>
+                <div class="grid-cell"><span class="cell-number">18</span></div>
+                <div class="grid-cell"><span class="cell-number">19</span></div>
+
+                <!-- Row 4: Sep 20 - Sep 26 -->
+                <div class="grid-cell"><span class="cell-number">20</span></div>
+                <div class="grid-cell"><span class="cell-number">21</span></div>
+                <div class="grid-cell"><span class="cell-number">22</span></div>
+                <div class="grid-cell"><span class="cell-number">23</span></div>
+                <div class="grid-cell"><span class="cell-number">24</span></div>
+                <div class="grid-cell"><span class="cell-number">25</span></div>
+                <div class="grid-cell"><span class="cell-number">26</span></div>
+
+                <!-- Row 5: Sep 27 - Oct 3 -->
+                <div class="grid-cell"><span class="cell-number">27</span></div>
+                <div class="grid-cell"><span class="cell-number">28</span></div>
+                <div class="grid-cell"><span class="cell-number">29</span></div>
+                <div class="grid-cell"><span class="cell-number">30</span></div>
+                <div class="grid-cell muted"><span class="cell-number">1</span></div>
+                <div class="grid-cell muted"><span class="cell-number">2</span></div>
+                <div class="grid-cell muted"><span class="cell-number">3</span></div>
+
+                <!-- Row 6: Oct 4 - Oct 10 -->
+                <div class="grid-cell muted"><span class="cell-number">4</span></div>
+                <div class="grid-cell muted"><span class="cell-number">5</span></div>
+                <div class="grid-cell muted"><span class="cell-number">6</span></div>
+                <div class="grid-cell muted"><span class="cell-number">7</span></div>
+                <div class="grid-cell muted"><span class="cell-number">8</span></div>
+                <div class="grid-cell muted"><span class="cell-number">9</span></div>
+                <div class="grid-cell muted"><span class="cell-number">10</span></div>
+            </div>
+        </div>
+    </main>
+</div>
