@@ -1,0 +1,61 @@
+<div class="modal-overlay">
+    <div class="acadeno-popup">
+        <header class="popup-header">
+            <div class="header-meta">
+                <span class="icon">📄</span>
+                <span class="label">Page</span>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn">🗗</button>
+                <button class="action-btn">✕</button>
+            </div>
+        </header>
+
+        <div class="popup-body">
+            <input type="text" class="title-input" placeholder="Title" value="CICS - SC Meeting">
+            
+            <div class="property-row">
+                <div class="prop-label">📅 Date</div>
+                <div class="prop-value">
+                    <!-- LOGIC GUIDE: 
+                         SelectedDate.ToString("dddd, MMMM dd, yyyy")
+                         Expected Output: Tuesday, May 05, 2026 -->
+                    Tuesday, May 05, 2026
+                </div>
+            </div>
+
+            <div class="property-row">
+                <div class="prop-label">🔵 All-day</div>
+                <div class="prop-value">
+                    <label class="switch">
+                        <!--  Bind this checkbox to a 'IsAllDay' boolean -->
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- SEPARATOR: Visual break before organization details -->
+            <div class="property-row separator">
+                <div class="prop-label">🗂️ Course</div>
+                <div class="prop-value">Science</div>
+            </div>
+
+            <div class="property-row">
+                <div class="prop-label">🕒 Time</div>
+                <div class="prop-value empty">
+                    <!-- LOGIC GUIDE: 
+                         If TimeSlot is null, add the 'empty' class to dim the text.
+                         Otherwise, display the time (e.g., 9:00 AM - 10:00 AM). -->
+                    Empty
+                </div>
+            </div>
+        </div>
+
+        <footer class="popup-footer">
+            <button class="manage-btn">
+                Open Page <span class="action-icon">↗</span>
+            </button>
+        </footer>
+    </div>
+</div>
