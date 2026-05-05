@@ -72,6 +72,7 @@ Backend/Core/
 Backend/Enums/
  DayOfWeek.cs
  GradeScaleType.cs
+ Month.cs
  RiskLevel.cs
  Status.cs
 Backend/Models/
@@ -79,6 +80,7 @@ Backend/Models/
  AcademicTaskType.cs
  AcademicYear.cs
  BaseTask.cs
+ Calendar.cs
  Course.cs
  Grade.cs
  ScheduleEntry.cs
@@ -86,6 +88,7 @@ Backend/Models/
  User.cs
 Backend/Services/
  AuthService.cs
+ CalendarServices.cs
  IdService.cs
  MockDataService.cs
  ScheduleService.cs
