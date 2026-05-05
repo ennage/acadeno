@@ -29,11 +29,6 @@ public class CalendarServices
         };
     }
 
-    public async Task<Calendar> GetCalendarMonthView(int year, Month month, int userId)
-    {
-        return await GetCalendarView(year, month, userId);
-    }
-
     public async Task<bool> AddCalendarEvent(Calendar newEvent)
     {
 
