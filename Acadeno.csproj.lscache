@@ -392,11 +392,13 @@ App.xaml
 Frontend/Components/Pages/
  About.razor
  Access.razor
+ Calendar.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
 Frontend/Components/
+ Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
 MainPage.xaml
@@ -405,10 +407,12 @@ MainPage.xaml
 Frontend/Components/Pages/
  About.razor
  Access.razor
+ Calendar.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
 Frontend/Components/
+ Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
