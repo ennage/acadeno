@@ -18,5 +18,6 @@ namespace Acadeno.Backend.Tools
         public DbSet<BaseTask> Tasks {get; set;}
         public DbSet<AcademicTaskType> AcademicTaskTypes {get; set;}
         public DbSet<ScheduleEntry> ScheduleEntries {get; set;}
+        public DbSet<Calendar> Calendars { get; set; } 
     }
 }

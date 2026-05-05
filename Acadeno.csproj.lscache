@@ -72,6 +72,7 @@ Backend/Core/
 Backend/Enums/
  DayOfWeek.cs
  GradeScaleType.cs
+ Month.cs
  RiskLevel.cs
  Status.cs
 Backend/Models/
@@ -79,6 +80,7 @@ Backend/Models/
  AcademicTaskType.cs
  AcademicYear.cs
  BaseTask.cs
+ Calendar.cs
  Course.cs
  Grade.cs
  ScheduleEntry.cs
@@ -86,6 +88,7 @@ Backend/Models/
  User.cs
 Backend/Services/
  AuthService.cs
+ CalendarServices.cs
  IdService.cs
  MockDataService.cs
  ScheduleService.cs
@@ -392,11 +395,13 @@ App.xaml
 Frontend/Components/Pages/
  About.razor
  Access.razor
+ Calendar.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
 Frontend/Components/
+ Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
 MainPage.xaml
@@ -405,10 +410,12 @@ MainPage.xaml
 Frontend/Components/Pages/
  About.razor
  Access.razor
+ Calendar.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
 Frontend/Components/
+ Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
