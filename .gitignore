@@ -2,7 +2,6 @@
 [Bb]in/
 [Oo]bj/
 Generated\ Files/
-Template/
 
 # --- SQLite Database ---
 # We leave these commented out for the 5-day sprint so the team shares the initial .db file.

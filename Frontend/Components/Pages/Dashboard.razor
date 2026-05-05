@@ -1,6 +1,15 @@
 @page "/dashboard"
 
+@using Acadeno.Backend.Core
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
+@using BaseTask = Acadeno.Backend.Models.BaseTask
+@using AcademicTask = Acadeno.Backend.Models.AcademicTask
 @implements IDisposable
+
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject PriorityEngine PriorityService
+
 
 <div class="dashboard-wrapper">
     @* --- SIDEBAR COMPONENT --- *@
@@ -38,24 +47,43 @@
             </div>
             
             <div class="card-stretch">
-                <h3>REMINDERS!</h3>
+                <h3> REMINDERS </h3>
                 <div class="card-content-area">
                     <div class="reminder-list">
-                        <div class="reminder-item alert">
-                            <div class="reminder-icon">!</div>
-                            <div class="reminder-text">
-                                <h4>Science Exam</h4>
-                                <p>24 Sep 2026, Friday</p>
+                        @if (_priorityTasks != null && _priorityTasks.Any())
+                        {
+                            @foreach (var task in _priorityTasks)
+                            {
+                                var score = PriorityService.CalculatePriorityScore(task);
+                                var isUrgent = score > 10 || task.TaskStatus == Status.Overdue;
+
+                                <div class="reminder-item @(isUrgent ? "alert" : "")">
+                                    <div class="reminder-icon">
+                                        @if (task is AcademicTask)
+                                        {
+                                            <span>📖</span>
+                                        }
+                                        else
+                                        {
+                                            <span>📌</span>
+                                        }
+                                    </div>
+
+                                    <div class="reminder-text">
+                                        <h4>@task.Name</h4>
+                                        <p>@task.DueDate.ToString("MMM dd") — @task.TaskStatus.ToString()</p>
+                                    </div>
+                                    <span class="priority-tag">@Math.Round(score, 1)</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            @* --- EMPTY STATE HANDLER --- *@
+                            <div class="empty-state">
+                                <p>✨ All caught up! No pending tasks.</p>
                             </div>
-                        </div>
-                        
-                        <div class="reminder-item">
-                            <div class="reminder-icon">✎</div>
-                            <div class="reminder-text">
-                                <h4>Science Exam</h4>
-                                <p>24 Sep 2026, Friday</p>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -83,6 +111,8 @@
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
     private System.Timers.Timer? _timer;
 
+    private List<BaseTask> _priorityTasks = new();
+
     protected override void OnInitialized()
     {
         // Update every 1000ms (1 second)
@@ -90,13 +120,35 @@
         _timer.Elapsed += async (sender, e) => await UpdateClock();
         _timer.AutoReset = true;
         _timer.Enabled = true;
+
+        try 
+        {
+            // We only want Pending (1), Ongoing (2), or Overdue (6)
+            var activeTasks = _db.Tasks?
+                .Where(t => t.TaskStatus == Status.Pending || 
+                            t.TaskStatus == Status.Ongoing || 
+                            t.TaskStatus == Status.Overdue)
+                .ToList() ?? new List<BaseTask>();
+
+            _priorityTasks = PriorityService.GetTopPriorities(5, activeTasks);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading tasks: {ex.Message}");
+        }
     }
 
     private async Task UpdateClock()
     {
-        _currentDate = DateTime.Now.ToString("MMMM dd,  yyyy");
-        _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
-        await InvokeAsync(StateHasChanged);
+        _timer = new System.Timers.Timer(1000);
+        _timer.Elapsed += async (sender, e) => 
+        {
+            _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
+            _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
+            await InvokeAsync(StateHasChanged);
+        };
+        _timer.AutoReset = true;
+        _timer.Enabled = true;
     }
 
     public void Dispose()

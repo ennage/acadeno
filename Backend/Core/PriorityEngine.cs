@@ -1,28 +1,33 @@
-using Task = Acadeno.Backend.Models.AcademicTask;
+using BaseTask = Acadeno.Backend.Models.BaseTask;
+using AcademicTask = Acadeno.Backend.Models.AcademicTask;
 
 namespace Acadeno.Backend.Core
 {
     public class PriorityEngine
     {
-        public List<Task> GetTopProrities(int limit, List<Task> tasks)
+        public List<BaseTask> GetTopPriorities(int limit, List<BaseTask> tasks)
         {
             return RankTasks(tasks)
                 .Take(limit)
                 .ToList();
         }
 
-        public double CalculatePriorityScore(Task task)
+        public double CalculatePriorityScore(BaseTask task)
         {
-            var daysUntilDue = (task.DueDate - DateTime.Now).TotalDays;
-            double timeFactor = daysUntilDue > 0 ? 100 : (10 / daysUntilDue);
+            //  These properties are on the BASE, so they are always visible.
+            var date = task.DueDate; 
+            double weight = 1.0; 
 
-            // FIX: Reach into the 'Type' property to get the Weight
-            // We use ?. to be safe just in case the Type is null
-            double weight = task.Type?.Weight ?? 1.0; 
-            return timeFactor + (weight * 10);
+            //  Academic task check:
+            if (task is AcademicTask academic)
+            {
+                weight = academic.Type?.Weight ?? 1.0;
+            }
+
+            return (100 / (date - DateTime.Now).TotalDays) + (weight * 10);
         }
 
-        public List<Task> RankTasks(List<Task> tasks)
+        public List<BaseTask> RankTasks(List<BaseTask> tasks)
         {
             return tasks.OrderByDescending(t => CalculatePriorityScore(t)).ToList();
         }
