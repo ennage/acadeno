@@ -396,6 +396,7 @@ Frontend/Components/Pages/
  About.razor
  Access.razor
  Calendar.razor
+ Courses.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
@@ -411,6 +412,7 @@ Frontend/Components/Pages/
  About.razor
  Access.razor
  Calendar.razor
+ Courses.razor
  Dashboard.razor
  MainLayout.razor
  NavMenu.razor
