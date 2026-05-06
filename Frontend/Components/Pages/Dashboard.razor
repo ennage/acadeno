@@ -4,8 +4,11 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
+@using Acadeno.Frontend.Components.Popups
+
 @using BaseTask = Acadeno.Backend.Models.BaseTask
 @using AcademicTask = Acadeno.Backend.Models.AcademicTask
+
 @implements IDisposable
 
 @inject Acadeno.Backend.Tools.AppDbContext _db
@@ -52,7 +55,7 @@
             <div class="card-stretch">
                 <div class="card-header">
                     <h3>REMINDERS</h3>
-                    <button class="btn-add-reminder" @onclick="NavigateToAddTask" title="Add New Task"> ✚ </button>
+                    <button class="btn-add-reminder" @onclick="ShowModal">+</button>
                 </div>
 
                 <div class="card-content-area">
@@ -109,14 +112,22 @@
     </main>
 </div>
 
+<AddTaskModal IsVisible="_showModal" 
+        OnClose="HideModal" 
+        OnTaskAdded="RefreshDashboard" />
+
 @code {
     private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
+    private bool _showModal = false;
+    private void ShowModal() => _showModal = true;
+    private void HideModal() => _showModal = false;
     private System.Timers.Timer? _timer;
 
     // This holds the filtered tasks for the UI
     private List<BaseTask> _priorityTasks = new();
 
+    @* ----- DASHBOARD ----- *@
     protected override void OnInitialized()
     {
         try 
@@ -152,6 +163,13 @@
         StateHasChanged();  // Tell Blazor to check the list again and hide the empty state
     }
 
+    private async Task RefreshDashboard()
+    {
+        await LoadTasks(); // Your existing loading logic
+        StateHasChanged();
+    }
+
+    @* ----- CLOCK ----- *@
     private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);
@@ -173,6 +191,7 @@
         _timer?.Dispose();
     }
 
+    @* ----- REMINDER ----- *@
     private async Task MarkAsComplete(BaseTask task)
     {
         try

@@ -64,6 +64,71 @@
     </div>
 }
 
+<style>
+/* This is the dim layer - it stays full screen but transparent */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3); /* Lighter dim for less "takeover" feel */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px); /* Optional: slight blur looks high-end */
+}
+
+/* This is the actual popup - the "Card" */
+.modal-container {
+    background: white;
+    width: 400px; /* Fixed width so it doesn't stretch */
+    max-height: 90vh; /* Prevents it from going off-screen on small heights */
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.2s ease-out; /* Smooth pop-in effect */
+}
+
+@@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.modal-body {
+    overflow-y: auto; /* If the form gets long (like Academic fields), it scrolls internally */
+    padding-right: 5px;
+}
+
+/* Make form elements tighter */
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-control {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+</style>
+
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
