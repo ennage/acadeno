@@ -1,0 +1,307 @@
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Services
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject UserService UserService
+
+@if (IsVisible)
+{
+    <div class="modal-backdrop">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>CREATE NEW TASK</h3>
+                <button class="close-btn" @onclick="Close">×</button>
+            </div>
+
+            <EditForm Model="@_newTask" OnValidSubmit="HandleSave" style="display: flex; flex-direction: column; overflow: hidden;">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>NAME</label>
+                        <InputText @bind-Value="_newTask.Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>DESCRIPTION</label>
+                        <InputTextArea @bind-Value="_newTask.Description" class="form-control" rows="2" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>START DATE</label>
+                            <InputDate @bind-Value="_newTask.StartDate" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label>DUE DATE</label>
+                            <InputDate @bind-Value="_newTask.DueDate" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>DIFFICULTY</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" class="form-control" min="1" max="10" />
+                        </div>
+                        <div class="form-group">
+                            <label>RISK LEVEL</label>
+                            <select class="form-control" @bind="_newTask.RiskLevel">
+                                @foreach (var risk in Enum.GetValues<RiskLevel>())
+                                {
+                                    <option value="@risk">@risk.ToString().ToUpper()</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" @bind="_isAcademicTask" /> IS ACADEMIC TASK?</label>
+                    </div>
+
+                    @if (_isAcademicTask)
+                    {
+                        <div class="academic-fields">
+                            <div class="form-group">
+                                <label>COURSE ID</label>
+                                <InputText @bind-Value="_courseId" class="form-control" />
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>TARGET SCORE</label>
+                                    <InputNumber @bind-Value="_targetScore" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label>SCORE</label>
+                                    <InputNumber @bind-Value="_score" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label>MAX SCORE</label>
+                                    <InputNumber @bind-Value="_maxScore" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn-save">SAVE TASK</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
+<style>
+@@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Dimmed background layer */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+/* The Popup Card */
+.modal-container {
+    background: white;
+    width: 450px; 
+    /* Set a fixed max-height so it doesn't bleed off screen */
+    max-height: 80vh; 
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column; /* Stack header, body, footer vertically */
+    animation: slideIn 0.2s ease-out;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+/* The "X" Button */
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.modal-body {
+    flex: 1 1 auto; 
+    overflow-y: auto; 
+    padding-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.modal-body::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.academic-fields {
+    background: #fcfcfc;
+    border: 1px solid #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Centered Save Button */
+.modal-footer {
+    flex-shrink: 0; /* Prevents footer from squishing */
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0; /* Added a top border to separate the scroll area */
+}
+
+.btn-save {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 40px; /* Wider horizontal padding for a balanced look */
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-save:hover {
+    background-color: #218838;
+}
+
+.btn-save:active {
+    transform: scale(0.98);
+}
+</style>
+
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskAdded { get; set; }
+
+    // Initializing with default dates
+    private BaseTask _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
+    private bool _isAcademicTask = false;
+    
+    // Academic specifics
+    private string _courseId = "";
+    private double _targetScore = 0;
+    private double _score = 0;
+    private double _maxScore = 0;
+
+    private async Task HandleSave()
+    {
+        string userId = UserService.CurrentUser?.UserID ?? "";
+        string id = Guid.NewGuid().ToString("N").Substring(0, 5).ToUpper();
+
+        if (_isAcademicTask)
+        {
+            var academic = new AcademicTask 
+            { 
+                TaskID = id, 
+                UserID = userId, 
+                Name = _newTask.Name, 
+                Description = _newTask.Description,
+                StartDate = _newTask.StartDate,
+                DueDate = _newTask.DueDate, 
+                Difficulty = _newTask.Difficulty, 
+                RiskLevel = _newTask.RiskLevel, 
+                TaskStatus = _newTask.TaskStatus, // Explicitly set to Pending
+                CourseID = _courseId, 
+                TargetScore = _targetScore,
+                Score = _score,
+                MaxScore = _maxScore
+            };
+            _db.Tasks.Add(academic);
+        }
+        else
+        {
+            _newTask.TaskID = id;
+            _newTask.UserID = userId;
+            _newTask.TaskStatus = (Status)1; // Ensure BaseTask also gets the Pending status
+            _db.Tasks.Add(_newTask);
+        }
+
+        await _db.SaveChangesAsync();
+        await OnTaskAdded.InvokeAsync();
+        
+        // Reset local fields for next use
+        ResetForm();
+        await Close();
+    }
+
+    private void ResetForm()
+    {
+        _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
+        _isAcademicTask = false;
+        _courseId = "";
+        _targetScore = 0;
+        _score = 0;
+        _maxScore = 0;
+    }
+    private async Task Close() => await OnClose.InvokeAsync();
+}

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Acadeno.Backend.Enums;
 
 namespace Acadeno.Backend.Models
@@ -13,7 +14,9 @@ namespace Acadeno.Backend.Models
         public int Difficulty {get; set;}
         public DateTime StartDate {get; set;}
         public DateTime DueDate {get; set;}
-        public Status TaskStatus {get; set;} = Status.Pending;
+
+        [Column("Status")]
+        public Status TaskStatus {get; set;} = (Status) 1;
         public RiskLevel RiskLevel {get; set;}
 
         //  Foreign Key

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Services;
 using Acadeno.Backend.Tools;
+using Acadeno.Backend.Core;
 
 namespace Acadeno
 {
@@ -26,8 +27,14 @@ namespace Acadeno
 			This tells the app: "Whenever I ask for the Database, use this specific file." */
 			builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite($"Data Source={dbPath}"));
 
+			//	CORE
+			builder.Services.AddScoped<GenAveSimulator>();
+			builder.Services.AddScoped<GradingEngine>();
+			builder.Services.AddScoped<PriorityEngine>();
+
 			//	SERVICES
 			builder.Services.AddScoped<AuthService>();
+			builder.Services.AddScoped<CalendarService>();
 			builder.Services.AddScoped<IdService>();
 			builder.Services.AddScoped<ScheduleService>();
 			builder.Services.AddScoped<TaskService>();
