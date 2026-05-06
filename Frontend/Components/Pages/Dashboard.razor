@@ -22,36 +22,16 @@
     <NavMenu />
 
     <main class="main-content">
-        <header class="welcome-card">
-            <h1> WELCOME BACK! </h1>
-            <p>You've accomplished 30% of your goal this week. Keep it up!</p>
-            <svg class="welcome-vector" width="100" height="4">
-                <line x1="0" y1="2" x2="100%" y2="2" stroke="#38bdf8" stroke-width="4"/>
-            </svg>
+        <header class="welcome-card clock-grade-card">
+            <!-- DATE AND TIME -->
+            <div class="live-clock-container">
+                <div class="live-date">@_currentDate</div>
+                <div class="live-time">@_currentTime</div>
+            </div>
         </header>
 
         <div class="dashboard-grid-container">
             <!-- BOTTOM ROW -->
-            <div class="card-stretch clock-grade-card">
-                <!-- DATE AND TIME -->
-                <div class="live-clock-container">
-                    <div class="live-date">@_currentDate</div>
-                    <div class="live-time">@_currentTime</div>
-                </div>
-
-                <!-- GRADES-->
-                <div class="grade-metrics">
-                    <div class="grade-item">
-                        <span>Current Grade</span>
-                        <strong>95%</strong>
-                    </div>
-                    <div class="grade-item">
-                        <span>Expected Grade</span>
-                        <strong>99%</strong>
-                    </div>
-                </div>
-            </div>
-            
             <div class="card-stretch">
                 <div class="card-header">
                     <h3>REMINDERS</h3>
@@ -97,17 +77,34 @@
             <div class="card-stretch timetable-huge">
                 <h3>COURSE TIMETABLE</h3>
                 <div class="timetable-grid">
-                    <div class="timetable-cell">Time</div>
-                    <div class="timetable-cell">Mon</div><div class="timetable-cell">Tue</div>
-                    <div class="timetable-cell">Wed</div><div class="timetable-cell">Thu</div>
-                    <div class="timetable-cell">Fri</div><div class="timetable-cell">Sat</div>
-                    <div class="timetable-cell">1:00 AM</div>
-                    <div class="timetable-cell"></div><div class="timetable-cell"></div>
-                    <div class="timetable-cell"></div><div class="timetable-cell"></div>
-                    <div class="timetable-cell"></div><div class="timetable-cell"></div>
-                </div>
-            </div>
+                    @* --- HEADER ROW --- *@
+                    <div class="timetable-cell header">TIME</div>
+                    @foreach (var day in new[] { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" })
+                    {
+                        <div class="timetable-cell header">@day</div>
+                    }
 
+                    @* --- 24-HOUR BODY --- *@
+                    @for (int hour = 0; hour <= 23; hour++)
+                    {
+                        @* 1. Time Label *@
+                        <div class="timetable-cell time-label">
+                            @(DateTime.Today.AddHours(hour).ToString("hh:mm tt"))
+                        </div>
+
+                        @* 2. The 7 Day Columns (0=Sun, 6=Sat) *@
+                        @for (int dayIndex = 0; dayIndex <= 6; dayIndex++)
+                        {
+                            <div class="timetable-cell">
+                                @foreach (var task in _allTasks.Where(t => (int)t.StartDate.DayOfWeek == dayIndex && t.StartDate.Hour == hour))
+                                {
+                                    <div class="task-entry">@task.Name</div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+</div>
         </div>
     </main>
 </div>
@@ -115,6 +112,10 @@
 <AddTaskModal IsVisible="_showModal" 
         OnClose="HideModal" 
         OnTaskAdded="RefreshDashboard" />
+
+
+
+
 
 @code {
     private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
@@ -124,52 +125,51 @@
     private void HideModal() => _showModal = false;
     private System.Timers.Timer? _timer;
 
-    // This holds the filtered tasks for the UI
+    private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
+    private List<ScheduleEntry> _schedule = new();
 
-    @* ----- DASHBOARD ----- *@
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        try 
-        {
-            // 1. Get the current UserID
-            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-
-            // 2. Count EVERYTHING in the table regardless of User or Status
-            var totalTasks = _db.Tasks.Count();
-
-            // 3. Try to find any task for this user (Case-Insensitive)
-            var userTasks = _db.Tasks
-                .ToList() // Pull to memory to bypass SQL collation issues for a sec
-                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            // 4. Filter by your TaskStatus model property
-            var activeTasks = userTasks
-                .Where(t => t.TaskStatus == Status.Pending || 
-                            t.TaskStatus == Status.Ongoing || 
-                            t.TaskStatus == Status.Overdue)
-                .ToList();
-
-            // 5. Assign to the UI list
-            _priorityTasks = PriorityService.GetTopPriorities(10, activeTasks);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[ERROR] Dashboard Logic Failed: {ex.Message}");
-        }
-
         GetClock();
-        StateHasChanged();  // Tell Blazor to check the list again and hide the empty state
+        await LoadTasks(); // One source of truth for loading
     }
 
     private async Task RefreshDashboard()
     {
-        await LoadTasks(); // Your existing loading logic
-        StateHasChanged();
+        await LoadTasks();
     }
 
-    @* ----- CLOCK ----- *@
+    private async Task LoadTasks()
+    {
+        try 
+        {
+            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
+            if (string.IsNullOrEmpty(currentUserId)) return;
+
+            // 1. Fetch from DB (Using the userTasks logic you had)
+            var userTasks = _db.Tasks
+                .ToList() 
+                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            // 2. Assign EVERYTHING to _allTasks for the Timetable
+            _allTasks = userTasks
+                .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
+                .ToList();
+
+            // 3. Extract Top Priorities for the Reminders card
+            _priorityTasks = PriorityService.GetTopPriorities(10, _allTasks);
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] LoadTasks Failed: {ex.Message}");
+        }
+    }
+
+    @* ----- REMAINDER OF YOUR CLOCK/MARK-AS-COMPLETE LOGIC ----- *@
     private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);
@@ -185,52 +185,17 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private async Task MarkAsComplete(BaseTask task)
+    {
+        task.TaskStatus = Status.Completed;
+        _db.Tasks.Update(task);
+        await _db.SaveChangesAsync();
+        await LoadTasks(); 
+    }
+
     public void Dispose()
     {
         _timer?.Stop();
         _timer?.Dispose();
-    }
-
-    @* ----- REMINDER ----- *@
-    private async Task MarkAsComplete(BaseTask task)
-    {
-        try
-        {
-            // 1. Update the status in the object
-            task.TaskStatus = Status.Completed;
-
-            // 2. Tell the Database to update this specific entry
-            _db.Tasks.Update(task);
-            await _db.SaveChangesAsync();
-
-            // 3. Refresh the list so the completed task disappears 
-            // (Since our query filters out Status.Completed)
-            await LoadTasks(); 
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error completing task: {ex.Message}");
-        }
-    }
-
-    private void NavigateToAddTask()
-    {
-        NavManager.NavigateTo("/add-task");
-    }
-
-    // Refactored loading logic to reuse it after updates
-    private async Task LoadTasks()
-    {
-        string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-        if (!string.IsNullOrEmpty(currentUserId))
-        {
-            var activeTasks = _db.Tasks
-                .Where(t => t.UserID == currentUserId)
-                .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
-                .ToList();
-
-            _priorityTasks = PriorityService.GetTopPriorities(5, activeTasks);
-            StateHasChanged();
-        }
     }
 }

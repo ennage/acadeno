@@ -27,12 +27,13 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>START DATE</label>
-                            <InputDate @bind-Value="_newTask.StartDate" class="form-control" />
+                            <label>START DATE & TIME</label>
+                            @* type="datetime-local" captures the time of day *@
+                            <input type="datetime-local" @bind="_newTask.StartDate" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <label>DUE DATE</label>
-                            <InputDate @bind-Value="_newTask.DueDate" class="form-control" />
+                            <label>DUE DATE & TIME</label>
+                            <input type="datetime-local" @bind="_newTask.DueDate" class="form-control" />
                         </div>
                     </div>
 
