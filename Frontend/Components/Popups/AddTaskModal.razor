@@ -1,0 +1,103 @@
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Services
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject UserService UserService
+
+@if (IsVisible)
+{
+    <div class="modal-backdrop">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>CREATE NEW TASK</h3>
+                <button class="close-btn" @onclick="Close">×</button>
+            </div>
+
+            <EditForm Model="@_newTask" OnValidSubmit="HandleSave">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>NAME</label>
+                        <InputText @bind-Value="_newTask.Name" class="form-control" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>DUE DATE</label>
+                            <InputDate @bind-Value="_newTask.DueDate" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label>DIFFICULTY</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" class="form-control" min="1" max="10" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>RISK LEVEL</label>
+                        <select class="form-control" @bind="_newTask.RiskLevel">
+                            @foreach (var risk in Enum.GetValues<RiskLevel>())
+                            {
+                                <option value="@risk">@risk.ToString().ToUpper()</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" @bind="_isAcademicTask" /> IS ACADEMIC TASK?</label>
+                    </div>
+
+                    @if (_isAcademicTask)
+                    {
+                        <div class="academic-fields">
+                            <label>COURSE ID</label>
+                            <InputText @bind-Value="_courseId" class="form-control" />
+                            <label>TARGET SCORE</label>
+                            <InputNumber @bind-Value="_targetScore" class="form-control" />
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn-save">SAVE TASK</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskAdded { get; set; }
+
+    private BaseTask _newTask = new() { DueDate = DateTime.Now.AddDays(1) };
+    private bool _isAcademicTask = false;
+    private string _courseId = "";
+    private double _targetScore = 0;
+
+    private async Task HandleSave()
+    {
+        string userId = UserService.CurrentUser?.UserID ?? "";
+        string id = Guid.NewGuid().ToString("N").Substring(0, 5).ToUpper();
+
+        if (_isAcademicTask)
+        {
+            _db.Tasks.Add(new AcademicTask { 
+                TaskID = id, UserID = userId, Name = _newTask.Name, 
+                DueDate = _newTask.DueDate, Difficulty = _newTask.Difficulty, 
+                RiskLevel = _newTask.RiskLevel, CourseID = _courseId, TargetScore = _targetScore 
+            });
+        }
+        else
+        {
+            _newTask.TaskID = id;
+            _newTask.UserID = userId;
+            _db.Tasks.Add(_newTask);
+        }
+
+        await _db.SaveChangesAsync();
+        await OnTaskAdded.InvokeAsync();
+        await Close();
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}

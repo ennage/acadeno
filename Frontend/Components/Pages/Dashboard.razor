@@ -9,6 +9,7 @@
 @implements IDisposable
 
 @inject Acadeno.Backend.Tools.AppDbContext _db
+@inject NavigationManager NavManager
 @inject PriorityEngine PriorityService
 @inject UserService UserService
 
@@ -49,7 +50,11 @@
             </div>
             
             <div class="card-stretch">
-                <h3> REMINDERS </h3>
+                <div class="card-header">
+                    <h3>REMINDERS</h3>
+                    <button class="btn-add-reminder" @onclick="NavigateToAddTask" title="Add New Task"> ✚ </button>
+                </div>
+
                 <div class="card-content-area">
                     <div class="reminder-list">
                         @if (_priorityTasks != null && _priorityTasks.Any())
@@ -74,15 +79,13 @@
                                             <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
                                         }
                                     </div>
+                                    <button class="btn-complete" @onclick="() => MarkAsComplete(task)"> ✔ </button>
                                 </div>
                             }
                         }
                         else
                         {
-                            @* --- EMPTY STATE HANDLER --- *@
-                            <div class="empty-state">
-                                <p>✨ All caught up! No pending tasks.</p>
-                            </div>
+                            <div class="empty-state"> ✨ All caught up! </div>
                         }
                     </div>
                 </div>
@@ -120,19 +123,15 @@
         {
             // 1. Get the current UserID
             string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-            Console.WriteLine($"[DEBUG] Current Session UserID: '{currentUserId}'");
 
             // 2. Count EVERYTHING in the table regardless of User or Status
             var totalTasks = _db.Tasks.Count();
-            Console.WriteLine($"[DEBUG] Total Tasks in Database: {totalTasks}");
 
             // 3. Try to find any task for this user (Case-Insensitive)
             var userTasks = _db.Tasks
                 .ToList() // Pull to memory to bypass SQL collation issues for a sec
                 .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            
-            Console.WriteLine($"[DEBUG] Tasks matching UserID: {userTasks.Count}");
 
             // 4. Filter by your TaskStatus model property
             var activeTasks = userTasks
@@ -141,10 +140,8 @@
                             t.TaskStatus == Status.Overdue)
                 .ToList();
 
-            Console.WriteLine($"[DEBUG] Final count after Status filter: {activeTasks.Count}");
-
             // 5. Assign to the UI list
-            _priorityTasks = PriorityService.GetTopPriorities(5, activeTasks);
+            _priorityTasks = PriorityService.GetTopPriorities(10, activeTasks);
         }
         catch (Exception ex)
         {
@@ -174,5 +171,47 @@
     {
         _timer?.Stop();
         _timer?.Dispose();
+    }
+
+    private async Task MarkAsComplete(BaseTask task)
+    {
+        try
+        {
+            // 1. Update the status in the object
+            task.TaskStatus = Status.Completed;
+
+            // 2. Tell the Database to update this specific entry
+            _db.Tasks.Update(task);
+            await _db.SaveChangesAsync();
+
+            // 3. Refresh the list so the completed task disappears 
+            // (Since our query filters out Status.Completed)
+            await LoadTasks(); 
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error completing task: {ex.Message}");
+        }
+    }
+
+    private void NavigateToAddTask()
+    {
+        NavManager.NavigateTo("/add-task");
+    }
+
+    // Refactored loading logic to reuse it after updates
+    private async Task LoadTasks()
+    {
+        string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
+        if (!string.IsNullOrEmpty(currentUserId))
+        {
+            var activeTasks = _db.Tasks
+                .Where(t => t.UserID == currentUserId)
+                .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
+                .ToList();
+
+            _priorityTasks = PriorityService.GetTopPriorities(5, activeTasks);
+            StateHasChanged();
+        }
     }
 }
