@@ -3,12 +3,14 @@
 @using Acadeno.Backend.Core
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
+@using Acadeno.Backend.Services
 @using BaseTask = Acadeno.Backend.Models.BaseTask
 @using AcademicTask = Acadeno.Backend.Models.AcademicTask
 @implements IDisposable
 
 @inject Acadeno.Backend.Tools.AppDbContext _db
 @inject PriorityEngine PriorityService
+@inject UserService UserService
 
 
 <div class="dashboard-wrapper">
@@ -54,26 +56,24 @@
                         {
                             @foreach (var task in _priorityTasks)
                             {
-                                var score = PriorityService.CalculatePriorityScore(task);
-                                var isUrgent = score > 10 || task.TaskStatus == Status.Overdue;
+                                var PriorityScore = PriorityService.CalculatePriorityScore(task);
+                                
+                                // UI Logic: If it's Critical Risk or the score is high, it gets the 'alert' class
+                                var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
 
                                 <div class="reminder-item @(isUrgent ? "alert" : "")">
-                                    <div class="reminder-icon">
+                                    <div class="reminder-text">
                                         @if (task is AcademicTask)
                                         {
-                                            <span>📖</span>
+                                            <h4>✎ @task.Name</h4>
+                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
                                         }
                                         else
                                         {
-                                            <span>📌</span>
+                                            <h4>𖦹 @task.Name</h4>
+                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
                                         }
                                     </div>
-
-                                    <div class="reminder-text">
-                                        <h4>@task.Name</h4>
-                                        <p>@task.DueDate.ToString("MMM dd") — @task.TaskStatus.ToString()</p>
-                                    </div>
-                                    <span class="priority-tag">@Math.Round(score, 1)</span>
                                 </div>
                             }
                         }
@@ -111,49 +111,67 @@
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
     private System.Timers.Timer? _timer;
 
+    // This holds the filtered tasks for the UI
     private List<BaseTask> _priorityTasks = new();
 
     protected override void OnInitialized()
     {
-        // Update every 1000ms (1 second)
-        _timer = new System.Timers.Timer(1000);
-        _timer.Elapsed += async (sender, e) => await UpdateClock();
-        _timer.AutoReset = true;
-        _timer.Enabled = true;
-
         try 
         {
-            // We only want Pending (1), Ongoing (2), or Overdue (6)
-            var activeTasks = _db.Tasks?
+            // 1. Get the current UserID
+            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
+            Console.WriteLine($"[DEBUG] Current Session UserID: '{currentUserId}'");
+
+            // 2. Count EVERYTHING in the table regardless of User or Status
+            var totalTasks = _db.Tasks.Count();
+            Console.WriteLine($"[DEBUG] Total Tasks in Database: {totalTasks}");
+
+            // 3. Try to find any task for this user (Case-Insensitive)
+            var userTasks = _db.Tasks
+                .ToList() // Pull to memory to bypass SQL collation issues for a sec
+                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+            
+            Console.WriteLine($"[DEBUG] Tasks matching UserID: {userTasks.Count}");
+
+            // 4. Filter by your TaskStatus model property
+            var activeTasks = userTasks
                 .Where(t => t.TaskStatus == Status.Pending || 
                             t.TaskStatus == Status.Ongoing || 
                             t.TaskStatus == Status.Overdue)
-                .ToList() ?? new List<BaseTask>();
+                .ToList();
 
+            Console.WriteLine($"[DEBUG] Final count after Status filter: {activeTasks.Count}");
+
+            // 5. Assign to the UI list
             _priorityTasks = PriorityService.GetTopPriorities(5, activeTasks);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading tasks: {ex.Message}");
+            Console.WriteLine($"[ERROR] Dashboard Logic Failed: {ex.Message}");
         }
+
+        GetClock();
+        StateHasChanged();  // Tell Blazor to check the list again and hide the empty state
     }
 
-    private async Task UpdateClock()
+    private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);
-        _timer.Elapsed += async (sender, e) => 
-        {
-            _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
-            _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
-            await InvokeAsync(StateHasChanged);
-        };
+        _timer.Elapsed += (sender, e) => _ = UpdateClock();
         _timer.AutoReset = true;
         _timer.Enabled = true;
     }
 
+    private async Task UpdateClock()
+    {
+        _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
+        _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
+        await InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
-        // Prevents memory leaks and background "ghost" timers
         _timer?.Stop();
         _timer?.Dispose();
     }
