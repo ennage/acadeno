@@ -1,0 +1,145 @@
+@page "/courses"
+
+<div class="dashboard-root">
+    <NavMenu /> 
+    
+    <div class="main-content-wrapper">
+        <div class="dashboard-inner">
+            
+            <header class="dashboard-header">
+                <h1 class="page-title">Enrolled Courses</h1>
+                <p class="welcome-subtitle">Welcome back! Here is your academic overview for Semester 3.</p>
+            </header>
+
+            <div class="dashboard-grid-layout">
+                <div class="primary-column">
+                    
+                    <section class="content-section">
+                        <div class="section-top-bar">
+                            <div class="title-group">
+                                <h2 class="section-title">My Courses</h2>
+                                <button class="btn-add" title="Add New Course">+</button>
+                            </div>
+                            <a href="#" class="accent-link">View all courses &rsaquo;</a>
+                        </div>
+
+                        <div class="course-cards-row">
+                            <div class="modern-card">
+                                <div class="side-indicator purple-line"></div>
+                                <div class="card-inner">
+                                    <h3 class="course-name">Graphic Fundamentals</h3>
+                                    <p class="course-id">ART101 • Prof. Smith</p>
+                                    <div class="course-details">🕒 9:00 AM – 10:30 AM | 📍 Studio A</div>
+                                </div>
+                            </div>
+
+                            <div class="modern-card">
+                                <div class="side-indicator blue-line"></div>
+                                <div class="card-inner">
+                                    <h3 class="course-name">User Experience Research</h3>
+                                    <p class="course-id">UXD301 • Prof. Davis</p>
+                                    <div class="course-details">🕒 11:00 AM – 12:30 PM | 📍 Lab 2</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="course-cards-row">
+                            <div class="modern-card">
+                                <div class="side-indicator orange-line"></div>
+                                <div class="card-inner">
+                                    <h3 class="course-name">Advanced Web Design</h3>
+                                    <p class="course-id">ITD201 • Dr. Johnson</p>
+                                    <div class="course-details">🕒 1:30 PM – 3:00 PM | 📍 Lab 3</div>
+                                </div>
+                            </div>
+
+                            <div class="modern-card">
+                                <div class="side-indicator green-line"></div>
+                                <div class="card-inner">
+                                    <h3 class="course-name">3D Animation</h3>
+                                    <p class="course-id">ANI301 • Dr. Martinez</p>
+                                    <div class="course-details">🕒 2:00 PM – 5:00 PM | 📍 Animation Studio</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="content-section">
+                        <div class="section-top-bar">
+                            <div class="title-group">
+                                <h2 class="section-title">Upcoming Exams</h2>
+                                <button class="btn-add" title="Add New Exam">+</button>
+                            </div>
+                            <a href="#" class="accent-link">View all exams &rsaquo;</a>
+                        </div>
+                        <div class="data-table-card">
+                            <table class="styled-table">
+                                <thead>
+                                    <tr>
+                                        <th>Exam Name</th>
+                                        <th>Course</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Graphic Design Finals</td>
+                                        <td>Design Fundamentals</td>
+                                        <td>Jan 25, 2026</td>
+                                        <td><span class="badge badge-success">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="secondary-column">
+                    <div class="calendar-card">
+                        <div class="cal-nav">
+                            <button class="cal-arrow">&lt;</button>
+                            <span class="cal-month-year">January 2026</span>
+                            <button class="cal-arrow">&gt;</button>
+                        </div>
+                        <div class="cal-grid">
+                            <div class="cal-labels"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+                            <div class="cal-days">
+                                <span></span><span></span><span></span>
+                                @for (int i = 1; i <= 31; i++) {
+                                    <span class="day-cell @(i == 12 ? "is-active" : "")">@i</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-section">
+                        <div class="section-top-bar">
+                            <div class="title-group">
+                                <h2 class="section-title">Homeworks</h2>
+                                <button class="btn-add" title="Add New Homework">+</button>
+                            </div>
+                            <a href="#" class="accent-link">View all &rsaquo;</a>
+                        </div>
+                        
+                        <div class="mini-card">
+                            <div class="side-indicator red-line"></div>
+                            <div class="card-inner">
+                                <h3 class="course-name">Design Project 1</h3>
+                                <p class="due-date">Due in 2 days</p>
+                            </div>
+                        </div>
+
+                        <div class="mini-card">
+                            <div class="side-indicator orange-line"></div>
+                            <div class="card-inner">
+                                <h3 class="course-name">Website Mockup</h3>
+                                <p class="due-date">Due in 4 days</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
