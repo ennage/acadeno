@@ -1,3 +1,6 @@
+/* ==========================================================================
+    1. GLOBAL & CORE LAYOUT
+    ========================================================================== */
 * { box-sizing: border-box; }
 
 .dashboard-wrapper { 
@@ -25,12 +28,9 @@
     padding-bottom: 0;
 }
 
-.card-stretch h3 {
-    margin-bottom: 1rem;
-    text-align: center;
-    width: 100%;
-}
-
+/* ==========================================================================
+    2. CARD COMPONENTS (BASE & SHARED)
+    ========================================================================== */
 .card-stretch { 
     background: #ffffff; 
     border-radius: 12px; 
@@ -41,6 +41,12 @@
     height: 100%;
     min-height: 0;
     padding: 30px; 
+}
+
+.card-stretch h3 {
+    margin-bottom: 1rem;
+    text-align: center;
+    width: 100%;
 }
 
 .card-header {
@@ -60,15 +66,15 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: hidden;   /* Contains the scrollable list */
+    overflow: hidden;
 }
 
-/*  WELCOME BANNER  */
-
+/* ==========================================================================
+    3. WELCOME BANNER & DATE/GRADE SECTION
+    ========================================================================== */
 .welcome-card { 
     border-left: 6px solid #38bdf8;
     margin-bottom: 24px;
-    /* from card-stretch */
     background: #ffffff; 
     border-radius: 12px; 
     border: 1px solid #e2e8f0; 
@@ -84,8 +90,6 @@
     margin: 0 0 10px; 
     text-transform: uppercase; 
 }
-
-/* --- DATE & GRADE CARD STYLING --- */
 
 .clock-grade-card {
     background: var(--navy); 
@@ -119,13 +123,12 @@
     align-items: baseline;
     display: flex;
     font-family: 'Consolas', monospace;
-    font-size: 1.2rm;
+    font-size: 1.2rem;
     font-weight: 700;
     justify-content: space-between;
     width: 100%;
 }
 
-/* The Grade Capsules */
 .grade-item {
     align-items: center;
     background: rgba(255, 255, 255, 0.08); 
@@ -144,36 +147,12 @@
     font-weight: 800;
 }
 
-/*  REMINDER CARD   */
-
-.btn-add-reminder {
-    background: #007bff;
-    border-radius: 6px;
-    border: none;
-    color: white;
-    height: 32px;
-    width: 32px;
-    /* Text-based Plus Styling */
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    font-size: 22px; 
-    font-weight: bold;
-    justify-content: center;
-    line-height: 0;
-    padding: 10px;
-    transition: background 0.2s ease;
-}
-
-.btn-add-reminder:hover {
-    background: #0056b3;
-}
-
-/* REMINDER CONTENT */
-
+/*  ==========================================================================
+    4. REMINDERS & TASK UI
+    ========================================================================== */
 .reminder-list {
     flex-grow: 1;
-    overflow-y: auto;   /* Enable vertical scroll */
+    overflow-y: auto;
     padding: 10px 20px;
 }
 
@@ -186,10 +165,18 @@
 }
 
 .reminder-item.alert {
-    border-left: 4px solid #ef4444;     /* Bright Red for high priority */
+    border-left: 4px solid #ef4444;
     background: rgba(239, 68, 68, 0.1);
     padding: 10px;
     border-radius: 8px;
+}
+
+.reminder-text { 
+    color: #64748b;
+    flex-grow: 1;
+    font-size: 0.75rem; 
+    margin: 0 0 0 15px;
+    text-transform: uppercase;
 }
 
 .reminder-text h4 { 
@@ -203,13 +190,22 @@
     white-space: nowrap;
 }
 
-.reminder-text { 
-    color: #64748b;
-    flex-grow: 1;
-    font-size: 0.75rem; 
-    margin-left: 15px;
-    margin: 0;
-    text-transform: uppercase;
+.btn-add-reminder {
+    background: #007bff;
+    border-radius: 6px;
+    border: none;
+    color: white;
+    height: 32px;
+    width: 32px;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 22px; 
+    font-weight: bold;
+    justify-content: center;
+    line-height: 0;
+    padding: 10px;
+    transition: background 0.2s ease;
 }
 
 .btn-complete {
@@ -226,11 +222,6 @@
     width: 32px;
 }
 
-.btn-complete:hover {
-    background: #28a745;
-    color: white;
-}
-
 .btn-add-task {
     margin-top: 20px;
     width: 100%;
@@ -239,12 +230,14 @@
     color: white;
     border: none;
     border-radius: 8px;
-    text-transform: uppercase;  /* Ensures "ADD NEW TASK" is all caps */
+    text-transform: uppercase;
     font-weight: bold;
     cursor: pointer;
 }
 
-/* TIMETABLE */
+/*  ==========================================================================
+    5. TIMETABLE GRID SYSTEM
+    ========================================================================== */
 
 .timetable-huge {
     grid-column: auto;
@@ -258,18 +251,10 @@
     display: grid;
     flex-grow: 1;
     gap: 2px;
-    grid-auto-rows: minmax(80px, auto);     /* Auto rows so it expands based on content */
-    grid-template-columns: repeat(8, 1fr);  /* 1 Column for Time + 7 Columns for Days = 8 Total */
+    grid-auto-rows: minmax(80px, auto);
+    grid-template-columns: repeat(8, 1fr);
     max-height: 65vh; 
     overflow-y: auto;
-}
-
-.timetable-grid > .timetable-cell:nth-child(8n+1) {
-    display: flex !important;
-    justify-content: center !important; /* Force horizontal center */
-    align-items: flex-start !important;  /* Keep vertical start for the float */
-    padding: 0 !important;              /* Remove padding that might push text */
-    background: #f1f5f9;                /* Light background for the time rail */
 }
 
 .timetable-cell.header {
@@ -283,27 +268,26 @@
     justify-content: center;
     letter-spacing: 0.5px;
     position: sticky;
-    text-align: center;
     top: 0;
-    transform: none;
-    z-index: 20; /* High z-index to stay above the floating time labels */
+    z-index: 20;
 }
 
 .timetable-cell {
-    align-items: stretch;               /* Make entries fill width */
+    align-items: stretch;
     background: #ffffff;
     border-top: 1px solid #f1f5f9;
     display: flex;
-    flex-direction: column;             /* Stack multiple tasks vertically */
-    justify-content: flex-start;        /* Start tasks at the top of the cell */
+    flex-direction: column;
+    justify-content: flex-start;
     min-height: 30px;
     padding: 2px;
 }
 
 .time-label {
-    width: 100% !important;
-    text-align: center !important;
-    /* The Floating Logic */
+    align-items: center;
+    width: auto !important; 
+    display: flex;
+    justify-content: center;
     transform: translateY(-50%);
     position: relative;
     z-index: 5;
@@ -316,7 +300,13 @@
     white-space: nowrap;
 }
 
-.day-header {
+.time-label span {
+    display: inline-block;
+    width: 75px;
+    text-align: center;
+}
+
+.day-header { /* Day Headers (MON 4, etc.) */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -325,40 +315,17 @@
     line-height: 1.1;
 }
 
-.day-header.is-today {  /* Highlight 'Today' so it's obvious */
+.day-header.is-today {
     background: #f0f9ff;
     border-bottom: 4px solid #38bdf8 !important;
 }
 
-.day-name {
-    font-size: 0.65rem;
-    color: #64748b;
-    font-weight: 800;
-}
+.day-name { font-size: 0.65rem; color: #64748b; font-weight: 800; }
+.day-number { font-size: 1.1rem; font-weight: 900; color: var(--navy); }
 
-.day-number {
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: var(--navy); /* Or your primary theme color */
-}
-
-.room-text {
-    font-size: 0.6rem;
-    opacity: 0.8;
-    text-transform: uppercase;
-}
-
-.schedule-entry {
-    background: rgba(14, 165, 233, 0.15);   /* Semi-transparent blue */
-    border-left: 3px solid #0ea5e9;
-    color: #0ea5e9;
-    display: flex;
-    flex-direction: column;
-    font-size: 0.65rem;
-    margin: 1px 0;                            /* Tiny gap so multiple classes in one hour don't touch */
-    padding: 2px 6px;
-    width: 100%;
-}
+/*  ==========================================================================
+    6. TIMETABLE ENTRIES (TASKS & SCHEDULES)
+    ========================================================================== */
 
 .task-entry {
     background: #fef2f2;
@@ -366,4 +333,23 @@
     padding: 4px 8px;
     font-size: 0.7rem;
     border-radius: 4px;
+    margin-bottom: 2px;
+}
+
+.schedule-entry {
+    background: rgba(14, 165, 233, 0.15);
+    border-left: 3px solid #0ea5e9;
+    color: #0ea5e9;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.65rem;
+    margin: 1px 0;
+    padding: 2px 6px;
+    width: 100%;
+}
+
+.room-text {
+    font-size: 0.6rem;
+    opacity: 0.8;
+    text-transform: uppercase;
 }
