@@ -3,10 +3,12 @@
 @inject UserService UserService
 
 <aside class="sidebar">
-    <div class="logo"> ACADENYO </div>
-    <div class="user-info">
-            <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
-            <p>@UserService.CurrentUser?.University</p>
+    <div class="sidebar-header">
+        <div class="logo"> ACADENYO </div>
+        <div class="user-info">
+                <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
+                <p>@UserService.CurrentUser?.University</p>
+        </div>
     </div>
 
     @* --- SIDEBAR --- *@
@@ -36,7 +38,7 @@
     @* --- SIDEBAR FOOTER --- *@
     <div class="sidebar-footer">
         <!-- LOGOUT -->
-        <button class="nav-button logout-btn" @onclick="HandleLogout">
+        <button class="logout-nav logout-btn" @onclick="HandleLogout">
             Logout
         </button>
         <!-- COPYRIGHT -->

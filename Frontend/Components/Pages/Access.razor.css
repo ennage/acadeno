@@ -31,6 +31,7 @@
     flex-direction: column;
     justify-content: flex-end; 
     padding: 60px;
+    pointer-events: none;
 }
 
 .welcome-note { 

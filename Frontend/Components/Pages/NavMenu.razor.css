@@ -1,12 +1,14 @@
-/* Sidebar Nav Container */
 .sidebar { 
     display: flex;
     height: 100vh;
     width: 300px;
     flex-shrink: 0; 
     background: var(--navy); 
-    color: var(--text-on-dark); 
-    padding: 20px; 
+    color: var(--text-on-dark);
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 0;
+    padding-bottom: 5px;
     flex-direction: column;
 }
 
@@ -17,67 +19,80 @@
     width: 100%;
 }
 
-.nav-link.active {
-    background-color: #F1F5F9 !important; /* Your light "active" color */
-    color: #0d1b3e !important;            /* Dark text for contrast */
-    border-radius: 8px;
-    display: block;                        /* Ensure it fills the container */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-/* Ensure the NavLink itself takes up the full button space */
-.nav-link {
-    display: block;
-    width: 100%;
-    padding: 10px 15px;
-    color: inherit; /* Inherit color from nav-button unless active */
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-/* Modify your .nav-button to be a wrapper only */
 .nav-button {
-    display: block; 
+    position: relative;
+    display: flex;
+    align-items: center;
     width: 100%;
-    padding: 10px 15px;
-    border-radius: 8px;
-    background-color: transparent;
-    overflow: hidden;
-}
-
-/* .nav-button {
-    display: block !important; 
-    width: 100%;
-    padding: 10px 15px;
-    border-radius: 8px;
-    background-color: var(--navy);
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
+    padding: 15px 25px;
+    color: #f1f5f9;
     font-weight: 600;
-    transition: all 0.2s ease;
-} */
-
-.nav-button:hover {
-    background-color: rgba(39, 29, 230, 0.563);
-    color: white;
-    text-decoration: none;
+    text-decoration: none !important;
+    border-radius: 30px 0 0 30px; /* The rounded "inward" side */
+    transition: all 0.3s ease;
+    background-color: #0D1B3E;
 }
 
-.logo { 
+.nav-button.active {
+    background-color: #F1F5F9 !important;
+    color: #0d1b3e !important;
+    text-decoration: none !important;
+}
+
+.nav-button.active::before { /* THE CUT-OUT CURVES (Only visible when active) */
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 15px 15px 0 0 #F1F5F9;  /* This creates the curve effect using the sidebar's Navy color */
+}
+
+.nav-button.active::after {
+    content: "";
+    position: absolute;
+    bottom: -30px;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 15px -15px 0 0 #F1F5F9;
+}
+
+.nav-button:not(.active):hover { /* Hover state for non-active links */
+    background-color: #f1f5f9;
+    color: #0D1B3E;
+    text-decoration: none !important;
+}
+
+/*  HEADER  */
+
+.sidebar-header {
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+.logo {
     font-family: 'Montserrat'; 
     font-weight: 800; 
     font-size: 1.5rem; 
     color: #38bdf8; 
-    margin-bottom: 50px; 
+    margin-bottom: 50px;
+    text-align: center;
     text-transform: uppercase; 
-    letter-spacing: 0.1em; 
+    letter-spacing: 0.1em;
 }
 
-/*  USER  */
-
 .user-info { 
-    text-align: center; 
-    margin-bottom: 30px; 
+    text-align: left;    
 }
 
 /*  FOOTER  */
@@ -86,14 +101,20 @@
     margin-top: auto; 
     color: rgba(255, 255, 255, 0.5); 
     font-size: 0.85rem; 
-    padding-top: 20px; 
+    padding-top: 10px;
+    padding-right: 20px; 
 }
 
-.theme-toggle { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    margin-bottom: 15px; 
+.logout-nav {
+    display: block !important; 
+    width: 100%;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background-color: var(--navy);
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 .logout-btn:hover {

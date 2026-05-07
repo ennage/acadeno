@@ -101,6 +101,7 @@
     color: var(--text-on-dark);
     justify-content: flex-start;
     padding: 30px;
+    pointer-events: none;
 }
 
 .live-clock-container {
