@@ -19,7 +19,7 @@
     width: 100%;
 }
 
-.nav-button {
+.nav-button ::deep .nav-link {
     position: relative;
     display: flex;
     align-items: center;
@@ -28,43 +28,19 @@
     color: #f1f5f9;
     font-weight: 600;
     text-decoration: none !important;
-    border-radius: 30px 0 0 30px; /* The rounded "inward" side */
+    border-radius: 15px 0 0 15px; /* The rounded "inward" side */
     transition: all 0.3s ease;
     background-color: #0D1B3E;
 }
 
-.nav-button.active {
+.nav-button ::deep a.active {
     background-color: #F1F5F9 !important;
     color: #0d1b3e !important;
     text-decoration: none !important;
 }
 
-.nav-button.active::before { /* THE CUT-OUT CURVES (Only visible when active) */
-    content: "";
-    position: absolute;
-    top: -30px;
-    right: 0;
-    width: 30px;
-    height: 30px;
-    background-color: transparent;
-    border-radius: 50%;
-    box-shadow: 15px 15px 0 0 #F1F5F9;  /* This creates the curve effect using the sidebar's Navy color */
-}
-
-.nav-button.active::after {
-    content: "";
-    position: absolute;
-    bottom: -30px;
-    right: 0;
-    width: 30px;
-    height: 30px;
-    background-color: transparent;
-    border-radius: 50%;
-    box-shadow: 15px -15px 0 0 #F1F5F9;
-}
-
-.nav-button:not(.active):hover { /* Hover state for non-active links */
-    background-color: #f1f5f9;
+.nav-button ::deep .nav-link:hover {
+    background-color: #f1f5f97f;
     color: #0D1B3E;
     text-decoration: none !important;
 }
