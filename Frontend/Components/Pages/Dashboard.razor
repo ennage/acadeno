@@ -101,7 +101,7 @@
                                 <span class="day-number">@dayNumber</span>
                             </div>
                         }
-                    <div class="time-axis">
+                    <div class="time-axis" style="grid-column: 1;"">
                         @for (int h = 0; h <= 23; h++)
                         {
                             <div class="hour-marker">
@@ -115,11 +115,14 @@
                         var columnDate = _startOfWeek.AddDays(i);
                         int dayIndex = (int)columnDate.DayOfWeek;
 
-                        <div class="timetable-day-column @(columnDate == DateTime.Today ? "is-today" : "")">
+                        <div class="timetable-day-column @(columnDate == DateTime.Today ? "is-today" : "")"
+                            style="grid-column: @(i + 2); grid-row: 2;">
                             
                             @for (int h = 0; h <= 23; h++) { <div class="hour-line"></div> }
 
-                            @foreach (var entry in _schedule.Where(s => s.Day == dayIndex))
+                            @foreach (var entry in _schedule.Where(s => 
+                                s.Day == dayIndex &&
+                                (s.IsRepeating || s.StartTime.Date == columnDate.Date)))
                             {
                                 // MATH: 1 minute = 1 pixel
                                 double topOffset = entry.StartTime.TimeOfDay.TotalMinutes;
@@ -136,7 +139,7 @@
                             }
                         </div>
                     }
-</div>
+                </div>
             </div>
         </div>
     </main>

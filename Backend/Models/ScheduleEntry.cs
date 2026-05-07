@@ -17,6 +17,7 @@ namespace Acadeno.Backend.Models
         public string Label {get; set;}  = string.Empty;
         public string Description {get; set;} = string.Empty;
         public int Day {get; set;}
+        public bool IsRepeating { get; set; } // True for weekly classes, False for one-off events
 
         public DateTime StartTime {get; set;}
         public DateTime EndTime {get; set;}
