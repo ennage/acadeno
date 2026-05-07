@@ -30,8 +30,7 @@
             </div>
         </header>
 
-        <div class="dashboard-grid-container">
-            <!-- BOTTOM ROW -->
+        <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
                 <div class="card-header">
                     <h3>REMINDERS</h3>
@@ -80,12 +79,22 @@
                 </div>
                 
                 <div class="timetable-grid">
-                    @* --- HEADER ROW --- *@
+                    <!--- HEADER ROW --->
                     <div class="timetable-cell header">TIME</div>
-                    @foreach (var day in new[] { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" })
+
+                    @for (int i = 0; i <= 6; i++)
                     {
-                        <div class="timetable-cell header">@day</div>
+                        var dateForColumn = _startOfWeek.AddDays(i);
+                        var dayName = dateForColumn.ToString("ddd").ToUpper();
+                        var dayNumber = dateForColumn.Day;
+                        var isToday = dateForColumn == DateTime.Today;
+
+                        <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
+                            <span class="day-name">@dayName</span>
+                            <span class="day-number">@dayNumber</span>
+                        </div>
                     }
+
                     @for (int hour = 0; hour <= 23; hour++)
                     {
                         <div class="timetable-cell time-label">
@@ -94,20 +103,34 @@
                                 @(DateTime.Today.AddHours(hour).ToString("hh:mm tt"))
                             }
                         </div>
-
-                        @* 2. The 7 Day Columns (0=Sun, 6=Sat) *@
-                        @for (int dayIndex = 0; dayIndex <= 6; dayIndex++)
+                        
+                        @for (int i = 0; i <= 6; i++)
                         {
+                            // Convert our loop index (0-6) to C# DayOfWeek (1-6, then 0)
+                            int dayIndex = (i + 1) % 7;
+
                             <div class="timetable-cell">
+                                @* TASKS *@
                                 @foreach (var task in _allTasks.Where(t => (int)t.StartDate.DayOfWeek == dayIndex && t.StartDate.Hour == hour))
                                 {
                                     <div class="task-entry">@task.Name</div>
+                                }
+
+                                @* SCHEDULE *@
+                                @foreach (var entry in _schedule.Where(s => 
+                                    int.TryParse(s.DayOfWeek?.Trim(), out var d) && d == dayIndex && 
+                                    hour >= s.StartTime.Hours && hour < s.EndTime.Hours))
+                                {
+                                    <div class="schedule-entry">
+                                        <strong>@(_courseNames.ContainsKey(entry.CourseID) ? _courseNames[entry.CourseID] : entry.CourseID)</strong>
+                                        <span class="room-text">@entry.Room</span>
+                                    </div>
                                 }
                             </div>
                         }
                     }
                 </div>
-</div>
+            </div>
         </div>
     </main>
 </div>
@@ -116,25 +139,28 @@
         OnClose="HideModal" 
         OnTaskAdded="RefreshDashboard" />
 
-
-
-
-
 @code {
     private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
     private bool _showModal = false;
     private void ShowModal() => _showModal = true;
     private void HideModal() => _showModal = false;
+    private DateTime _startOfWeek;
     private System.Timers.Timer? _timer;
 
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
+    private Dictionary<string, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
     {
         GetClock();
+
+        // Calculate the most recent Monday, (int)DayOfWeek.Monday is 1. 
+        int diff = (7 + (DateTime.Today.DayOfWeek - DayOfWeek.Monday)) % 7;
+        _startOfWeek = DateTime.Today.AddDays(-1 * diff);
+
         await LoadTasks(); // One source of truth for loading
     }
 
@@ -150,19 +176,29 @@
             string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
             if (string.IsNullOrEmpty(currentUserId)) return;
 
-            // 1. Fetch from DB (Using the userTasks logic you had)
+            // Fetch Tasks (Case-Insensitive lookup)
             var userTasks = _db.Tasks
                 .ToList() 
                 .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            // 2. Assign EVERYTHING to _allTasks for the Timetable
             _allTasks = userTasks
                 .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
                 .ToList();
-
-            // 3. Extract Top Priorities for the Reminders card
+            
+            // Extract Top Priorities for the Reminders card
             _priorityTasks = PriorityService.GetTopPriorities(10, _allTasks);
+
+            // Fetch Schedule Entries for this user
+            _schedule = _db.ScheduleEntries
+                .Where(s => s.UserID == currentUserId)
+                .ToList();
+
+            // Load Course Names into Dictionary for the timetable lookup
+            // This maps CourseID -> CourseCode so the timetable shows "CS101" instead of a GUID
+            _courseNames = _db.Courses
+                .Where(c => c.UserID == currentUserId)
+                .ToDictionary(c => c.CourseID, c => c.CourseCode);
             
             StateHasChanged();
         }
