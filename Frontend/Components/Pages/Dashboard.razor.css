@@ -252,7 +252,7 @@
     flex-grow: 1;
     gap: 2px;
     grid-auto-rows: minmax(80px, auto);
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(8, minmax(0, 1fr)); /* DO NOT TOUCH */
     max-height: 65vh; 
     overflow-y: auto;
 }
