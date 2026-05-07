@@ -74,7 +74,6 @@ Backend/Core/
  GradingEngine.cs
  PriorityEngine.cs
 Backend/Enums/
- DayOfWeek.cs
  GradeScaleType.cs
  Month.cs
  RiskLevel.cs
@@ -411,6 +410,7 @@ Frontend/Components/Pages/
 Frontend/Components/Popups/
  AddTaskModal.razor
  CalendarPopUps.razor
+ EnrolledCourses.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
@@ -429,6 +429,7 @@ Frontend/Components/Pages/
 Frontend/Components/Popups/
  AddTaskModal.razor
  CalendarPopUps.razor
+ EnrolledCourses.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
