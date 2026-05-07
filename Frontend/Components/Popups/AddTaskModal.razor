@@ -6,45 +6,45 @@
 
 @if (IsVisible)
 {
-    <div class="modal-backdrop">
-        <div class="modal-container">
+    <div class="modal-overlay">
+        <div class="modal-card">
+            
             <div class="modal-header">
-                <h3>CREATE NEW TASK</h3>
-                <button class="close-btn" @onclick="Close">×</button>
+                <h2 class="modal-title">Create New Task</h2>
+                <button class="close-x" @onclick="Close" aria-label="Close">&times;</button>
             </div>
 
-            <EditForm Model="@_newTask" OnValidSubmit="HandleSave" style="display: flex; flex-direction: column; overflow: hidden;">
+            <EditForm Model="@_newTask" OnValidSubmit="HandleSave">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Name</label>
-                        <InputText @bind-Value="_newTask.Name" class="form-control" />
+                        <label>Task Name</label>
+                        <InputText @bind-Value="_newTask.Name" class="input-field" placeholder="e.g. Finish Project Documentation" />
                     </div>
 
                     <div class="form-group">
                         <label>Description</label>
-                        <InputTextArea @bind-Value="_newTask.Description" class="form-control" rows="2" />
+                        <InputTextArea @bind-Value="_newTask.Description" class="input-field" rows="2" placeholder="What needs to be done?" />
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Start Date & Time</label>
-                            @* type="datetime-local" captures the time of day *@
-                            <input type="datetime-local" @bind="_newTask.StartDate" class="form-control" />
+                        <div class="field-container">
+                            <label>Start Date</label>
+                            <input type="datetime-local" @bind="_newTask.StartDate" class="input-field date-input" />
                         </div>
-                        <div class="form-group">
-                            <label>Due Date & Time</label>
-                            <input type="datetime-local" @bind="_newTask.DueDate" class="form-control" />
+                        <div class="field-container">
+                            <label>Due Date</label>
+                            <input type="datetime-local" @bind="_newTask.DueDate" class="input-field date-input" />
                         </div>
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Difficulty</label>
-                            <InputNumber @bind-Value="_newTask.Difficulty" class="form-control" min="1" max="10" />
+                        <div class="field-container">
+                            <label>Difficulty (1-10)</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" class="input-field" min="1" max="10" />
                         </div>
-                        <div class="form-group">
+                        <div class="field-container">
                             <label>Risk Level</label>
-                            <select class="form-control" @bind="_newTask.RiskLevel">
+                            <select class="input-field" @bind="_newTask.RiskLevel">
                                 @foreach (var risk in Enum.GetValues<RiskLevel>())
                                 {
                                     <option value="@risk">@risk.ToString().ToUpper()</option>
@@ -53,29 +53,32 @@
                         </div>
                     </div>
 
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" @bind="_isAcademicTask" /> Is Academic Task?</label>
+                    <div class="checkbox-wrapper">
+                        <label class="checkbox-label">
+                            <input type="checkbox" @bind="_isAcademicTask" />
+                            <span>This is an Academic Task</span>
+                        </label>
                     </div>
 
                     @if (_isAcademicTask)
                     {
-                        <div class="academic-fields">
+                        <div class="academic-container">
                             <div class="form-group">
-                                <label>COURSE ID</label>
-                                <InputText @bind-Value="_courseId" class="form-control" />
+                                <label>Course ID</label>
+                                <InputText @bind-Value="_courseId" class="input-field" placeholder="e.g. CS101" />
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>Target Score</label>
-                                    <InputNumber @bind-Value="_targetScore" class="form-control" />
+                            <div class="form-row three-cols">
+                                <div class="field-container">
+                                    <label>Target</label>
+                                    <InputNumber @bind-Value="_targetScore" class="input-field" />
                                 </div>
-                                <div class="form-group">
+                                <div class="field-container">
                                     <label>Score</label>
-                                    <InputNumber @bind-Value="_score" class="form-control" />
+                                    <InputNumber @bind-Value="_score" class="input-field" />
                                 </div>
-                                <div class="form-group">
-                                    <label>Max Score</label>
-                                    <InputNumber @bind-Value="_maxScore" class="form-control" />
+                                <div class="field-container">
+                                    <label>Max</label>
+                                    <InputNumber @bind-Value="_maxScore" class="input-field" />
                                 </div>
                             </div>
                         </div>
@@ -83,172 +86,131 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn-save">SAVE</button>
+                    <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Create Task</button>
                 </div>
             </EditForm>
         </div>
     </div>
 }
 
-
 <style>
-@@keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(5px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999;
+    }
 
-/* Dimmed background layer */
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(2px);
-}
+    .modal-card {
+        background: #ffffff;
+        width: 95%; max-width: 540px;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        font-family: 'Poppins', sans-serif;
+        box-sizing: border-box; /* Crucial for width calculation */
+    }
 
-/* The Popup Card */
-.modal-container {
-    background: white;
-    width: 450px; 
-    /* Set a fixed max-height so it doesn't bleed off screen */
-    max-height: 80vh; 
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    display: flex;
-    flex-direction: column; /* Stack header, body, footer vertically */
-    animation: slideIn 0.2s ease-out;
-}
+    .modal-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 20px;
+    }
 
-.modal-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    letter-spacing: 1.5px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+    .modal-title { font-size: 1.3rem; font-weight: 700; color: #1e293b; margin: 0; }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
-}
+    .close-x {
+        background: none; border: none; font-size: 1.8rem;
+        color: #94a3b8; cursor: pointer; line-height: 1;
+    }
 
-/* The "X" Button */
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    line-height: 1;
-    color: #999;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-    transition: color 0.2s;
-}
+    /* Fixed Grid Layout */
+    .form-row { 
+        display: flex;
+        gap: 16px;
+        width: 100%;
+        margin-bottom: 18px;
+    }
 
-.close-btn:hover {
-    color: #333;
-}
+    .field-container {
+        flex: 1; /* Forces each column to take equal space */
+        min-width: 0; /* Prevents datetime inputs from pushing the container wider */
+    }
 
-.modal-body {
-    flex: 1 1 auto; 
-    overflow-y: auto; 
-    padding-right: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
+    .form-group { margin-bottom: 18px; width: 100%; }
 
-.modal-body::-webkit-scrollbar {
-    display: block;
-    width: 8px;
-}
+    label {
+        display: block; font-size: 0.8rem; font-weight: 600;
+        color: #64748b; margin-bottom: 6px;
+    }
 
-.modal-body::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
+    .input-field {
+        width: 100%; 
+        height: 46px; 
+        padding: 10px 14px; 
+        border-radius: 12px;
+        border: 1px solid #e2e8f0; 
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem; 
+        box-sizing: border-box; /* Ensures padding doesn't add to width */
+        background-color: #fff;
+        display: block;
+    }
 
-.form-group {
-    margin-bottom: 15px;
-}
+    /* Specific fix for browser-specific date input padding/width */
+    .date-input {
+        appearance: none;
+        -webkit-appearance: none;
+    }
 
-.form-group label {
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #666;
-    display: block;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
+    textarea.input-field { height: auto; padding: 12px; }
 
-.form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.9rem;
-}
+    .input-field:focus {
+        outline: none; border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
 
-.academic-fields {
-    background: #fcfcfc;
-    border: 1px solid #f0f0f0;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-}
+    .checkbox-wrapper { margin: 10px 0 20px 0; }
+    .checkbox-label { 
+        display: flex; align-items: center; gap: 10px; 
+        font-size: 0.85rem; color: #1e293b; cursor: pointer;
+        font-weight: 600;
+    }
 
-/* Centered Save Button */
-.modal-footer {
-    flex-shrink: 0; /* Prevents footer from squishing */
-    display: flex;
-    justify-content: center;
-    padding-top: 15px;
-    border-top: 1px solid #f0f0f0; /* Added a top border to separate the scroll area */
-}
+    .academic-container {
+        background: #f8fafc; 
+        padding: 18px;
+        border-radius: 16px; 
+        border: 1px solid #e2e8f0;
+    }
 
-.btn-save {
-    background-color: #28a745;
-    color: white;
-    padding: 12px 40px; /* Wider horizontal padding for a balanced look */
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-}
+    .modal-footer {
+        display: flex; justify-content: flex-end; gap: 12px;
+        margin-top: 15px;
+    }
 
-.btn-save:hover {
-    background-color: #218838;
-}
+    .btn {
+        padding: 12px 28px; border-radius: 12px;
+        font-size: 0.9rem; font-weight: 600; cursor: pointer;
+        transition: all 0.2s; font-family: 'Poppins', sans-serif;
+    }
 
-.btn-save:active {
-    transform: scale(0.98);
-}
+    .btn-cancel { background: #ffffff; border: 1px solid #e2e8f0; color: #64748b; }
+    .btn-submit { 
+        background: #4f46e5; border: none; color: #ffffff; 
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+    }
 </style>
-
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback OnTaskAdded { get; set; }
 
-    // Initializing with default dates
     private BaseTask _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
     private bool _isAcademicTask = false;
-    
-    // Academic specifics
     private string _courseId = "";
     private double _targetScore = 0;
     private double _score = 0;
@@ -263,19 +225,13 @@
         {
             var academic = new AcademicTask 
             { 
-                TaskID = id, 
-                UserID = userId, 
-                Name = _newTask.Name, 
-                Description = _newTask.Description,
-                StartDate = _newTask.StartDate,
-                DueDate = _newTask.DueDate, 
-                Difficulty = _newTask.Difficulty, 
-                RiskLevel = _newTask.RiskLevel, 
-                TaskStatus = _newTask.TaskStatus, // Explicitly set to Pending
-                CourseID = _courseId, 
-                TargetScore = _targetScore,
-                Score = _score,
-                MaxScore = _maxScore
+                TaskID = id, UserID = userId, 
+                Name = _newTask.Name, Description = _newTask.Description,
+                StartDate = _newTask.StartDate, DueDate = _newTask.DueDate, 
+                Difficulty = _newTask.Difficulty, RiskLevel = _newTask.RiskLevel, 
+                TaskStatus = Status.Pending,
+                CourseID = _courseId, TargetScore = _targetScore,
+                Score = _score, MaxScore = _maxScore
             };
             _db.Tasks.Add(academic);
         }
@@ -283,14 +239,12 @@
         {
             _newTask.TaskID = id;
             _newTask.UserID = userId;
-            _newTask.TaskStatus = (Status)1; // Ensure BaseTask also gets the Pending status
+            _newTask.TaskStatus = Status.Pending;
             _db.Tasks.Add(_newTask);
         }
 
         await _db.SaveChangesAsync();
         await OnTaskAdded.InvokeAsync();
-        
-        // Reset local fields for next use
         ResetForm();
         await Close();
     }
@@ -299,10 +253,7 @@
     {
         _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
         _isAcademicTask = false;
-        _courseId = "";
-        _targetScore = 0;
-        _score = 0;
-        _maxScore = 0;
+        _courseId = ""; _targetScore = 0; _score = 0; _maxScore = 0;
     }
     private async Task Close() => await OnClose.InvokeAsync();
 }
