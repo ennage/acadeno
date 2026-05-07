@@ -16,34 +16,34 @@
             <EditForm Model="@_newTask" OnValidSubmit="HandleSave" style="display: flex; flex-direction: column; overflow: hidden;">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>NAME</label>
+                        <label>Name</label>
                         <InputText @bind-Value="_newTask.Name" class="form-control" />
                     </div>
 
                     <div class="form-group">
-                        <label>DESCRIPTION</label>
+                        <label>Description</label>
                         <InputTextArea @bind-Value="_newTask.Description" class="form-control" rows="2" />
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>START DATE & TIME</label>
+                            <label>Start Date & Time</label>
                             @* type="datetime-local" captures the time of day *@
                             <input type="datetime-local" @bind="_newTask.StartDate" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <label>DUE DATE & TIME</label>
+                            <label>Due Date & Time</label>
                             <input type="datetime-local" @bind="_newTask.DueDate" class="form-control" />
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label>DIFFICULTY</label>
+                            <label>Difficulty</label>
                             <InputNumber @bind-Value="_newTask.Difficulty" class="form-control" min="1" max="10" />
                         </div>
                         <div class="form-group">
-                            <label>RISK LEVEL</label>
+                            <label>Risk Level</label>
                             <select class="form-control" @bind="_newTask.RiskLevel">
                                 @foreach (var risk in Enum.GetValues<RiskLevel>())
                                 {
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="checkbox-group">
-                        <label><input type="checkbox" @bind="_isAcademicTask" /> IS ACADEMIC TASK?</label>
+                        <label><input type="checkbox" @bind="_isAcademicTask" /> Is Academic Task?</label>
                     </div>
 
                     @if (_isAcademicTask)
@@ -66,15 +66,15 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>TARGET SCORE</label>
+                                    <label>Target Score</label>
                                     <InputNumber @bind-Value="_targetScore" class="form-control" />
                                 </div>
                                 <div class="form-group">
-                                    <label>SCORE</label>
+                                    <label>Score</label>
                                     <InputNumber @bind-Value="_score" class="form-control" />
                                 </div>
                                 <div class="form-group">
-                                    <label>MAX SCORE</label>
+                                    <label>Max Score</label>
                                     <InputNumber @bind-Value="_maxScore" class="form-control" />
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn-save">SAVE TASK</button>
+                    <button type="submit" class="btn-save">SAVE</button>
                 </div>
             </EditForm>
         </div>

@@ -257,39 +257,54 @@
     border: 1px solid #e2e8f0;
     display: grid;
     flex-grow: 1;
-    gap: 2px; /* Tighter gap for a cleaner look */
+    gap: 2px;
     grid-auto-rows: minmax(60px, auto); /* Auto rows so it expands based on content */
-    grid-template-columns: 100px repeat(7, 1fr); /* 1 Column for Time + 7 Columns for Days = 8 Total */
+    grid-template-columns: repeat(8, 2fr); /* 1 Column for Time + 7 Columns for Days = 8 Total */
     max-height: 65vh; 
     overflow-y: auto;
     padding: 1px;
+    padding-top: 15px;
 }
 
 .timetable-cell.header {
     background: #f8fafc;
     font-size: 0.7rem;
     font-weight: 800;
+    height: min-content;
     letter-spacing: 0.5px;
     position: sticky;
+    text-align: center;
+    transform: none;
     top: 0;
     z-index: 10;
 }
 
-.time-label {
-    background: #f1f5f9;
-    font-family: 'Consolas', monospace;
-    font-size: 0.7rem;
-    font-weight: bold;
-    justify-content: center;
-}
-
 .timetable-cell {
     background: #ffffff;
+    border-top: 1px solid #f1f5f9;
     display: flex;
     flex-direction: column; /* Stack multiple tasks vertically */
     justify-content: flex-start; /* Start tasks at the top of the cell */
+    min-height: 30px;
     padding: 5px;
-    min-height: 60px;
+}
+
+.time-label {
+    align-items: flex-start;
+    background: transparent;
+    color: #64748b;
+    display: flex;
+    font-family: 'Consolas', monospace;
+    font-size: 0.75rem;
+    font-weight: bold;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+    position: relative;
+    text-align: center;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    z-index: 5;
 }
 
 .schedule-entry {
