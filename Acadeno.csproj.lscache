@@ -65,6 +65,10 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
  UndockedRegFreeWinRT-AutoInitializer.cs
  WindowsAppRuntimeAutoInitializer.cs
 App.xaml.cs
+Backend/AddControl/
+ AddCourses.cs
+ AddExams.cs
+ AddHomeworks.cs
 Backend/Core/
  GenAveSimulator.cs
  GradingEngine.cs
@@ -88,13 +92,14 @@ Backend/Models/
  User.cs
 Backend/Services/
  AuthService.cs
- CalendarServices.cs
+ CalendarService.cs
  IdService.cs
- MockDataService.cs
  ScheduleService.cs
  TaskService.cs
  UserService.cs
- ValidationService.cs
+ ViewAllCourses.cs
+ ViewAllExams.cs
+ ViewAllHomework.cs
 Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
@@ -105,7 +110,9 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/
  EmbeddedAttribute.cs
  ValidatableTypeAttribute.cs
 Platforms/Windows/App.xaml.cs
-Tests/ThisFileForLogicDev.cs
+Tests/
+ MockDataService.cs
+ ValidationService.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.6/ref/net10.0/
@@ -401,8 +408,10 @@ Frontend/Components/Pages/
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
+Frontend/Components/Popups/
+ AddTaskModal.razor
+ CalendarPopUps.razor
 Frontend/Components/
- Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
 MainPage.xaml
@@ -417,7 +426,9 @@ Frontend/Components/Pages/
  MainLayout.razor
  NavMenu.razor
  NotFound.razor
+Frontend/Components/Popups/
+ AddTaskModal.razor
+ CalendarPopUps.razor
 Frontend/Components/
- Popups/CalendarPopUps.razor
  Routes.razor
  _Imports.razor
