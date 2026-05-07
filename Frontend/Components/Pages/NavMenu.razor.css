@@ -53,6 +53,7 @@
     flex-direction: column;
     padding-right: 20px;
     padding-bottom: 10px;
+    pointer-events: none;
     width: 100%;
 }
 
@@ -68,7 +69,7 @@
 }
 
 .user-info { 
-    text-align: left;    
+    text-align: left;
 }
 
 /*  FOOTER  */
@@ -100,6 +101,7 @@
 }
 
 .copyright { 
-    margin-top: 10px; 
-    font-size: 0.75rem; 
+    margin-top: 10px;
+    font-size: 0.75rem;
+    pointer-events: none;
 }
