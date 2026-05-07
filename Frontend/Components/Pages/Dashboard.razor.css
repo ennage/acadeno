@@ -191,30 +191,19 @@
 }
 
 .btn-add-reminder {
-    /* Layout & Centering */
     display: flex;
-    align-items: center;      /* Vertical center */
-    justify-content: center;   /* Horizontal center */
-    
-    /* The Nudge Fix */
-    padding: 0;                /* Clear all default padding */
-    padding-bottom: 4px;       /* Adds space at the bottom to push the '+' up visually */
-    
-    /* Shape & Size */
+    align-items: center;     
+    justify-content: center;   
+    padding: 0;              
+    padding-bottom: 4px;       
     width: 32px;
     height: 32px;
-    border-radius: 8px;        /* Match the soft rounded corners in your image */
-    
-    /* Colors from your image */
-    background-color: #f0f4ff;  /* Light lavender/blue background */
-    color: #4f46e5;            /* Deep purple/blue '+' icon */
-    
-    /* Typography */
-    font-size: 22px;           /* Large enough to be clear */
+    border-radius: 8px;        
+    background-color: #f0f4ff;  
+    color: #4f46e5;            
+    font-size: 22px;         
     font-weight: bold;
-    line-height: 0;            /* Crucial: prevents font-standard line spacing */
-    
-    /* Interaction */
+    line-height: 0;          
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
