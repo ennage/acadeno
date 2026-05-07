@@ -2,7 +2,7 @@ using Acadeno.Backend.Enums;
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Tools;
 
-namespace Acadeno.Backend.PopUps
+namespace Acadeno.Backend.AddControl
 {
     public class AddExams
     {

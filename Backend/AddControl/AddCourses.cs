@@ -1,7 +1,7 @@
 using Acadeno.Backend.Tools;
 using Acadeno.Backend.Models;
 
-namespace Acadeno.Backend.PopUps
+namespace Acadeno.Backend.AddControl
 {
     public class AddCourses
     {

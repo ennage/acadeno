@@ -65,6 +65,10 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
  UndockedRegFreeWinRT-AutoInitializer.cs
  WindowsAppRuntimeAutoInitializer.cs
 App.xaml.cs
+Backend/AddControl/
+ AddCourses.cs
+ AddExams.cs
+ AddHomeworks.cs
 Backend/Core/
  GenAveSimulator.cs
  GradingEngine.cs
@@ -86,10 +90,6 @@ Backend/Models/
  ScheduleEntry.cs
  Term.cs
  User.cs
-Backend/PopUps/
- AddCourses.cs
- AddExams.cs
- AddHomeworks.cs
 Backend/Services/
  AuthService.cs
  CalendarService.cs
