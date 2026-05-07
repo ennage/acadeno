@@ -88,53 +88,55 @@
                 </div>
                 
                 <div class="timetable-grid">
-                    <!--- HEADER ROW --->
-                    <div class="timetable-cell header">TIME</div>
+                    <div class="timetable-cell header">TIME</div> <!--- HEADER ROW --->
+                        @for (int i = 0; i <= 6; i++)
+                        {
+                            var dateForColumn = _startOfWeek.AddDays(i);
+                            var dayName = dateForColumn.ToString("ddd").ToUpper();
+                            var dayNumber = dateForColumn.Day;
+                            var isToday = dateForColumn == DateTime.Today;
+
+                            <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
+                                <span class="day-name">@dayName</span>
+                                <span class="day-number">@dayNumber</span>
+                            </div>
+                        }
+                    <div class="time-axis">
+                        @for (int h = 0; h <= 23; h++)
+                        {
+                            <div class="hour-marker">
+                                @(DateTime.Today.AddHours(h).ToString("hh:mm tt"))
+                            </div>
+                        }
+                    </div>
 
                     @for (int i = 0; i <= 6; i++)
                     {
-                        var dateForColumn = _startOfWeek.AddDays(i);
-                        var dayName = dateForColumn.ToString("ddd").ToUpper();
-                        var dayNumber = dateForColumn.Day;
-                        var isToday = dateForColumn == DateTime.Today;
+                        var columnDate = _startOfWeek.AddDays(i);
+                        int dayIndex = (int)columnDate.DayOfWeek;
 
-                        <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
-                            <span class="day-name">@dayName</span>
-                            <span class="day-number">@dayNumber</span>
-                        </div>
-                    }
+                        <div class="timetable-day-column @(columnDate == DateTime.Today ? "is-today" : "")">
+                            
+                            @for (int h = 0; h <= 23; h++) { <div class="hour-line"></div> }
 
-                    @for (int hour = 0; hour <= 23; hour++)
-                    {
-                        <div class="timetable-cell time-label">
-                            @if (hour != 0) { <span>@(DateTime.Today.AddHours(hour).ToString("hh:mm tt"))</span> }
-                        </div>
+                            @foreach (var entry in _schedule.Where(s => s.Day == dayIndex))
+                            {
+                                // MATH: 1 minute = 1 pixel
+                                double topOffset = entry.StartTime.TimeOfDay.TotalMinutes;
+                                double height = (entry.EndTime - entry.StartTime).TotalMinutes;
 
-                        @for (int i = 0; i <= 6; i++)
-                        {
-                            // 1. Get the exact Date for this column (Year-Month-Day)
-                            var columnDate = _startOfWeek.AddDays(i);
-
-                            <div class="timetable-cell">
-                                @* 2. Match based on the Date and the current Hour *@
-                                @foreach (var entry in _schedule.Where(s => 
-                                    s.StartTime.Date == columnDate.Date && 
-                                    hour >= s.StartTime.Hour && 
-                                    hour < s.EndTime.Hour))
-                                {
-                                    var isCourse = !string.IsNullOrEmpty(entry.CourseID);
-
-                                    <div class="schedule-entry @(isCourse ? "course-block" : "personal-block")">
+                                <div class="schedule-entry-bubble" 
+                                    style="top: @(topOffset)px; height: @(height)px;">
+                                    <div class="bubble-inner">
                                         <strong>@entry.Label</strong>
-                                        <span class="sub-text">@entry.Session</span>
-                                        <span class="room-text">@entry.Building @entry.Room</span>
-                                        <span class="exact-time">@entry.StartTime.ToString("hh:mm tt")</span>
+                                        <span class="sub">@entry.StartTime.ToString("h:mm") - @entry.EndTime.ToString("h:mm")</span>
+                                        <span class="loc">@entry.Building @entry.Room</span>
                                     </div>
-                                }
-                            </div>
-                        }
+                                </div>
+                            }
+                        </div>
                     }
-                </div>
+</div>
             </div>
         </div>
     </main>

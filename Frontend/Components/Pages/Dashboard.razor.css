@@ -245,16 +245,66 @@
     flex-direction: column;
 }
 
-.timetable-grid {
+/* .timetable-grid {
     background: #f8fafc;
     border: 1px solid #e2e8f0;
     display: grid;
     flex-grow: 1;
     gap: 2px;
     grid-auto-rows: minmax(80px, auto);
-    grid-template-columns: repeat(8, minmax(0, 1fr)); /* DO NOT TOUCH */
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     max-height: 65vh; 
     overflow-y: auto;
+} */
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr); /* Time + 7 Days */
+    background: white;
+    border: 1px solid #ddd;
+    overflow-y: auto;
+    height: 800px; /* Adjust to your screen size */
+}
+
+/* Parent container for the floating entries */
+.timetable-day-column {
+    position: relative; 
+    height: 1440px; /* REQUIRED: 24 hours * 60 mins = 1440px */
+    border-right: 1px solid #eee;
+    background-image: linear-gradient(#eee 1px, transparent 1px);
+    background-size: 100% 60px; /* Creates an hour line every 60px */
+}
+
+/* The actual Entry Box */
+.schedule-entry-bubble {
+    position: absolute; /* REQUIRED: To float at the correct time */
+    left: 4px;
+    right: 4px;
+    z-index: 10;
+    background: #e0f2fe;
+    border-left: 4px solid #0ea5e9;
+    border-radius: 4px;
+    padding: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.bubble-inner {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    color: #0369a1;
+}
+
+.time-axis {
+    margin-top: -10px; /* Align text with the grid lines */
+}
+
+.hour-marker {
+    height: 60px; /* Must match the background-size above */
+    font-size: 0.7rem;
+    color: #999;
+    text-align: right;
+    padding-right: 10px;
 }
 
 .timetable-cell.header {
@@ -391,4 +441,6 @@
     border-left: 3px solid #a855f7;
     color: #7e22ce;
 }
+
+
 
