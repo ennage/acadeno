@@ -96,12 +96,35 @@
 }
 
 .modern-card { padding: 20px; }
-.mini-card { padding: 15px; margin-bottom: 12px; }
 
 .side-indicator {
     width: 4px;
     border-radius: 4px;
     margin-right: 18px;
+}
+
+.course-subtitle {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin: 2px 0 8px 0;
+}
+.mini-card .card-footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2px;
+}
+.deadline-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+.mini-card {
+    padding: 12px 12px;
+    margin-bottom: 12px;
 }
 
 /* Colors from design */
@@ -115,6 +138,58 @@
 .course-id { font-size: 0.8rem; color: #64748b; margin-bottom: 12px; }
 .course-details { font-size: 0.75rem; color: #94a3b8; }
 .due-date { font-size: 0.78rem; color: #64748b; margin: 0; }
+
+/* Container to push grade to the right */
+.card-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Grade Styling */
+.course-grade {
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Footer layout for Time/Loc and Term/Year */
+.card-footer-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto; /* Pushes to bottom of card */
+    padding-top: 10px;
+    border-top: 1px dashed #f1f5f9;
+}
+
+/* Term and Year Tag */
+.term-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4f46e5;
+    background: #eef2ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Subtle Hover Effect for the whole card */
+.modern-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
 
 /* Table Section */
 .data-table-card {
@@ -130,6 +205,105 @@
 
 .badge { padding: 4px 12px; border-radius: 15px; font-size: 0.7rem; font-weight: 600; }
 .badge-success { background: #dcfce7; color: #15803d; }
+.badge-notstarted { background: #dcfce7; color: #801c15; }
+.badge-inprogress { background: #dcfce7; color: #805e15; }
+
+
+/* GWA Card Styles */
+.gwa-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.gwa-display {
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.gwa-circle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+}
+
+.circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #f1f5f9;
+    stroke-width: 2.8;
+}
+
+.circle {
+    fill: none;
+    stroke: #4f46e5; /* The primary brand blue */
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.gwa-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.gwa-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+}
+
+.gwa-label {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.gwa-stats {
+    display: flex;
+    justify-content: space-around;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-item span {
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.stat-item strong {
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+/* Sidebar spacing refinement */
+.secondary-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Uniform gap between side widgets */
+}
 
 /* Calendar Widget */
 .calendar-card {
