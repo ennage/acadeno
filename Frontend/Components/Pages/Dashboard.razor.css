@@ -182,7 +182,7 @@
 .reminder-text h4 { 
     color: var(--text-on-light);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.90rem;
     font-weight: bold;
     margin: 0;
     overflow: hidden;
@@ -191,23 +191,43 @@
 }
 
 .btn-add-reminder {
-    background: #007bff;
-    border-radius: 6px;
-    border: none;
-    color: white;
-    height: 32px;
-    width: 32px;
-    align-items: center;
-    cursor: pointer;
+    /* Layout & Centering */
     display: flex;
-    font-size: 22px; 
+    align-items: center;      /* Vertical center */
+    justify-content: center;   /* Horizontal center */
+    
+    /* The Nudge Fix */
+    padding: 0;                /* Clear all default padding */
+    padding-bottom: 4px;       /* Adds space at the bottom to push the '+' up visually */
+    
+    /* Shape & Size */
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;        /* Match the soft rounded corners in your image */
+    
+    /* Colors from your image */
+    background-color: #f0f4ff;  /* Light lavender/blue background */
+    color: #4f46e5;            /* Deep purple/blue '+' icon */
+    
+    /* Typography */
+    font-size: 22px;           /* Large enough to be clear */
     font-weight: bold;
-    justify-content: center;
-    line-height: 0;
-    padding: 10px;
-    transition: background 0.2s ease;
+    line-height: 0;            /* Crucial: prevents font-standard line spacing */
+    
+    /* Interaction */
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+.btn-add-reminder:hover {
+    background-color: #e2e8ff;
+    transform: scale(1.05);
+}
+
+.btn-add-reminder:active {
+    transform: scale(0.95);
+}
 .btn-complete {
     align-items: center;
     background: transparent;
