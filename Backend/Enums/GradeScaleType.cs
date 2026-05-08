@@ -5,5 +5,6 @@ public enum GradeScaleType
     GPA = 1,
     GWA = 2,
     Letter = 3,
-    Percentage = 4
+    Percentage = 4,
+    Default = 5
 }
