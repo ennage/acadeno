@@ -13,7 +13,7 @@ public class CalendarService
         _db = db;
     }
 
-    public async Task<Calendar> GetCalendarView(int year, Month month, int userId)
+    public async Task<CalendarEntry> GetCalendarView(int year, Month month, int userId)
     {
         var events = await _db.Calendars
             .Where(e => e.UserID == userId && e.Year == year && e.Month == month)
@@ -27,7 +27,7 @@ public class CalendarService
         // This tells the UI which day of the week to start drawing (0 = Sunday)
         int startDayOfWeek = (int)firstOfMonth.DayOfWeek;
 
-        return new Calendar
+        return new CalendarEntry
         {
             Title = $"{month.ToString().ToUpper()} {year}",
             Event = events,
@@ -39,7 +39,7 @@ public class CalendarService
         };
     }
 
-    public async Task<bool> AddCalendarEvent(Calendar newEvent)
+    public async Task<bool> AddCalendarEvent(CalendarEntry newEvent)
     {
         // Ensure the ID is generated if not already set
         if (newEvent.CalendarID == Guid.Empty)

@@ -7,13 +7,6 @@
     overflow: hidden;
 }
 
-/* Sidebar must have a set width to not collapse */
-.sidebar {
-    width: 260px;
-    background-color: #0d1b3e; /* Navy from your dashboard */
-    height: 100%;
-}
-
 /* Calendar Main Area */
 .calendar-page {
     flex: 1;
@@ -54,11 +47,13 @@
 }
 
 .day-headers div {
-    padding: 12px;
-    text-align: right; /* Header text to right */
-    font-weight: 700;
-    font-size: 0.75rem;
+    align-items: center;
     color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 12px;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .calendar-grid {
@@ -81,6 +76,7 @@
 .cell-number {
     font-family: 'Consolas', monospace;
     font-size: 0.85rem;
+    font-weight: bold;
     color: #1e293b;
     margin-bottom: auto; /* This forces the number to the TOP right */
 }
@@ -93,9 +89,8 @@
     color: #cbd5e1;
 }
 
-/* Active Highlight */
 .active-day {
-    background-color: rgba(56, 189, 248, 0.05);
+    background-color: rgba(56, 189, 248, 0.08) !important;
 }
 
 .active-day .cell-number {
@@ -103,20 +98,62 @@
     font-weight: 800;
 }
 
-/* Task Tags */
-.event-container {
-    width: 100%;
-    margin-top: 10px;
-}
-
+/* Regular Manual Event Tags (CalendarEntry) */
 .event-tag {
-    background: #f1f5f9;
-    border-left: 4px solid #38bdf8;
+    background: #f8fafc; /* Very light gray-blue */
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #38bdf8; /* The signature blue accent */
     padding: 4px 8px;
     font-size: 0.7rem;
+    font-weight: 600;
     border-radius: 4px;
-    color: #0d1b3e;
-    text-align: left; /* Keep tag text readable */
+    color: #1e293b;
+    text-align: left;
+    margin-bottom: 2px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-tag:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateX(2px); /* Subtle interaction feel */
+    overflow: hidden;
+}
+
+/* Schedule Entry Tags (For Comparison/Consistency) */
+.event-tag.schedule-entry-tag {
+    background: #0d1b3e; /* Deep navy */
+    color: #f8fafc;
+    border: none;
+    border-left: 3px solid #38bdf8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.event-tag.schedule-entry-tag:hover {
+    background: #162a5a;
+    transform: translateX(2px);
+    overflow: hidden;
+}
+
+.entry-time {
+    font-size: 0.6rem;
+    opacity: 0.8;
+}
+
+/* Ensure the container doesn't overflow if there are many entries */
+.event-container {
+    width: 100%;
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 80px;
+    overflow: hidden;
 }
 
 /* Header Buttons */
