@@ -3,6 +3,7 @@
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Enums
 @using Acadeno.Frontend.Components.Popups
+@using Microsoft.EntityFrameworkCore
 @inject Acadeno.Backend.Tools.AppDbContext _db
 
 <div class="dashboard-layout">
@@ -33,16 +34,32 @@
                 @for (int i = 0; i < 42; i++)
                 {
                     DateTime day = startDate.AddDays(i);
-                    // Use .Date to ensure we match only the day, not the time
+                    
+                    // Filter Manual Notes
                     var dayEvents = Events.Where(e => e.Year == day.Year && (int)e.Month == day.Month && e.Day == day.Day).ToList();
+                    
+                    // Filter Database Schedule Entries (Classes)
+                    // We compare the date part of StartTime to the current grid day
+                    var daySchedules = DatabaseSchedules.Where(s => s.StartTime.Date == day.Date).ToList();
+
                     bool isToday = day.Date == DateTime.Today;
 
                     <div class="grid-cell @(day.Month != _currentViewDate.Month ? "muted" : "") @(isToday ? "active-day" : "")" 
-                            @onclick="() => OpenPopup(day)">
+                        @onclick="() => OpenPopup(day)">
                         
                         <span class="cell-number">@day.Day</span>
 
                         <div class="event-container">
+                            @* 1. Display Database Classes (ScheduleEntry) *@
+                            @foreach (var sched in daySchedules)
+                            {
+                                <div class="event-tag schedule-entry-tag">
+                                    <strong>@sched.Label</strong>
+                                    <span class="entry-time">@sched.StartTime.ToString("h:mm tt")</span>
+                                </div>
+                            }
+
+                            @* 2. Display Manual Notes (CalendarEntry) *@
                             @foreach (var ev in dayEvents)
                             {
                                 <div class="event-tag">@ev.Title</div>
@@ -55,7 +72,6 @@
     </main>
 </div>
 
-@* The Popup Component *@
 <CalendarPopUp 
     IsVisible="showPopup" 
     SelectedDate="selectedDate" 
@@ -67,39 +83,30 @@
     private DateTime selectedDate;
     private DateTime _currentViewDate = DateTime.Now;
     
-    // One single list for all your schedule entries
     private List<CalendarEntry> Events = new();
+    private List<ScheduleEntry> DatabaseSchedules = new(); // The list for your classes
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Seed some data for May 2026
+        // 1. Seed your manual test data
         Events.Add(new CalendarEntry { 
-            Year = 2026, 
-            Month = Month.May, 
-            Day = 9, 
-            Title = "CICS - SC Meeting",
-            Time = "10:00 AM - 11:30 AM",
-            IsAllDay = false 
+            Year = 2026, Month = Month.May, Day = 9, 
+            Title = "CICS - SC Meeting", IsAllDay = false 
         });
 
-        Events.Add(new CalendarEntry { 
-            Year = 2026, 
-            Month = Month.May, 
-            Day = 15, 
-            Title = "Project Meeting",
-            Time = null,
-            IsAllDay = true 
-        });
+        // 2. Fetch the real Schedule Entries from the database
+        if (_db != null)
+        {
+            DatabaseSchedules = await _db.ScheduleEntries.ToListAsync();
+        }
     }
 
     private void ChangeMonth(int months) => _currentViewDate = _currentViewDate.AddMonths(months);
-    
     private void GoToToday() => _currentViewDate = DateTime.Now;
 
     private DateTime GetCalendarStart()
     {
         DateTime firstDayOfMonth = new DateTime(_currentViewDate.Year, _currentViewDate.Month, 1);
-        // Calculate offset to the start of the week (Sunday)
         int diff = (7 + (int)firstDayOfMonth.DayOfWeek - (int)DayOfWeek.Sunday) % 7;
         return firstDayOfMonth.AddDays(-diff);
     }
