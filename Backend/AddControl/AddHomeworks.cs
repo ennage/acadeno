@@ -11,7 +11,7 @@ namespace Acadeno.Backend.AddControl
             _db = db;
         }
 
-        public AddHomeworks(AppDbContext db, string userId, string courseId, string name, DateTime dueDate, TimeSpan? dueTime)
+        public AddHomeworks(AppDbContext db, string userId, string courseId, string name, DateTime dueDate)
         {
             _db = db;
             var homework = new AcademicTask
@@ -21,7 +21,7 @@ namespace Acadeno.Backend.AddControl
                 CourseID = courseId,
                 Name = name,
                 DueDate = dueDate,
-                DueTime = dueTime,
+                DueTime = dueDate.TimeOfDay,
                 TypeID = "Homework"
             };
             _db.AcademicTasks.Add(homework);

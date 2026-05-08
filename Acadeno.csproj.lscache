@@ -411,6 +411,8 @@ Frontend/Components/Popups/
  AddTaskModal.razor
  CalendarPopUps.razor
  EnrolledCourses.razor
+ HomeworkPopUp.razor
+ UpcomingTest.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
@@ -430,6 +432,8 @@ Frontend/Components/Popups/
  AddTaskModal.razor
  CalendarPopUps.razor
  EnrolledCourses.razor
+ HomeworkPopUp.razor
+ UpcomingTest.razor
 Frontend/Components/
  Routes.razor
  _Imports.razor
