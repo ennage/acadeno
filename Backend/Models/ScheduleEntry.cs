@@ -1,19 +1,27 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Acadeno.Backend.Models
 {
     public class ScheduleEntry
     {
         [Key]
-        public string UserID {get; set;} = string.Empty;
-
         public string EntryID {get; set;} = string.Empty;
+        public string UserID {get; set;} = string.Empty;
+        [ForeignKey("UserID")]
         public string CourseID {get; set;} = string.Empty;
+        [ForeignKey("CourseID")]
+        public Course? Course { get; set; }
 
-        public TimeSpan StartTime {get; set;}
-        public TimeSpan EndTime {get; set;}
-        public string DayOfWeek {get; set;} = string.Empty;
+        public User? User { get; set; }
+        public string Label {get; set;}  = string.Empty;
+        public string Description {get; set;} = string.Empty;
+        public int Day {get; set;}
+        public bool IsRepeating { get; set; } // True for weekly classes, False for one-off events
 
+        public DateTime StartTime {get; set;}
+        public DateTime EndTime {get; set;}
+        
         public string Session {get; set;} = string.Empty; 
         public string Room {get; set;} = string.Empty;
         public string Building {get; set;} = string.Empty;

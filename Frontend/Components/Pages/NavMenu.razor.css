@@ -17,7 +17,35 @@
     width: 100%;
 }
 
+.nav-link.active {
+    background-color: #F1F5F9 !important; /* Your light "active" color */
+    color: #0d1b3e !important;            /* Dark text for contrast */
+    border-radius: 8px;
+    display: block;                        /* Ensure it fills the container */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Ensure the NavLink itself takes up the full button space */
+.nav-link {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    color: inherit; /* Inherit color from nav-button unless active */
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+/* Modify your .nav-button to be a wrapper only */
 .nav-button {
+    display: block; 
+    width: 100%;
+    padding: 10px 15px;
+    border-radius: 8px;
+    background-color: transparent;
+    overflow: hidden;
+}
+
+/* .nav-button {
     display: block !important; 
     width: 100%;
     padding: 10px 15px;
@@ -27,19 +55,12 @@
     text-decoration: none;
     font-weight: 600;
     transition: all 0.2s ease;
-}
+} */
 
 .nav-button:hover {
     background-color: rgba(39, 29, 230, 0.563);
     color: white;
     text-decoration: none;
-}
-
-/* The ACTIVE Button (Where you are now) */
-.nav-button.active {
-    background-color: #38bdf8 !important;
-    color: #0d1b3e !important;
-    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
 }
 
 .logo { 

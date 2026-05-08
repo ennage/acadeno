@@ -17,7 +17,7 @@ namespace Acadeno.Backend.Services
         {
             return await _db.ScheduleEntries
                 .Where(e => e.UserID == userId)
-                .OrderBy(e => e.DayOfWeek)
+                .OrderBy(e => e.Day)
                 .ThenBy(e => e.StartTime)
                 .ToListAsync();
         }
@@ -25,7 +25,7 @@ namespace Acadeno.Backend.Services
         public async Task<bool> CheckScheduleConflict(ScheduleEntry newEntry)
         {
             var existingEntries = await _db.ScheduleEntries
-                .Where(e => e.UserID == newEntry.UserID && e.DayOfWeek == newEntry.DayOfWeek)
+                .Where(e => e.UserID == newEntry.UserID && e.Day == newEntry.Day)
                 .ToListAsync();
 
             foreach (var entry in existingEntries)
