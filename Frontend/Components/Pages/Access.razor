@@ -35,7 +35,7 @@
             @if (isRegisterMode)
             {
                 <div class="input-group">
-                    <input type="text" placeholder="Full Name" @bind="fullName" required />
+                    <input type="text" placeholder="Name" @bind="name" required />
                 </div>
             }
             <input type="email" placeholder="Enter email" @bind="loginEmail" required>
@@ -77,7 +77,7 @@
 {
     private bool isRegisterMode = false;    // false=Login, true=Register
     private bool isRemembered = false;
-    private string fullName = string.Empty; // Only needed for Register
+    private string name = string.Empty; // Only needed for Register
     private string loginEmail = string.Empty;
     private string loginPassword = string.Empty;
     private string errorMsg = string.Empty;
@@ -100,7 +100,7 @@
         {
             if (isRegisterMode)
             {
-                var newUser = new User { Name = fullName, Email = loginEmail };
+                var newUser = new User { Name = name, Email = loginEmail };
                 bool success = await AuthEngine.RegisterUser(newUser, loginPassword);
                 
                 if (success) 

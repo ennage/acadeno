@@ -19,6 +19,8 @@
     width: 100%;
 }
 
+/*  BUTTONS */
+
 .nav-button ::deep .nav-link {
     position: relative;
     display: flex;
@@ -43,6 +45,29 @@
     background-color: #f1f5f97f;
     color: #0D1B3E;
     text-decoration: none !important;
+}
+
+.nav-link:hover .nav-icon {
+    fill: currentColor;
+}
+
+.nav-link.active .nav-icon {
+    fill: currentColor;
+}
+
+.nav-icon {
+    fill: white;
+    width: 30px;
+    height: 30px;
+    padding-right: 5px;
+    display: inline-block;
+    transition: fill 0.3s ease;
+}
+
+.nav-text {
+    font-size: 1rem;
+    font-weight: 600;
+    padding-left: 5px;
 }
 
 /*  HEADER  */
@@ -98,6 +123,11 @@
     background-color: #ff686b;
     color: white;
     text-decoration: none;
+}
+
+.copyright-icon {
+    width: 15px;
+    height: 155px;
 }
 
 .copyright { 
