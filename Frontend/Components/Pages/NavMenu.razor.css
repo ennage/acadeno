@@ -75,11 +75,12 @@
 .sidebar-header {
     align-content: center;
     display: flex;
+    width: 100%;
     flex-direction: column;
     padding-right: 20px;
     padding-bottom: 10px;
     pointer-events: none;
-    width: 100%;
+    user-select: none;
 }
 
 .logo {
@@ -104,7 +105,8 @@
     color: rgba(255, 255, 255, 0.5); 
     font-size: 0.85rem; 
     padding-top: 10px;
-    padding-right: 20px; 
+    padding-right: 20px;
+    padding-bottom: 0px;
 }
 
 .logout-nav {
@@ -119,19 +121,34 @@
     transition: all 0.2s ease;
 }
 
+.logout-btn {
+    border-top: 1px solid #152c66;
+    border-left: 1px solid #152c66;
+    border-bottom: 2px solid black;
+    border-right: 2px solid black;
+    transition: all 0.3s ease;
+}
+
 .logout-btn:hover {
-    background-color: #ff686b;
+    background-color: crimson;
     color: white;
     text-decoration: none;
 }
 
-.copyright-icon {
-    width: 15px;
-    height: 155px;
+.logout-icon {
+    left: 5px;
+    display: inline-block;
+    transition: fill 0.3s ease;
+}
+
+.logout-text {
+    padding-left: 5px;
+    user-select: none;
 }
 
 .copyright { 
     margin-top: 10px;
+    font-family: 'Consolas', monospace;
     font-size: 0.75rem;
     pointer-events: none;
 }

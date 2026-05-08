@@ -43,7 +43,7 @@
 .dashboard-root {
     display: flex;
     min-height: 100vh;
-    background-color: #f8fafc;
+    background-color: #F1F5F9;
     font-family: 'Poppins', 'Inter', sans-serif; /* Matching design font */
 }
 
