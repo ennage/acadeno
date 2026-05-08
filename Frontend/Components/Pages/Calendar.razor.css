@@ -7,13 +7,6 @@
     overflow: hidden;
 }
 
-/* Sidebar must have a set width to not collapse */
-.sidebar {
-    width: 260px;
-    background-color: #0d1b3e; /* Navy from your dashboard */
-    height: 100%;
-}
-
 /* Calendar Main Area */
 .calendar-page {
     flex: 1;
@@ -54,11 +47,13 @@
 }
 
 .day-headers div {
-    padding: 12px;
-    text-align: right; /* Header text to right */
-    font-weight: 700;
-    font-size: 0.75rem;
+    align-items: center;
     color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 12px;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .calendar-grid {
@@ -93,9 +88,8 @@
     color: #cbd5e1;
 }
 
-/* Active Highlight */
 .active-day {
-    background-color: rgba(56, 189, 248, 0.05);
+    background-color: rgba(56, 189, 248, 0.08) !important;
 }
 
 .active-day .cell-number {

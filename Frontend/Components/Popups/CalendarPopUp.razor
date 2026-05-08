@@ -1,0 +1,275 @@
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+
+@if (IsVisible)
+{
+    <div class="modal-overlay" @onclick="Close">
+        <div class="acadeno-popup" @onclick:stopPropagation="true">
+            
+            @{
+                // Find the event for this specific day using your Model properties
+                var currentEvent = ExistingEvents.FirstOrDefault(e => 
+                    e.Year == SelectedDate.Year && 
+                    (int)e.Month == SelectedDate.Month && 
+                    e.Day == SelectedDate.Day);
+            }
+
+            <header class="popup-header">
+                <div class="header-meta">
+                    <span class="icon">📄</span>
+                    <span class="label">Schedule Entry</span>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn">🗗</button>
+                    <button class="action-btn" @onclick="Close">✕</button>
+                </div>
+            </header>
+
+            <div class="popup-body">
+                <input type="text" class="title-input" placeholder="Untitled" 
+                        value="@(currentEvent?.Title ?? "New Event")" 
+                        @onchange="@(e => UpdateTitle(e.Value?.ToString()))">
+                
+                <div class="property-row">
+                    <div class="prop-label">📅 Date</div>
+                    <div class="prop-value">
+                        @SelectedDate.ToString("dddd, MMMM dd, yyyy")
+                    </div>
+                </div>
+
+                <div class="property-row">
+                    <div class="prop-label">🔵 All-day</div>
+                    <div class="prop-value">
+                        <label class="switch">
+                            <input type="checkbox" checked="@(currentEvent?.IsAllDay ?? true)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="property-row separator">
+                    <div class="prop-label">🗂️ Course</div>
+                    <div class="prop-value">@(currentEvent != null ? "Science" : "General")</div>
+                </div>
+
+                <div class="property-row">
+                    <div class="prop-label">🕒 Time</div>
+                    <div class="prop-value @(string.IsNullOrEmpty(currentEvent?.Time) ? "empty" : "")">
+                        @(currentEvent?.Time ?? "Empty")
+                    </div>
+                </div>
+            </div>
+
+            <footer class="popup-footer">
+                <button class="manage-btn">
+                    Open Page <span class="action-icon">↗</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public DateTime SelectedDate {get; set;}
+    [Parameter] public List<CalendarEntry> ExistingEvents {get; set;} = new();
+    [Parameter] public EventCallback OnClose {get; set;}
+
+    private async Task Close() => await OnClose.InvokeAsync();
+
+    private void UpdateTitle(string? newTitle)
+    {
+        var ev = ExistingEvents.FirstOrDefault(e => 
+            e.Year == SelectedDate.Year && 
+            (int)e.Month == SelectedDate.Month && 
+            e.Day == SelectedDate.Day);
+            
+        if (ev != null && newTitle != null) {
+            ev.Title = newTitle;
+        }
+    }
+}
+
+<style>
+    .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(4px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* --- POPUP MAIN CONTAINER --- */
+.acadeno-popup {
+    background: #191919; 
+    width: 420px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    padding: 24px;
+    color: #ffffff;
+    position: relative; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1.1rem;
+    line-height: 1;
+    transition: 0.2s ease;
+}
+
+.action-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+/* --- TITLE INPUT --- */
+.title-input {
+    background: transparent;
+    border: none;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    width: 100%;
+    margin: 10px 0 25px 0;
+    outline: none;
+    display: block;
+}
+
+.title-input::placeholder {
+    color: #444;
+}
+
+/* --- PROPERTY ROWS (Labels & Values) --- */
+.property-row {
+    display: grid;
+    grid-template-columns: 130px 1fr; 
+    padding: 12px 0;
+    font-size: 0.95rem;
+    align-items: center;
+}
+
+.prop-label {
+    color: #8a8a8a; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prop-value {
+    color: #efefef;
+}
+
+.prop-value.empty {
+    color: #444; 
+}
+
+/* --- SEPARATOR --- */
+.separator {
+    border-top: 1px solid #2f2f2f;
+    margin-top: 15px;
+    padding-top: 20px;
+}
+
+/* --- TOGGLE SWITCH --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #333;
+    transition: .3s;
+    border-radius: 20px;
+}
+
+input:checked + .slider {
+    background-color: #38bdf8; 
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px; width: 14px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+/* --- FOOTER & BUTTON --- */
+.popup-footer {
+    margin-top: 30px;
+}
+
+.manage-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #2f2f2f;
+    color: #8a8a8a;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.manage-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+    border-color: #38bdf8;
+}
+
+.action-icon {
+    font-size: 0.8rem;
+}
+</style>
