@@ -77,13 +77,21 @@
             <div class="card-stretch timetable-huge">
                 <div class="card-header timetable-header">
                     <div class="week-nav">
-                        <button class="btn-nav" @onclick="() => ChangeWeek(-7)">&lt;</button>
+                        <button class="btn-nav" @onclick="() => ChangeWeek(-7)" aria-label="Previous Week">
+                            <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.921,1.505a1.5,1.5,0,0,1-.44,1.06L9.809,10.237a2.5,2.5,0,0,0,0,3.536l7.662,7.662a1.5,1.5,0,0,1-2.121,2.121L7.688,15.9a5.506,5.506,0,0,1,0-7.779L15.36.444a1.5,1.5,0,0,1,2.561,1.061Z"/>
+                            </svg>
+                        </button>
                     </div>
-                    
+
                     <h3>COURSE TIMETABLE</h3>
 
                     <div class="week-nav">
-                        <button class="btn-nav" @onclick="() => ChangeWeek(7)">&gt;</button>
+                        <button class="btn-nav" @onclick="() => ChangeWeek(7)" aria-label="Next Week">
+                            <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.079,22.5a1.5,1.5,0,0,1,.44-1.06l7.672-7.672a2.5,2.5,0,0,0,0-3.536L6.529,2.565A1.5,1.5,0,0,1,8.65.444l7.662,7.661a5.506,5.506,0,0,1,0,7.779L8.64,23.556A1.5,1.5,0,0,1,6.079,22.5Z"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 

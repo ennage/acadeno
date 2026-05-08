@@ -1,7 +1,7 @@
 .about-wrapper {
     display: flex; 
     height: 100vh; 
-    overflow: hidden; 
+    overflow: hidden;
 }
 /* About Page Styling */
 .about-container {
@@ -9,6 +9,7 @@
     grid-template-columns: 1fr 350px;
     gap: 40px;
     padding: 20px;
+    pointer-events: none;
 }
 
 .section-title { 
