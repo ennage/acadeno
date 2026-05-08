@@ -48,6 +48,9 @@
 }
 
 .card-stretch h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 1rem;
     text-align: center;
     width: 100%;
@@ -266,27 +269,31 @@
 }
 
 .btn-nav {
-    background: transparent;    /* Makes it see-through */
-    border: none;               /* Removes the box border */
-    color: #64748b;              /* Your base arrow color (adjust as needed) */
-    font-size: 1.5rem;             /* Makes the arrows more readable */
-    font-weight: bold;
-    cursor: pointer;
-    transition: color 0.2s ease, transform 0.2s ease;
-    padding: 0 15px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: transparent;
+    border: none;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: #16254a;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.nav-svg {
+    width: 24px;
+    height: 24px;
 }
 
 .btn-nav:hover {
-    color: #3b82f6;
+    border-radius: 8px;
     transform: scale(1.1);
-    background: transparent;
 }
 
 .btn-nav:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
 }
 
 .timetable-cell.header {
@@ -358,8 +365,6 @@
     text-align: right;
     padding-right: 10px;
 }
-
-
 
 .time-label span {
     display: inline-block;
