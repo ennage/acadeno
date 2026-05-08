@@ -9,13 +9,11 @@ namespace Acadeno.Backend.Services
     public class AuthService
     {
         private readonly AppDbContext _db;
-        private readonly IdService _idService;
         public User? CurrentUser {get; private set;}
 
-        public AuthService(AppDbContext db, IdService idService)
+        public AuthService(AppDbContext db)
         {
             _db = db;
-            _idService = idService;
         }
 
         private bool IsDBLocked(Exception ex)
@@ -64,7 +62,6 @@ namespace Acadeno.Backend.Services
             if (exists) return false;
 
             newUser.Email = cleanEmail;
-            newUser.UserID = await _idService.GenerateNextUserID();
             newUser.Password = HashPassword(password);
 
             _db.Users.Add(newUser);

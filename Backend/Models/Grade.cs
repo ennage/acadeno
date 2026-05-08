@@ -5,12 +5,12 @@ namespace Acadeno.Backend.Models
     public class Grade
     {
         [Key]
-        public string GradeID {get; set;} = string.Empty;
+        public Guid GradeID {get; set;} = Guid.NewGuid();
         
         public double? TargetCourseGrade {get; set;}
         public double? CourseGrade {get; set;}
 
-        public string CourseID {get; set;} = string.Empty;
+        public Guid CourseID {get; set;}
 
         public List<AcademicTaskType> AcademicTaskTypes {get; set;} = new List<AcademicTaskType>();
     }   

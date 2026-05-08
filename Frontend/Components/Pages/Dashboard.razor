@@ -153,7 +153,7 @@
     </main>
 </div>
 
-<AddTaskModal IsVisible="_showModal" 
+<AddTask IsVisible="_showModal" 
         OnClose="HideModal" 
         OnTaskAdded="RefreshDashboard" />
 
@@ -168,7 +168,7 @@
 
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
-    private Dictionary<string, string> _courseNames = new();
+    private Dictionary<Guid, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
@@ -205,13 +205,15 @@
     {
         try 
         {
-            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-            if (string.IsNullOrEmpty(currentUserId)) return;
+            Guid currentUserId = UserService.CurrentUser?.UserID ?? Guid.Empty;
+            if (currentUserId == Guid.Empty) return;
+
+            string currentUserIdString = currentUserId.ToString();
 
             // Fetch Tasks (Case-Insensitive lookup)
             var userTasks = _db.Tasks
                 .ToList() 
-                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
+                .Where(t => string.Equals(t.UserID.ToString(), currentUserIdString, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
             _allTasks = userTasks

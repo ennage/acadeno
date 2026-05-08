@@ -1,29 +1,28 @@
 using Acadeno.Backend.Tools;
 using Acadeno.Backend.Models;
 
-namespace Acadeno.Backend.AddControl
+namespace Acadeno.Backend.Controllers
 {
     public class AddCourses
     {
-        public readonly AppDbContext _db;
+        private readonly AppDbContext _db;
+
         public AddCourses(AppDbContext db)
         {
             _db = db;
         }
 
-        public AddCourses(AppDbContext db, string userId, string termId, string professor, string courseCode, string name, ScheduleEntry scheduleEntry, ScheduleEntry Room )
+        public void AddNewCourse(Guid userId, Guid termId, string courseCode, string name, ScheduleEntry scheduleEntry)
         {
-            _db = db;
             var course = new Course
             {
-                CourseID = Guid.NewGuid().ToString(),
+                CourseID = Guid.NewGuid(),
                 UserID = userId,
                 TermID = termId,
-                Professor = professor,
                 CourseCode = courseCode,
-                ScheduleEntrys = new List<ScheduleEntry> { scheduleEntry },
+                Name = name,
                 Room = scheduleEntry.Room,
-                Name = name
+                ScheduleEntrys = new List<ScheduleEntry> { scheduleEntry }
             };
             _db.Courses.Add(course);
             _db.SaveChanges();

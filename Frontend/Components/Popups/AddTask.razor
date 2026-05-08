@@ -1,6 +1,7 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
+@using Microsoft.AspNetCore.Components.Web
 @inject Acadeno.Backend.Tools.AppDbContext _db
 @inject UserService UserService
 
@@ -65,7 +66,8 @@
                         <div class="academic-container">
                             <div class="form-group">
                                 <label>Course ID</label>
-                                <InputText @bind-Value="_courseId" class="input-field" placeholder="e.g. CS101" />
+                                @* Bind to the helper property instead of the Guid directly *@
+                                <InputText @bind-Value="CourseIdString" class="input-field" placeholder="e.g. a1b2c3d4..." />
                             </div>
                             <div class="form-row three-cols">
                                 <div class="field-container">
@@ -211,15 +213,15 @@
 
     private BaseTask _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
     private bool _isAcademicTask = false;
-    private string _courseId = "";
+    private Guid _courseId = Guid.Empty;
     private double _targetScore = 0;
     private double _score = 0;
     private double _maxScore = 0;
 
     private async Task HandleSave()
     {
-        string userId = UserService.CurrentUser?.UserID ?? "";
-        string id = Guid.NewGuid().ToString("N").Substring(0, 5).ToUpper();
+        Guid userId = UserService.CurrentUser?.UserID ?? Guid.Empty;
+        Guid id = Guid.NewGuid();
 
         if (_isAcademicTask)
         {
@@ -249,11 +251,17 @@
         await Close();
     }
 
+    private string CourseIdString
+    {
+        get => _courseId == Guid.Empty ? string.Empty : _courseId.ToString();
+        set => Guid.TryParse(value, out _courseId);
+    }
+
     private void ResetForm()
     {
         _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
         _isAcademicTask = false;
-        _courseId = ""; _targetScore = 0; _score = 0; _maxScore = 0;
+        _courseId = Guid.Empty; _targetScore = 0; _score = 0; _maxScore = 0;
     }
     private async Task Close() => await OnClose.InvokeAsync();
 }

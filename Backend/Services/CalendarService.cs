@@ -13,9 +13,9 @@ public class CalendarService
         _db = db;
     }
 
-    public async Task<CalendarEntry> GetCalendarView(int year, Month month, int userId)
+    public async Task<CalendarEntry> GetCalendarView(int year, Month month, Guid userId)
     {
-        var events = await _db.Calendars
+        var events = await _db.CalendarEntries
             .Where(e => e.UserID == userId && e.Year == year && e.Month == month)
             .OrderBy(e => e.Day)
             .ToListAsync();
@@ -46,17 +46,17 @@ public class CalendarService
         {
             newEvent.CalendarID = Guid.NewGuid();
         }
-        _db.Calendars.Add(newEvent);
+        _db.CalendarEntries.Add(newEvent);
         var result =await _db.SaveChangesAsync();
         return result > 0;
     }
 
     public async Task<bool> DeleteCalendarEvent(Guid calendarId)
     {
-        var item = await _db.Calendars.FindAsync(calendarId);
+        var item = await _db.CalendarEntries.FindAsync(calendarId);
         if (item == null) return false;
 
-        _db.Calendars.Remove(item);
+        _db.CalendarEntries.Remove(item);
         return await _db.SaveChangesAsync() > 0;
     }
 }

@@ -1,19 +1,21 @@
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Tools;
+using Microsoft.EntityFrameworkCore;
 
 namespace Acadeno.Backend.Services
 {
-    public class ViewAllHomework
+    public class ViewAllExams
     {
         public readonly AppDbContext _db;
-        public ViewAllHomework(AppDbContext db)
+        public ViewAllExams(AppDbContext db)
         {
             _db = db;
         }
-         public List<AcademicTask> GetAllHomework()
+        public List<AcademicTask> GetAllExams(Guid typeId)
         {
         return _db.AcademicTasks
-        .Where(t => t.TypeID == "Homework")
+        .Include(t => t.Type)
+        .Where(t => t.TypeID == typeId)
         .ToList();
         }
     }

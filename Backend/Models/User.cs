@@ -6,7 +6,7 @@ namespace Acadeno.Backend.Models
     public class User
     {
         [Key]
-        public string UserID {get; set;} = string.Empty;
+        public Guid UserID {get; set;} = Guid.NewGuid();
         
         public string Name {get; set;} = string.Empty;
         public string University {get; set;} = string.Empty;
@@ -17,7 +17,7 @@ namespace Acadeno.Backend.Models
         public string Password {get; set;} = string.Empty;
         public GradeScaleType PreferredScale {get; set;}
 
-        //  Holds many Academic Years:
+        //  Holds many Academic Years
         public List<AcademicYear> Years {get; set;} = new List<AcademicYear>();
     }
 }

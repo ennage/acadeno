@@ -6,18 +6,21 @@ namespace Acadeno.Backend.Models
     public class ScheduleEntry
     {
         [Key]
-        public string EntryID {get; set;} = string.Empty;
-        public string UserID {get; set;} = string.Empty;
-        [ForeignKey("UserID")]
-        public string CourseID {get; set;} = string.Empty;
-        [ForeignKey("CourseID")]
-        public Course? Course { get; set; }
+        public Guid EntryID {get; set;} = Guid.NewGuid();
 
-        public User? User { get; set; }
+        // Foreign Key
+        public Guid UserID {get; set;}
+        [ForeignKey("UserID")]
+        public Guid CourseID {get; set;}
+        [ForeignKey("CourseID")]
+
+        public Course? Course {get; set;}
+        public User? User {get; set;}
+
         public string Label {get; set;}  = string.Empty;
         public string Description {get; set;} = string.Empty;
         public int Day {get; set;}
-        public bool IsRepeating { get; set; } // True for weekly classes, False for one-off events
+        public bool IsRepeating {get; set;} // True for weekly classes, False for one-off events
 
         public DateTime StartTime {get; set;}
         public DateTime EndTime {get; set;}

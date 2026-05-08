@@ -5,14 +5,17 @@ namespace Acadeno.Backend.Models
     public class AcademicYear
     {
         [Key]
-        public string YearID {get; set;} = string.Empty;
+        public Guid YearID {get; set;} = Guid.NewGuid();
         
         public string YearSpan {get; set;} = string.Empty;
         public bool IsCurrent {get; set;}
         public double? AYTargetGenAve {get; set;}
         public double? AYCalculatedGenAve {get; set;}
 
-        public string UserID {get; set;} = string.Empty;
+        // Foreign Key
+        public Guid UserID {get; set;}
+
+        // Holds many Terms
         public List<Term> Terms {get; set;} = new List<Term>();
     }
 }
