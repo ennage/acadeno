@@ -158,6 +158,24 @@
 /*  ==========================================================================
     REMINDERS & TASK UI
     ========================================================================== */
+
+.btn-view-all {
+    background: none;
+    border: none;
+    color: #4f46e5; /* Primary indigo color */
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.btn-view-all:hover {
+    background-color: rgba(79, 70, 229, 0.1);
+    text-decoration: underline;
+}
+
 .reminder-list {
     flex-grow: 1;
     overflow-y: auto;

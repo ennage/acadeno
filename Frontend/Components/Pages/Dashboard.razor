@@ -43,10 +43,11 @@
 
         <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
-            <div class="card-header">
-                <h3 class="reminder-title">REMINDERS</h3>
-                <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
-            </div>
+                <div class="card-header">
+                    <button class="btn-view-all" @onclick="NavigateToAllTasks">View All</button>
+                    <h3 class="reminder-title">REMINDERS</h3>
+                    <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
+                </div>
 
                 <div class="card-content-area">
                     <div class="reminder-list">
@@ -63,17 +64,16 @@
                                         @if (task is AcademicTask academicTask)
                                         {
                                             <h4>@task.Name</h4>
-                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd")</h5>
+                                            <h5><strong>@task.RiskLevel ⸺ @task.DueDate.ToString("MMM dd, hh:mm tt")</strong></h5>
                                             <p>@academicTask.Course?.Name</p>
                                         }
                                         else
                                         {
                                             <h4>@task.Name</h4>
-                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd")</h5>
+                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd, hh:mm tt")</h5>
                                         }
                                     </div>
 
-                                    @* 2. Right side buttons (Now inside the card) *@
                                     <div class="action-buttons">
                                         <button class="btn-action btn-complete" @onclick="() => MarkAsComplete(task)">
                                             ✔
@@ -87,7 +87,7 @@
                         }
                         else
                         {
-                            <div class="empty-state"> ✨ All caught up! </div>
+                            <div class="empty-state"> All caught up! </div>
                         }
                     </div>
                 </div>
@@ -182,6 +182,11 @@
     private bool _showModal = false;
     private void ShowModal() => _showModal = true;
     private void HideModal() => _showModal = false;
+    private string _dbStatus = "Checking...";
+    private string _userStatus = "Checking...";
+    private string _idMismatchCheck = "";
+    private int _rawTaskCount = 0;
+    private int _rawScheduleCount = 0;
     private DateTime _startOfWeek;
     private System.Timers.Timer? _timer;
 
@@ -207,6 +212,10 @@
         StateHasChanged();
     }
 
+    private void NavigateToAllTasks()
+    {
+        // Adjust the path to wherever your full task list lives
+    }
         private async Task MarkAsComplete(BaseTask task)
     {
         task.TaskStatus = Status.Completed;
@@ -220,11 +229,7 @@
         await LoadTasks();
     }
 
-    private string _dbStatus = "Checking...";
-    private string _userStatus = "Checking...";
-    private string _idMismatchCheck = "";
-    private int _rawTaskCount = 0;
-    private int _rawScheduleCount = 0;
+
 
     private async Task LoadTasks()
     {
