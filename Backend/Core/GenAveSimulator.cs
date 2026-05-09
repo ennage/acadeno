@@ -26,7 +26,7 @@ public class GenAveSimulator
 
             if (hasGradedTasks)
             {
-                double categoryAve = _gradingEngine.CalculatCategoryScore(type);
+                double categoryAve = _gradingEngine.CalculateCategoryGrade(type);
                 currentWeightedGrade += categoryAve * (type.Weight / 100);
             }
 
