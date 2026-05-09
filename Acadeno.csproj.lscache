@@ -71,6 +71,8 @@ Backend/
   AddActivities.cs
   AddCourses.cs
   AddExams.cs
+  GWASimulator.cs
+  SimulatedTask.cs
   ViewAllCourses.cs
   ViewAllExams.cs
   ViewAllHomework.cs
