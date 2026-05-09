@@ -190,7 +190,7 @@
 .reminder-text h4 { 
     color: var(--text-on-light);
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.90rem;
     font-weight: bold;
     margin: 0;
     overflow: hidden;
@@ -199,23 +199,32 @@
 }
 
 .btn-add-reminder {
-    background: #007bff;
-    border-radius: 6px;
-    border: none;
-    color: white;
-    height: 32px;
-    width: 32px;
-    align-items: center;
-    cursor: pointer;
     display: flex;
-    font-size: 22px; 
+    align-items: center;     
+    justify-content: center;   
+    padding: 0;              
+    padding-bottom: 4px;       
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;        
+    background-color: #f0f4ff;  
+    color: #4f46e5;            
+    font-size: 22px;         
     font-weight: bold;
-    justify-content: center;
-    line-height: 0;
-    padding: 10px;
-    transition: background 0.2s ease;
+    line-height: 0;          
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+.btn-add-reminder:hover {
+    background-color: #e2e8ff;
+    transform: scale(1.05);
+}
+
+.btn-add-reminder:active {
+    transform: scale(0.95);
+}
 .btn-complete {
     align-items: center;
     background: transparent;
