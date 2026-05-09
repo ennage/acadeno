@@ -14,6 +14,7 @@ namespace Acadeno.Backend.Models
         public int Difficulty {get; set;}
         public DateTime StartDate {get; set;}
         public DateTime DueDate {get; set;}
+        public TimeSpan? DueTime {get; set;}
 
         [Column("Status")]
         public Status TaskStatus {get; set;} = (Status) 1;

@@ -7,19 +7,59 @@ namespace Acadeno.Backend.Core
     {
         public double CalculateTaskPercentage(AcademicTask task)
         {
-            double score = task.Score;
-            double maxScore = task.MaxScore;
-            
-            if (maxScore == 0) return 0;
-
-            return (score / maxScore) * 100;
-
+            if (task.MaxScore == 0) return 0;
+            return (double)task.Score / task.MaxScore * 100;
         }
 
-        public double CalculatCategoryScore(List<AcademicTask> tasks)
+        public double CalculateCategoryGrade(AcademicTaskType type)
         {
-            if (tasks.Count == 0) return 0;
-            return tasks.Average(t => CalculateTaskPercentage(t));
+            var gradedTasks = type.AcademicTasks
+                .Where(t => t.Score >= 0)
+                .ToList();      
+
+            if(!gradedTasks.Any()) return 0;
+
+            double TotalScore = gradedTasks.Sum(t => (double)t.Score);
+            double TotalMaxScore = gradedTasks.Sum(t => (double)t.MaxScore);
+
+            if (TotalMaxScore == 0) return 0;
+
+            double performancePercentage = TotalScore / TotalMaxScore;
+            return performancePercentage * type.Weight;
+        }
+
+        public double CalculateCourseGrade(Grade grade)
+        {
+           double totalWeightedGrade = 0;
+           double totalWeight = 0;
+
+            foreach (var type in grade.AcademicTaskTypes)
+            {
+                if (type.AcademicTasks == null || !type.AcademicTasks.Any()) continue;
+               
+                totalWeightedGrade += CalculateCategoryGrade(type);
+                totalWeight += type.Weight;
+            }
+
+            if (totalWeight == 0) return 0;
+            return totalWeightedGrade / totalWeight * 100;
+        }
+
+        public double CalculateTermGrade(Term term)
+        {
+           var coursesWithGrades = term.Courses
+                .Where(c => c.ActualGrade != null && (c.Units ?? 0) > 0)
+                .ToList(); 
+
+            if (!coursesWithGrades.Any()) return 0;
+
+            double totalWeightedGrade = coursesWithGrades
+            .Sum(c => ConvertToGWA(c.ActualGrade.CourseGrade ?? 0, GradeScaleType.Default) * (c.Units ?? 0));
+
+            double totalUnits = coursesWithGrades.Sum(c => c.Units ?? 0);
+            double termGWA = totalUnits == 0 ? 0 : totalWeightedGrade / totalUnits;
+            
+            return Math.Round(termGWA, 2);
         }
 
         public double ConvertToGPA(double rawGrade, GradeScaleType scale)
