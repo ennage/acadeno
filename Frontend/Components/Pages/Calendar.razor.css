@@ -42,13 +42,13 @@
 .day-headers {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    background: #f1f5f9;
+    background: #162a5a;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .day-headers div {
     align-items: center;
-    color: #64748b;
+    color: #b7d5ff;
     font-size: 0.75rem;
     font-weight: 700;
     padding: 12px;
@@ -138,6 +138,12 @@
     background: #162a5a;
     transform: translateX(2px);
     overflow: hidden;
+}
+
+.repeat-icon {
+    font-size: 0.6rem;
+    margin-right: 4px;
+    opacity: 0.7;
 }
 
 .entry-time {
