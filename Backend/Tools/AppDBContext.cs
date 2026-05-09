@@ -7,7 +7,6 @@ namespace Acadeno.Backend.Tools
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            // Database.EnsureCreated();
         }
         
         public DbSet<User> Users {get; set;}
@@ -19,21 +18,58 @@ namespace Acadeno.Backend.Tools
         public DbSet<BaseTask> Tasks {get; set;}
         public DbSet<AcademicTaskType> AcademicTaskTypes {get; set;}
         public DbSet<ScheduleEntry> ScheduleEntries {get; set;}
-        public DbSet<Calendar> Calendars {get; set;} 
+        public DbSet<CalendarEntry> CalendarEntries {get; set;} 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // --- 1. USERS ---
+            modelBuilder.Entity<User>(entity => {
+                entity.ToTable("users");
+                entity.HasKey(u => u.UserID); 
+            });
+
+            // --- 2. TASK HIERARCHY (Table-Per-Hierarchy) ---
             modelBuilder.Entity<BaseTask>()
-                .HasDiscriminator<int>("IsAcademic") // Use your existing column as the label
-                .HasValue<BaseTask>(0)              // 0 means it's a normal task
-                .HasValue<AcademicTask>(1);         // 1 means it's an AcademicTask
-                
-            // Also fix that naming mismatch from image_addb1a.png
-            modelBuilder.Entity<BaseTask>()
-                .Property(t => t.TaskStatus)
-                .HasColumnName("Status");
+                .ToTable("tasks") 
+                .HasDiscriminator<int>("IsAcademic") 
+                .HasValue<BaseTask>(0)  
+                .HasValue<AcademicTask>(1); 
+
+            modelBuilder.Entity<BaseTask>(entity => {
+                entity.HasKey(t => t.TaskID);
+                entity.Property(t => t.TaskStatus).HasColumnName("Status");
+                entity.Property(t => t.StartDate).HasColumnName("StartDate");
+                entity.Property(t => t.DueDate).HasColumnName("DueDate");
+                // Explicitly map UserID as a string to ensure no Guid conversion is attempted
+                entity.Property(t => t.UserID).IsRequired();
+            });
+
+            // --- 3. SCHEDULE ENTRIES ---
+            modelBuilder.Entity<ScheduleEntry>(entity => {
+                entity.ToTable("scheduleentries");
+                entity.HasKey(e => e.EntryID);
+                entity.Property(e => e.StartTime).HasColumnName("StartTime");
+                entity.Property(e => e.EndTime).HasColumnName("EndTime");
+            });
+
+            // --- 4. CALENDAR ENTRIES ---
+            modelBuilder.Entity<CalendarEntry>(entity => {
+                entity.ToTable("calendarentries");
+                entity.Property(e => e.Year).HasColumnName("EntryYear");
+                entity.Property(e => e.Month).HasColumnName("EntryMonth");
+                entity.Property(e => e.Day).HasColumnName("EntryDay");
+            });
+
+            // --- 5. REMAINING TABLES ---
+            modelBuilder.Entity<Course>(entity => {
+                entity.ToTable("courses");
+                entity.HasKey(c => c.CourseID);
+            });
+            
+            modelBuilder.Entity<AcademicTaskType>().ToTable("academictasktypes");
+            modelBuilder.Entity<AcademicYear>().ToTable("academicyears");
+            modelBuilder.Entity<Term>().ToTable("terms");
+            modelBuilder.Entity<Grade>().ToTable("grades");
         }
     }
-
-    
 }

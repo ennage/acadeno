@@ -1,5 +1,5 @@
 /* ==========================================================================
-    1. GLOBAL & CORE LAYOUT
+    GLOBAL & CORE LAYOUT
     ========================================================================== */
 * { box-sizing: border-box; }
 
@@ -16,7 +16,7 @@
     height: 100%;
     min-height: 0;
     overflow: hidden;
-    padding: 24px; 
+    padding: 24px;
 }
 
 .dashboard-grid-container { 
@@ -29,8 +29,9 @@
 }
 
 /* ==========================================================================
-    2. CARD COMPONENTS (BASE & SHARED)
+    CARD COMPONENTS (BASE & SHARED)
     ========================================================================== */
+
 .card-stretch { 
     background: #ffffff; 
     border-radius: 12px; 
@@ -40,10 +41,16 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
-    padding: 30px; 
+    padding-top: 15px;
+    padding-left: 30px;
+    padding-right: 30px; 
+    padding-bottom: 30px;
 }
 
 .card-stretch h3 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 1rem;
     text-align: center;
     width: 100%;
@@ -70,7 +77,7 @@
 }
 
 /* ==========================================================================
-    3. WELCOME BANNER & DATE/GRADE SECTION
+    WELCOME BANNER & DATE/GRADE SECTION
     ========================================================================== */
 .welcome-card { 
     border-left: 6px solid #38bdf8;
@@ -97,6 +104,7 @@
     color: var(--text-on-dark);
     justify-content: flex-start;
     padding: 30px;
+    pointer-events: none;
 }
 
 .live-clock-container {
@@ -148,7 +156,7 @@
 }
 
 /*  ==========================================================================
-    4. REMINDERS & TASK UI
+    REMINDERS & TASK UI
     ========================================================================== */
 .reminder-list {
     flex-grow: 1;
@@ -231,6 +239,12 @@
     width: 32px;
 }
 
+.btn-complete:hover {
+    background: #28a745;
+    color: white;
+    transform: scale(1.1);
+}
+
 .btn-add-task {
     margin-top: 20px;
     width: 100%;
@@ -245,7 +259,7 @@
 }
 
 /*  ==========================================================================
-    5. TIMETABLE GRID SYSTEM
+    TIMETABLE GRID SYSTEM
     ========================================================================== */
 
 .timetable-huge {
@@ -255,15 +269,40 @@
 }
 
 .timetable-grid {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
     display: grid;
-    flex-grow: 1;
-    gap: 2px;
-    grid-auto-rows: minmax(80px, auto);
-    grid-template-columns: repeat(8, minmax(0, 1fr)); /* DO NOT TOUCH */
-    max-height: 65vh; 
+    grid-template-columns: 80px repeat(7, 1fr); /* Time + 7 Days */
+    background: white;
+    border: 1px solid #ddd;
     overflow-y: auto;
+    height: 800px; /* Adjust to your screen size */
+}
+
+.btn-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    color: #16254a;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.nav-svg {
+    width: 24px;
+    height: 24px;
+}
+
+.btn-nav:hover {
+    border-radius: 8px;
+    transform: scale(1.1);
+}
+
+.btn-nav:active {
+    transform: scale(0.9);
 }
 
 .timetable-cell.header {
@@ -309,6 +348,33 @@
     white-space: nowrap;
 }
 
+.timetable-day-column {
+    position: relative; 
+    height: 1440px; /* REQUIRED: 24 hours * 60 mins = 1440px */
+    border-right: 1px solid #eee;
+    background-image: linear-gradient(#eee 1px, transparent 1px);
+    background-size: 100% 60px; /* Creates an hour line every 60px */
+}
+
+.bubble-inner {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    color: #0369a1;
+}
+
+.time-axis {
+    margin-top: -10px; /* Align text with the grid lines */
+}
+
+.hour-marker {
+    height: 60px; /* Must match the background-size above */
+    font-size: 0.7rem;
+    color: #999;
+    text-align: right;
+    padding-right: 10px;
+}
+
 .time-label span {
     display: inline-block;
     width: 75px;
@@ -333,7 +399,7 @@
 .day-number { font-size: 1.1rem; font-weight: 900; color: var(--navy); }
 
 /*  ==========================================================================
-    6. TIMETABLE ENTRIES (TASKS & SCHEDULES)
+    TIMETABLE ENTRIES (TASKS & SCHEDULES)
     ========================================================================== */
 
 .task-entry {
@@ -357,8 +423,60 @@
     width: 100%;
 }
 
+.schedule-entry strong {
+    font-size: 0.75rem;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds "..." if the label is too long */
+}
+
+.schedule-entry-bubble {
+    position: absolute; /* REQUIRED: To float at the correct time */
+    left: 4px;
+    right: 4px;
+    z-index: 10;
+    background: #e0f2fe;
+    border-left: 4px solid #0ea5e9;
+    border-radius: 4px;
+    padding: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.sub-text {
+    font-size: 0.6rem;
+    font-weight: 600;
+    opacity: 0.8;
+    display: block;
+}
+
 .room-text {
     font-size: 0.6rem;
     opacity: 0.8;
     text-transform: uppercase;
 }
+
+.description-hint {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    font-size: 0.5rem;
+    opacity: 0.5;
+    cursor: help;
+}
+
+.course-block {
+    background: rgba(14, 165, 233, 0.15);
+    border-left: 3px solid #0ea5e9;
+    color: #0369a1;
+}
+
+.personal-block {
+    background: rgba(168, 85, 247, 0.15); /* Light Purple */
+    border-left: 3px solid #a855f7;
+    color: #7e22ce;
+}
+
+
+

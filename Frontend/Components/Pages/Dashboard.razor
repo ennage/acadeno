@@ -5,12 +5,14 @@
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
 @using Acadeno.Frontend.Components.Popups
+@using Microsoft.EntityFrameworkCore
 
 @using BaseTask = Acadeno.Backend.Models.BaseTask
 @using AcademicTask = Acadeno.Backend.Models.AcademicTask
 
 @implements IDisposable
 
+@inject Acadeno.Backend.Services.TaskService TaskService
 @inject Acadeno.Backend.Tools.AppDbContext _db
 @inject NavigationManager NavManager
 @inject PriorityEngine PriorityService
@@ -22,6 +24,15 @@
     <NavMenu />
 
     <main class="main-content">
+        <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
+        <div><strong>DATABASE STATUS:</strong> @_dbStatus</div>
+        <div><strong>LOGGED IN AS:</strong> @_userStatus</div>
+        <div><strong>RAW DB COUNTS:</strong> Tasks: @_rawTaskCount | Schedule: @_rawScheduleCount</div>
+        @if (!string.IsNullOrEmpty(_idMismatchCheck))
+        {
+            <div style="color: #fb7185;"><strong>ID MISMATCH CHECK:</strong> @_idMismatchCheck</div>
+        }</div>
+        
         <header class="welcome-card clock-grade-card">
             <!-- DATE AND TIME -->
             <div class="live-clock-container">
@@ -74,60 +85,77 @@
             </div>
 
             <div class="card-stretch timetable-huge">
-                <div class="card-header">
+                <div class="card-header timetable-header">
+                    <div class="week-nav">
+                        <button class="btn-nav" @onclick="() => ChangeWeek(-7)" aria-label="Previous Week">
+                            <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.921,1.505a1.5,1.5,0,0,1-.44,1.06L9.809,10.237a2.5,2.5,0,0,0,0,3.536l7.662,7.662a1.5,1.5,0,0,1-2.121,2.121L7.688,15.9a5.506,5.506,0,0,1,0-7.779L15.36.444a1.5,1.5,0,0,1,2.561,1.061Z"/>
+                            </svg>
+                        </button>
+                    </div>
+
                     <h3>COURSE TIMETABLE</h3>
+
+                    <div class="week-nav">
+                        <button class="btn-nav" @onclick="() => ChangeWeek(7)" aria-label="Next Week">
+                            <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.079,22.5a1.5,1.5,0,0,1,.44-1.06l7.672-7.672a2.5,2.5,0,0,0,0-3.536L6.529,2.565A1.5,1.5,0,0,1,8.65.444l7.662,7.661a5.506,5.506,0,0,1,0,7.779L8.64,23.556A1.5,1.5,0,0,1,6.079,22.5Z"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="timetable-grid">
-                    <!--- HEADER ROW --->
-                    <div class="timetable-cell header">TIME</div>
+                    <div class="timetable-cell header">TIME</div> <!--- HEADER ROW --->
+                        @for (int i = 0; i <= 6; i++)
+                        {
+                            var dateForColumn = _startOfWeek.AddDays(i);
+                            var dayName = dateForColumn.ToString("ddd").ToUpper();
+                            var dayNumber = dateForColumn.Day;
+                            var isToday = dateForColumn == DateTime.Today;
+
+                            <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
+                                <span class="day-name">@dayName</span>
+                                <span class="day-number">@dayNumber</span>
+                            </div>
+                        }
+                    <div class="time-axis" style="grid-column: 1;"">
+                        @for (int h = 0; h <= 23; h++)
+                        {
+                            <div class="hour-marker">
+                                @(DateTime.Today.AddHours(h).ToString("hh:mm tt"))
+                            </div>
+                        }
+                    </div>
 
                     @for (int i = 0; i <= 6; i++)
                     {
-                        var dateForColumn = _startOfWeek.AddDays(i);
-                        var dayName = dateForColumn.ToString("ddd").ToUpper();
-                        var dayNumber = dateForColumn.Day;
-                        var isToday = dateForColumn == DateTime.Today;
+                        var columnDate = _startOfWeek.AddDays(i);
+                        int dayIndex = (int)columnDate.DayOfWeek;
 
-                        <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
-                            <span class="day-name">@dayName</span>
-                            <span class="day-number">@dayNumber</span>
-                        </div>
-                    }
+                        <div class="timetable-day-column @(columnDate == DateTime.Today ? "is-today" : "")"
+                            style="grid-column: @(i + 2); grid-row: 2;">
+                            
+                            @for (int h = 0; h <= 23; h++) { <div class="hour-line"></div> }
 
-                    @for (int hour = 0; hour <= 23; hour++)
-                    {
-                        <div class="timetable-cell time-label">
-                            @if (hour != 0)
+                            @foreach (var entry in _schedule.Where(s => 
+                                // Case 1: Repeating class - Matches day of week AND we are past the start date
+                                (s.IsRepeating && (int)s.StartTime.DayOfWeek == dayIndex && columnDate.Date >= s.StartTime.Date) || 
+                                // Case 2: One-off event - Matches the exact date
+                                (!s.IsRepeating && s.StartTime.Date == columnDate.Date)))
                             {
-                                @(DateTime.Today.AddHours(hour).ToString("hh:mm tt"))
+                                double topOffset = entry.StartTime.TimeOfDay.TotalMinutes;
+                                double height = (entry.EndTime - entry.StartTime).TotalMinutes;
+
+                                <div class="schedule-entry-bubble" style="top: @(topOffset)px; height: @(height)px;">
+                                    <div class="bubble-inner">
+                                        <strong>@entry.Label</strong>
+                                        <span class="sub">@entry.StartTime.ToString("h:mm tt") - @entry.EndTime.ToString("h:mm tt")</span>
+                                        <span class="loc">@entry.Building @entry.Room</span>
+                                    </div>
+                                </div>
                             }
                         </div>
-                        
-                        @for (int i = 0; i <= 6; i++)
-                        {
-                            // Convert our loop index (0-6) to C# DayOfWeek (1-6, then 0)
-                            int dayIndex = (i + 1) % 7;
-
-                            <div class="timetable-cell">
-                                @* TASKS *@
-                                @foreach (var task in _allTasks.Where(t => (int)t.StartDate.DayOfWeek == dayIndex && t.StartDate.Hour == hour))
-                                {
-                                    <div class="task-entry">@task.Name</div>
-                                }
-
-                                @* SCHEDULE *@
-                                @foreach (var entry in _schedule.Where(s => 
-                                    int.TryParse(s.DayOfWeek?.Trim(), out var d) && d == dayIndex && 
-                                    hour >= s.StartTime.Hours && hour < s.EndTime.Hours))
-                                {
-                                    <div class="schedule-entry">
-                                        <strong>@(_courseNames.ContainsKey(entry.CourseID) ? _courseNames[entry.CourseID] : entry.CourseID)</strong>
-                                        <span class="room-text">@entry.Room</span>
-                                    </div>
-                                }
-                            </div>
-                        }
                     }
                 </div>
             </div>
@@ -135,7 +163,7 @@
     </main>
 </div>
 
-<AddTaskModal IsVisible="_showModal" 
+<AddTask IsVisible="_showModal" 
         OnClose="HideModal" 
         OnTaskAdded="RefreshDashboard" />
 
@@ -150,7 +178,7 @@
 
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
-    private Dictionary<string, string> _courseNames = new();
+    private Dictionary<Guid, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
@@ -164,47 +192,87 @@
         await LoadTasks(); // One source of truth for loading
     }
 
+    private void ChangeWeek(int days)
+    {
+        _startOfWeek = _startOfWeek.AddDays(days);
+        StateHasChanged();
+    }
+
+        private async Task MarkAsComplete(BaseTask task)
+    {
+        task.TaskStatus = Status.Completed;
+        _db.Tasks.Update(task);
+        await _db.SaveChangesAsync();
+        await LoadTasks(); 
+    }
+
     private async Task RefreshDashboard()
     {
         await LoadTasks();
     }
 
+    private string _dbStatus = "Checking...";
+    private string _userStatus = "Checking...";
+    private string _idMismatchCheck = "";
+    private int _rawTaskCount = 0;
+    private int _rawScheduleCount = 0;
+
     private async Task LoadTasks()
     {
         try 
         {
-            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-            if (string.IsNullOrEmpty(currentUserId)) return;
-
-            // Fetch Tasks (Case-Insensitive lookup)
-            var userTasks = _db.Tasks
-                .ToList() 
-                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            _allTasks = userTasks
-                .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
-                .ToList();
+            // 1. Check UserService
+            var currentUser = UserService.CurrentUser;
+            if (currentUser == null) {
+                _userStatus = "NULL - UserService is not holding a user!";
+                return;
+            }
             
-            // Extract Top Priorities for the Reminders card
+            string searchId = currentUser.UserID.ToString().ToLower();
+            _userStatus = $"Logged in as {currentUser.Name} ({searchId})";
+
+            // 2. Check Raw Database Connectivity
+            var allDbTasks = await _db.Tasks.ToListAsync();
+            var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
+            
+            _rawTaskCount = allDbTasks.Count;
+            _rawScheduleCount = allDbSchedule.Count;
+            _dbStatus = _db != null ? "Connected" : "Disconnected";
+
+            // 3. Check for ID Mismatch
+            if (allDbTasks.Any())
+            {
+                var sampleId = allDbTasks.First().UserID.ToString().ToLower();
+                if (sampleId != searchId)
+                {
+                    _idMismatchCheck = $"DB Sample ID ({sampleId}) does NOT match your Login ID ({searchId})";
+                }
+                else
+                {
+                    _idMismatchCheck = "IDs MATCH! Check Status filtering logic.";
+                }
+            }
+            else 
+            {
+                _idMismatchCheck = "No tasks found in the table to compare IDs with.";
+            }
+
+            // 4. Perform the filter
+            _allTasks = allDbTasks
+                .Where(t => t.UserID.ToString().ToLower() == searchId && 
+                            t.TaskStatus != Status.Completed)
+                .ToList();
+
+            _schedule = allDbSchedule
+                .Where(s => s.UserID.ToString().ToLower() == searchId)
+                .ToList();
+
             _priorityTasks = PriorityService.GetTopPriorities(10, _allTasks);
-
-            // Fetch Schedule Entries for this user
-            _schedule = _db.ScheduleEntries
-                .Where(s => s.UserID == currentUserId)
-                .ToList();
-
-            // Load Course Names into Dictionary for the timetable lookup
-            // This maps CourseID -> CourseCode so the timetable shows "CS101" instead of a GUID
-            _courseNames = _db.Courses
-                .Where(c => c.UserID == currentUserId)
-                .ToDictionary(c => c.CourseID, c => c.CourseCode);
-            
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ERROR] LoadTasks Failed: {ex.Message}");
+            _dbStatus = $"ERROR: {ex.Message}";
         }
     }
 
@@ -222,14 +290,6 @@
         _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
         _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
         await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task MarkAsComplete(BaseTask task)
-    {
-        task.TaskStatus = Status.Completed;
-        _db.Tasks.Update(task);
-        await _db.SaveChangesAsync();
-        await LoadTasks(); 
     }
 
     public void Dispose()

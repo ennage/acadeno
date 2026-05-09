@@ -3,32 +3,45 @@
 @inject UserService UserService
 
 <aside class="sidebar">
-    <div class="logo"> ACADENO </div>
-    <div class="user-info">
-            <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
-            <p>@UserService.CurrentUser?.University</p>
+    <div class="sidebar-header">
+        <div class="logo"> ACADEÑO </div>
+        <div class="user-info">
+                <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
+                <p>@UserService.CurrentUser?.University</p>
+        </div>
     </div>
 
     @* --- SIDEBAR --- *@
     <nav class="sidebar-nav">
         <div class="nav-button">   
             <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All">
-                Dashboard
+                <svg class="nav-icon" viewBox="0 0 512 512" width="30" height="30">
+                    <path d="M85.333,0h64c47.128,0,85.333,38.205,85.333,85.333v64c0,47.128-38.205,85.333-85.333,85.333h-64   C38.205,234.667,0,196.462,0,149.333v-64C0,38.205,38.205,0,85.333,0z"/>
+                    <path d="M362.667,0h64C473.795,0,512,38.205,512,85.333v64c0,47.128-38.205,85.333-85.333,85.333h-64   c-47.128,0-85.333-38.205-85.333-85.333v-64C277.333,38.205,315.538,0,362.667,0z"/>
+                    <path d="M85.333,277.333h64c47.128,0,85.333,38.205,85.333,85.333v64c0,47.128-38.205,85.333-85.333,85.333h-64   C38.205,512,0,473.795,0,426.667v-64C0,315.538,38.205,277.333,85.333,277.333z"/>
+                    <path d="M362.667,277.333h64c47.128,0,85.333,38.205,85.333,85.333v64C512,473.795,473.795,512,426.667,512h-64   c-47.128,0-85.333-38.205-85.333-85.333v-64C277.333,315.538,315.538,277.333,362.667,277.333z"/></svg>
+                <span class="nav-text">Dashboard</span>
             </NavLink>
         </div>
         <div class="nav-button">
             <NavLink class="nav-link" href="courses">
-                Courses
+                <svg class="nav-icon" viewBox="0 0 24 24" width="30" height="30">
+                    <path d="m19,15.49c0,.097,0,5.51,0,5.51,0,.553-.447,1-1,1s-1-.447-1-1v-3.621l-3.534,1.352c-.469.18-.972.269-1.475.269-.506,0-1.011-.09-1.482-.271l-4.346-1.67c-.719-.277-1.165-.878-1.164-1.568,0-.691.449-1.291,1.169-1.566l4.347-1.658h0c.932-.356,2.003-.357,2.936-.003l4.375,1.66c.71.268,1.171.883,1.172,1.565Zm5-10.49v2H0v-2C0,2.243,2.243,0,5,0h14c2.757,0,5,2.243,5,5ZM6,3.5c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5,1.5.672,1.5,1.5,1.5,1.5-.672,1.5-1.5Zm4,0c0-.828-.672-1.5-1.5-1.5s-1.5.672-1.5,1.5.672,1.5,1.5,1.5,1.5-.672,1.5-1.5Zm1.986,17.5c-.761,0-1.5-.135-2.199-.4l-1.787-.682v1.276c0,.974.57,1.866,1.454,2.273.769.354,1.625.533,2.546.533s1.777-.18,2.548-.533c.882-.407,1.452-1.3,1.452-2.273v-1.284l-1.823.692c-.692.264-1.43.398-2.191.398ZM0,17c0,2.757,2.243,5,5,5h1.082c-.049-.264-.082-.532-.082-.807v-2.055l-.554-.213c-1.488-.572-2.448-1.921-2.446-3.438s.966-2.863,2.456-3.431l4.347-1.658c1.385-.527,2.973-.529,4.359-.004l4.376,1.661c1.356.511,2.484,1.944,2.484,3.431,0,.106-.022,5.513-.022,5.513,0,.208-.022.412-.063.609,1.797-.759,3.063-2.538,3.063-4.609v-8H0v8Z"/></svg>
+                <span class="nav-text">Courses</span>
             </NavLink>
         </div>
         <div class="nav-button">
             <NavLink class="nav-link" href="calendar">
-                Calendar
+                <svg class="nav-icon" viewBox="0 0 24 24" width="30" height="30">
+                    <path d="M13,8h5v4h-5v-4ZM4,12v-4H0v4H4Zm0,2H0v4H4v-4Zm9,10h5v-4h-5v4Zm-2-4H6v4h5v-4Zm9-2h4v-4h-4v4ZM6,12h5v-4H6v4Zm-2,8H.1c.4,1.96,1.94,3.5,3.9,3.9v-3.9Zm7-6H6v4h5v-4Zm9,6v3.9c1.96-.4,3.5-1.94,3.9-3.9h-3.9Zm3.9-14c-.46-2.28-2.48-4-4.9-4h-1V1c0-.55-.45-1-1-1s-1,.45-1,1v1H8V1c0-.55-.45-1-1-1s-1,.45-1,1v1h-1C2.59,2,.57,3.72,.1,6H23.9ZM13,14v4h5v-4h-5Zm7-6v4h4v-4h-4Z"/></svg>
+                <span class="nav-text">Calendar</span>
             </NavLink>
         </div>
         <div class="nav-button">
             <NavLink class="nav-link" href="about">
-                About
+                <svg class="nav-icon" viewBox="0 0 24 24" width="30" height="30">
+                    <path d="M12,24A12,12,0,1,0,0,12,12.013,12.013,0,0,0,12,24ZM12,5a1.5,1.5,0,1,1-1.5,1.5A1.5,1.5,0,0,1,12,5Zm-1,5h1a2,2,0,0,1,2,2v6a1,1,0,0,1-2,0V12H11a1,1,0,0,1,0-2Z"/></svg>
+                <span class="nav-text">About</span>
             </NavLink>
         </div>
     </nav>
@@ -36,11 +49,14 @@
     @* --- SIDEBAR FOOTER --- *@
     <div class="sidebar-footer">
         <!-- LOGOUT -->
-        <button class="nav-button logout-btn" @onclick="HandleLogout">
-            Logout
+        <button class="logout-nav logout-btn" @onclick="HandleLogout">
+            <svg class="logout-icon" viewBox="0 0 24 24" width="15" height="15">
+                <path d="m15 6c0 3.309-2.691 6-6 6s-6-2.691-6-6 2.691-6 6-6 6 2.691 6 6zm2 16h-1c-.552 0-1-.449-1-1v-6c0-.551.448-1 1-1h1c.553 0 1-.448 1-1s-.447-1-1-1h-1c-1.654 0-3 1.346-3 3v6c0 1.654 1.346 3 3 3h1c.553 0 1-.448 1-1s-.447-1-1-1zm6.404-5.245-2.207-1.946c-.411-.363-1.046-.326-1.411.089-.365.414-.325 1.046.089 1.411l.783.691h-2.658c-.553 0-1 .448-1 1s.447 1 1 1h2.792l-.917.809c-.414.365-.454.997-.089 1.411.366.416.999.453 1.411.089l2.199-1.939c.384-.331.604-.809.604-1.311s-.22-.98-.596-1.304zm-12.404-1.755c0-.256.038-.503.076-.749-.668-.158-1.36-.251-2.076-.251-4.963 0-9 4.038-9 9 0 .552.447 1 1 1h11.026c-.635-.838-1.026-1.87-1.026-3z" 
+                fill="currentColor"/></svg>
+            <span class="logout-text"> LOGOUT </span>
         </button>
         <!-- COPYRIGHT -->
-        <p class="copyright">© @DateTime.Now.Year ACADENO</p>
+        <p class="copyright"> © @DateTime.Now.Year ACADEÑO </p>
     </div>
 </aside>
 

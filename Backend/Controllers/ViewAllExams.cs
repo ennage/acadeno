@@ -11,11 +11,11 @@ namespace Acadeno.Backend.Services
         {
             _db = db;
         }
-         public List<AcademicTask> GetAllExams()
+        public List<AcademicTask> GetAllExams(string typeId)
         {
         return _db.AcademicTasks
         .Include(t => t.Type)
-        .Where(t => t.TypeID == "Exam")
+        .Where(t => t.TypeID == typeId)
         .ToList();
         }
     }

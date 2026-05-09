@@ -3,17 +3,17 @@ using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
 {
-    public class ViewAllHomework
+    public class ViewAllActivities
     {
         public readonly AppDbContext _db;
-        public ViewAllHomework(AppDbContext db)
+        public ViewAllActivities(AppDbContext db)
         {
             _db = db;
         }
-         public List<AcademicTask> GetAllHomework()
+        public List<AcademicTask> GetAllActivities(string typeId)
         {
         return _db.AcademicTasks
-        .Where(t => t.TypeID == "Homework")
+        .Where(t => t.TypeID == typeId)
         .ToList();
         }
     }
