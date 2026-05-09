@@ -12,7 +12,10 @@ namespace Acadeno.Backend.Models
         public double? AYTargetGenAve {get; set;}
         public double? AYCalculatedGenAve {get; set;}
 
-        public string UserID {get; set;} = string.Empty;
+        // Foreign Key
+        public string UserID {get; set;}  = string.Empty;
+
+        // Holds many Terms
         public List<Term> Terms {get; set;} = new List<Term>();
     }
 }

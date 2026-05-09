@@ -13,10 +13,10 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
-        public async Task<List<ScheduleEntry>> GetWeeklySchedule(string userId)
+        public async Task<List<ScheduleEntry>> GetWeeklySchedule(Guid userId)
         {
             return await _db.ScheduleEntries
-                .Where(e => e.UserID == userId)
+                .Where(e => e.UserID == userId.ToString())
                 .OrderBy(e => e.Day)
                 .ThenBy(e => e.StartTime)
                 .ToListAsync();
@@ -38,10 +38,10 @@ namespace Acadeno.Backend.Services
             return false; 
         }
 
-        public async Task<string> CalculateLoad(string userId)
+        public async Task<string> CalculateLoad(Guid userId)
         {
             var result = await _db.ScheduleEntries
-                .Where(e => e.UserID == userId)
+                .Where(e => e.UserID == userId.ToString())
                 .ToListAsync();
 
             double totalHours = 0;

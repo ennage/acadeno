@@ -17,7 +17,7 @@ namespace Acadeno.Backend.Models
         public string Password {get; set;} = string.Empty;
         public GradeScaleType PreferredScale {get; set;}
 
-        //  Holds many Academic Years:
+        //  Holds many Academic Years
         public List<AcademicYear> Years {get; set;} = new List<AcademicYear>();
     }
 }

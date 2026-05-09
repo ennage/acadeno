@@ -12,6 +12,7 @@
 
 @implements IDisposable
 
+@inject Acadeno.Backend.Services.TaskService TaskService
 @inject Acadeno.Backend.Tools.AppDbContext _db
 @inject NavigationManager NavManager
 @inject PriorityEngine PriorityService
@@ -23,6 +24,15 @@
     <NavMenu />
 
     <main class="main-content">
+        <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
+        <div><strong>DATABASE STATUS:</strong> @_dbStatus</div>
+        <div><strong>LOGGED IN AS:</strong> @_userStatus</div>
+        <div><strong>RAW DB COUNTS:</strong> Tasks: @_rawTaskCount | Schedule: @_rawScheduleCount</div>
+        @if (!string.IsNullOrEmpty(_idMismatchCheck))
+        {
+            <div style="color: #fb7185;"><strong>ID MISMATCH CHECK:</strong> @_idMismatchCheck</div>
+        }</div>
+        
         <header class="welcome-card clock-grade-card">
             <!-- DATE AND TIME -->
             <div class="live-clock-container">
@@ -129,18 +139,18 @@
                             @for (int h = 0; h <= 23; h++) { <div class="hour-line"></div> }
 
                             @foreach (var entry in _schedule.Where(s => 
-                                s.Day == dayIndex &&
-                                (s.IsRepeating || s.StartTime.Date == columnDate.Date)))
+                                // Case 1: Repeating class - Matches day of week AND we are past the start date
+                                (s.IsRepeating && (int)s.StartTime.DayOfWeek == dayIndex && columnDate.Date >= s.StartTime.Date) || 
+                                // Case 2: One-off event - Matches the exact date
+                                (!s.IsRepeating && s.StartTime.Date == columnDate.Date)))
                             {
-                                // MATH: 1 minute = 1 pixel
                                 double topOffset = entry.StartTime.TimeOfDay.TotalMinutes;
                                 double height = (entry.EndTime - entry.StartTime).TotalMinutes;
 
-                                <div class="schedule-entry-bubble" 
-                                    style="top: @(topOffset)px; height: @(height)px;">
+                                <div class="schedule-entry-bubble" style="top: @(topOffset)px; height: @(height)px;">
                                     <div class="bubble-inner">
                                         <strong>@entry.Label</strong>
-                                        <span class="sub">@entry.StartTime.ToString("h:mm") - @entry.EndTime.ToString("h:mm")</span>
+                                        <span class="sub">@entry.StartTime.ToString("h:mm tt") - @entry.EndTime.ToString("h:mm tt")</span>
                                         <span class="loc">@entry.Building @entry.Room</span>
                                     </div>
                                 </div>
@@ -153,7 +163,7 @@
     </main>
 </div>
 
-<AddTaskModal IsVisible="_showModal" 
+<AddTask IsVisible="_showModal" 
         OnClose="HideModal" 
         OnTaskAdded="RefreshDashboard" />
 
@@ -168,7 +178,7 @@
 
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
-    private Dictionary<string, string> _courseNames = new();
+    private Dictionary<Guid, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
@@ -201,43 +211,68 @@
         await LoadTasks();
     }
 
+    private string _dbStatus = "Checking...";
+    private string _userStatus = "Checking...";
+    private string _idMismatchCheck = "";
+    private int _rawTaskCount = 0;
+    private int _rawScheduleCount = 0;
+
     private async Task LoadTasks()
     {
         try 
         {
-            string currentUserId = UserService.CurrentUser?.UserID ?? string.Empty;
-            if (string.IsNullOrEmpty(currentUserId)) return;
-
-            // Fetch Tasks (Case-Insensitive lookup)
-            var userTasks = _db.Tasks
-                .ToList() 
-                .Where(t => t.UserID.Equals(currentUserId, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            _allTasks = userTasks
-                .Where(t => t.TaskStatus != Status.Completed && t.TaskStatus != Status.Cancelled)
-                .ToList();
+            // 1. Check UserService
+            var currentUser = UserService.CurrentUser;
+            if (currentUser == null) {
+                _userStatus = "NULL - UserService is not holding a user!";
+                return;
+            }
             
-            // Extract Top Priorities for the Reminders card
+            string searchId = currentUser.UserID.ToString().ToLower();
+            _userStatus = $"Logged in as {currentUser.Name} ({searchId})";
+
+            // 2. Check Raw Database Connectivity
+            var allDbTasks = await _db.Tasks.ToListAsync();
+            var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
+            
+            _rawTaskCount = allDbTasks.Count;
+            _rawScheduleCount = allDbSchedule.Count;
+            _dbStatus = _db != null ? "Connected" : "Disconnected";
+
+            // 3. Check for ID Mismatch
+            if (allDbTasks.Any())
+            {
+                var sampleId = allDbTasks.First().UserID.ToString().ToLower();
+                if (sampleId != searchId)
+                {
+                    _idMismatchCheck = $"DB Sample ID ({sampleId}) does NOT match your Login ID ({searchId})";
+                }
+                else
+                {
+                    _idMismatchCheck = "IDs MATCH! Check Status filtering logic.";
+                }
+            }
+            else 
+            {
+                _idMismatchCheck = "No tasks found in the table to compare IDs with.";
+            }
+
+            // 4. Perform the filter
+            _allTasks = allDbTasks
+                .Where(t => t.UserID.ToString().ToLower() == searchId && 
+                            t.TaskStatus != Status.Completed)
+                .ToList();
+
+            _schedule = allDbSchedule
+                .Where(s => s.UserID.ToString().ToLower() == searchId)
+                .ToList();
+
             _priorityTasks = PriorityService.GetTopPriorities(10, _allTasks);
-
-            // Fetch Schedule Entries for this user
-            _schedule = _db.ScheduleEntries
-                .AsNoTracking()
-                .Where(s => s.UserID == currentUserId)
-                .ToList();
-
-            // Load Course Names into Dictionary for the timetable lookup
-            // This maps CourseID -> CourseCode so the timetable shows "CS101" instead of a GUID
-            _courseNames = _db.Courses
-                .Where(c => c.UserID == currentUserId)
-                .ToDictionary(c => c.CourseID, c => c.CourseCode);
-            
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[ERROR] LoadTasks Failed: {ex.Message}");
+            _dbStatus = $"ERROR: {ex.Message}";
         }
     }
 
