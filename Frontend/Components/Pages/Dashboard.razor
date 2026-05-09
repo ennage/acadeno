@@ -24,14 +24,14 @@
     <NavMenu />
 
     <main class="main-content">
-        <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
+        @*<div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
         <div><strong>DATABASE STATUS:</strong> @_dbStatus</div>
         <div><strong>LOGGED IN AS:</strong> @_userStatus</div>
         <div><strong>RAW DB COUNTS:</strong> Tasks: @_rawTaskCount | Schedule: @_rawScheduleCount</div>
         @if (!string.IsNullOrEmpty(_idMismatchCheck))
         {
             <div style="color: #fb7185;"><strong>ID MISMATCH CHECK:</strong> @_idMismatchCheck</div>
-        }</div>
+        }</div>@* *@
         
         <header class="welcome-card clock-grade-card">
             <!-- DATE AND TIME -->

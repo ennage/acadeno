@@ -1,180 +1,266 @@
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(30, 41, 59, 0.5); 
-            backdrop-filter: blur(5px);       
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-        .modal-card {
-            background: #ffffff;
-            width: 95%;
-            max-width: 500px;
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            font-family: 'Poppins', sans-serif;
-            animation: modalSlideUp 0.4s ease-out;
-        }
+<style>
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .modal-title {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-        }
+/* BODY */
+body{
+    font-family:'Inter',sans-serif;
+    background:#ffffff;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-        .close-x {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: #94a3b8;
-            cursor: pointer;
-            line-height: 1;
-        }
+/* OVERLAY */
+.modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.20);
+    backdrop-filter:blur(4px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:9999;
+}
 
-        /* Form Styling */
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+/* MODAL CARD */
+.modal-card{
+    width:100%;
+    max-width:560px;
+    background:#ffffff;
+    border-radius:24px;
+    border:1px solid #e5e7eb;
+    overflow:hidden;
+    box-shadow:0 20px 45px rgba(0,0,0,0.08);
+    animation:modalSlideUp 0.35s ease;
+}
 
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 8px;
-            padding-left: 2px;
-        }
+/* HEADER */
+.modal-header{
+    padding:28px 30px;
+    border-bottom:1px solid #f1f5f9;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#ffffff;
+}
 
-        input, select {
-            width: 100%;
-            padding: 13px 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.95rem;
-            font-family: 'Inter', sans-serif;
-            color: #1e293b;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-            background-color: white;
-        }
+.modal-title{
+    font-size:1.45rem;
+    font-family:'Poppins',sans-serif;
+    font-weight:700;
+    color:#111827;
+}
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
+.close-x{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:12px;
+    background:#f9fafb;
+    color:#6b7280;
+    font-size:1.4rem;
+    cursor:pointer;
+    transition:0.2s ease;
+}
 
-        /* Buttons */
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 15px;
-        }
+.close-x:hover{
+    background:#f3f4f6;
+    color:#111827;
+}
 
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Poppins', sans-serif;
-        }
+/* BODY */
+.modal-body{
+    padding:30px;
+    background:#ffffff;
+}
 
-        .btn-cancel {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-        }
+/* FORM */
+.form-group{
+    margin-bottom:22px;
+}
 
-        .btn-submit {
-            background: #4f46e5; 
-            border: none;
-            color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-        }
+.form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
 
-        .btn-submit:hover {
-            background: #4338ca;
-            transform: translateY(-1px);
-        }
-    </style>
+/* LABELS */
+label{
+    display:block;
+    margin-bottom:8px;
+    padding-left:2px;
+    font-size:0.8rem;
+    font-weight:600;
+    color:#6b7280;
+    font-family:'Poppins',sans-serif;
+}
+
+/* INPUTS */
+input,
+select,
+textarea{
+    width:100%;
+    padding:13px 15px;
+    border-radius:12px;
+    border:1px solid #d1d5db;
+    background:#ffffff;
+    font-family:'Inter',sans-serif;
+    font-size:0.95rem;
+    color:#111827;
+    outline:none;
+    transition:0.2s ease;
+}
+
+textarea{
+    resize:none;
+    min-height:110px;
+    line-height:1.6;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#111827;
+    box-shadow:none;
+}
+
+/* FOOTER */
+.modal-footer{
+    padding:20px 30px;
+    border-top:1px solid #f1f5f9;
+    background:#ffffff;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+}
+
+/* BUTTONS */
+.btn{
+    padding:12px 22px;
+    border:none;
+    border-radius:10px;
+    font-family:'Poppins',sans-serif;
+    font-weight:600;
+    font-size:0.9rem;
+    cursor:pointer;
+    transition:0.2s ease;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.btn-cancel{
+    background:#f3f4f6;
+    color:#374151;
+}
+
+.btn-submit{
+    background:#4f46e5;
+    color:#ffffff;
+}
+
+.btn-submit:hover{
+    background:#000000;
+}
+
+
+
+</style>
+
 <body>
 
-    <div class="modal-overlay" id="homeworkModal">
-        <div class="modal-card">
-            
-            <div class="modal-header">
-                <h2 class="modal-title">Add Homework</h2>
-                <button class="close-x">&times;</button>
-            </div>
+<!-- MODAL -->
+<div class="modal-overlay">
 
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Homework Name</label>
-                    <input type="text" placeholder="e.g. Website Mockup Design">
-                </div>
+    <div class="modal-card">
 
-                <div class="form-group">
-                    <label>Course Name</label>
-                    <select>
-                        <option value="" disabled selected>Select a course</option>
-                        <option>Graphic Fundamentals (ART101)</option>
-                        <option>User Experience Research (UXD301)</option>
-                        <option>Advanced Web Design (ITD201)</option>
-                        <option>3D Animation (ANI301)</option>
-                    </select>
-                </div>
+        <!-- HEADER -->
+        <div class="modal-header">
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Submission Date</label>
-                        <input type="date">
-                    </div>
-                    <div class="form-group">
-                        <label>Submission Time</label>
-                        <input type="time" value="23:59">
-                    </div>
-                </div>
-            </div>
+            <h2 class="modal-title">Add Homework</h2>
 
-            <div class="modal-footer">
-                <button class="btn btn-cancel">Cancel</button>
-                <button class="btn btn-submit">Save Homework</button>
-            </div>
+            <button class="close-x">&times;</button>
+
         </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+
+            <!-- Homework Name -->
+            <div class="form-group">
+
+                <label>Homework Name</label>
+
+                <input type="text" placeholder="e.g. Website Mockup Design">
+
+            </div>
+
+            <!-- Course -->
+            <div class="form-group">
+
+                <label>Course Name</label>
+
+                <select>
+                    <option disabled selected>Select a course</option>
+                    <option>Graphic Fundamentals (ART101)</option>
+                    <option>User Experience Research (UXD301)</option>
+                    <option>Advanced Web Design (ITD201)</option>
+                    <option>3D Animation (ANI301)</option>
+                    <option>Database Management (DBS201)</option>
+                    <option>Mobile Development (MOB202)</option>
+                </select>
+
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+
+                <label>Description</label>
+
+                <textarea placeholder="Enter homework details, instructions, or notes..."></textarea>
+
+            </div>
+
+            <!-- DATE + TIME -->
+            <div class="form-row">
+
+                <div class="form-group">
+                    <label>Submission Date</label>
+                    <input type="date">
+                </div>
+
+                <div class="form-group">
+                    <label>Submission Time</label>
+                    <input type="time" value="23:59">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+
+            <button class="btn btn-cancel">Cancel</button>
+
+            <button class="btn btn-submit">Save Homework</button>
+
+        </div>
+
     </div>
+
+</div>
 
 </body>
