@@ -24,14 +24,14 @@
     <NavMenu />
 
     <main class="main-content">
-        <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
+        @* <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
         <div><strong>DATABASE STATUS:</strong> @_dbStatus</div>
         <div><strong>LOGGED IN AS:</strong> @_userStatus</div>
         <div><strong>RAW DB COUNTS:</strong> Tasks: @_rawTaskCount | Schedule: @_rawScheduleCount</div>
         @if (!string.IsNullOrEmpty(_idMismatchCheck))
         {
             <div style="color: #fb7185;"><strong>ID MISMATCH CHECK:</strong> @_idMismatchCheck</div>
-        }</div>
+        }</div> *@
         
         <header class="welcome-card clock-grade-card">
             <!-- DATE AND TIME -->
@@ -221,7 +221,7 @@
     {
         try 
         {
-            // 1. Check UserService
+            // Check UserService
             var currentUser = UserService.CurrentUser;
             if (currentUser == null) {
                 _userStatus = "NULL - UserService is not holding a user!";
@@ -231,7 +231,7 @@
             string searchId = currentUser.UserID.ToString().ToLower();
             _userStatus = $"Logged in as {currentUser.Name} ({searchId})";
 
-            // 2. Check Raw Database Connectivity
+            // Check Raw Database Connectivity
             var allDbTasks = await _db.Tasks.ToListAsync();
             var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
             
@@ -239,7 +239,7 @@
             _rawScheduleCount = allDbSchedule.Count;
             _dbStatus = _db != null ? "Connected" : "Disconnected";
 
-            // 3. Check for ID Mismatch
+            // Check for ID Mismatch
             if (allDbTasks.Any())
             {
                 var sampleId = allDbTasks.First().UserID.ToString().ToLower();
@@ -257,7 +257,7 @@
                 _idMismatchCheck = "No tasks found in the table to compare IDs with.";
             }
 
-            // 4. Perform the filter
+            // Perform the filter
             _allTasks = allDbTasks
                 .Where(t => t.UserID.ToString().ToLower() == searchId && 
                             t.TaskStatus != Status.Completed)

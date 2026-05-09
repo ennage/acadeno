@@ -4,7 +4,9 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Frontend.Components.Popups
 @using Microsoft.EntityFrameworkCore
+@inject Acadeno.Backend.Services.UserService UserAccess
 @inject Acadeno.Backend.Tools.AppDbContext _db
+
 
 <div class="dashboard-layout">
     <NavMenu /> 
@@ -34,33 +36,25 @@
                 @for (int i = 0; i < 42; i++)
                 {
                     DateTime day = startDate.AddDays(i);
-                    
                     // Filter Manual Notes
                     var dayEvents = Events.Where(e => e.Year == day.Year && (int)e.Month == day.Month && e.Day == day.Day).ToList();
-                    
-                    // Filter Database Schedule Entries (Classes)
-                    // We compare the date part of StartTime to the current grid day
+                    // Filter Database Schedule Entries (Classes), we compare the date part of StartTime to the current grid day
                     var daySchedules = DatabaseSchedules.Where(s => s.StartTime.Date == day.Date).ToList();
 
                     bool isToday = day.Date == DateTime.Today;
-
                     <div class="grid-cell @(day.Month != _currentViewDate.Month ? "muted" : "") @(isToday ? "active-day" : "")" 
                         @onclick="() => OpenPopup(day)">
                         
                         <span class="cell-number">@day.Day</span>
-
                         <div class="event-container">
-                            @* 1. Display Database Classes (ScheduleEntry) *@
-                            @foreach (var sched in daySchedules)
+                            @foreach (var sched in daySchedules) // Display Database Classes (ScheduleEntry)
                             {
                                 <div class="event-tag schedule-entry-tag">
                                     <strong>@sched.Label</strong>
                                     <span class="entry-time">@sched.StartTime.ToString("h:mm tt")</span>
                                 </div>
                             }
-
-                            @* 2. Display Manual Notes (CalendarEntry) *@
-                            @foreach (var ev in dayEvents)
+                            @foreach (var ev in dayEvents) // Display Manual Notes (CalendarEntry)
                             {
                                 <div class="event-tag">@ev.Title</div>
                             }
@@ -88,16 +82,18 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Seed your manual test data
-        Events.Add(new CalendarEntry { 
-            Year = 2026, Month = Month.May, Day = 9, 
-            Title = "CICS - SC Meeting", IsAllDay = false 
-        });
+        // Get the current user's ID
+        string currentUserId = UserAccess.CurrentUser?.UserID ?? string.Empty;
 
-        // 2. Fetch the real Schedule Entries from the database
-        if (_db != null)
+        // Fetch ONLY the real Schedule Entries for THIS user
+        if (_db != null && !string.IsNullOrEmpty(currentUserId))
         {
-            DatabaseSchedules = await _db.ScheduleEntries.ToListAsync();
+            DatabaseSchedules = await _db.ScheduleEntries
+                .Where(s => s.UserID == currentUserId)
+                .ToListAsync();
+            Events = await _db.CalendarEntries
+                .Where(e => e.UserID == currentUserId)
+                .ToListAsync();
         }
     }
 
