@@ -241,7 +241,6 @@
     transition: background 0.2s;
 }
 
-/* Hover effects since they are inside the card now */
 .btn-complete {
     color: #166534;
 }
@@ -258,16 +257,17 @@
 }
 
 .btn-add-reminder {
-    background: #007bff;
-    border-radius: 6px;
-    border: none;
-    color: white;
-    height: 32px;
-    width: 32px;
-    align-items: center;
-    cursor: pointer;
     display: flex;
-    font-size: 22px; 
+    align-items: center;     
+    justify-content: center;   
+    padding: 0;              
+    padding-bottom: 4px;       
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;        
+    background-color: transparent;  
+    color: #16254a;            
+    font-size: 22px;         
     font-weight: bold;
     line-height: 0;          
     border: none;
@@ -275,33 +275,12 @@
     transition: all 0.2s ease;
 }
 
-/* .btn-complete {
-    align-items: center;
-    background: transparent;
-    border-radius: 50%;
-    border: 2px solid #28a745;
-    color: #28a745;
-    cursor: pointer;
-    display: flex;
-    height: 32px;
-    justify-content: center;
-    transition: all 0.2s ease;
-    width: 32px;
-} */
+.btn-add-reminder:hover {
+    transform: scale(1.05);
+}
 
-
-
-.btn-add-task {
-    margin-top: 20px;
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    text-transform: uppercase;
-    font-weight: bold;
-    cursor: pointer;
+.btn-add-reminder:active {
+    transform: scale(0.95);
 }
 
 /*  ==========================================================================
