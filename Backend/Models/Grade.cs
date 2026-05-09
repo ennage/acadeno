@@ -10,7 +10,8 @@ namespace Acadeno.Backend.Models
         public double? TargetCourseGrade {get; set;}
         public double? CourseGrade {get; set;}
 
-        public string CourseID {get; set;} = string.Empty;
+        // Foreign Key
+        public string CourseID {get; set;}  = string.Empty;
 
         public List<AcademicTaskType> AcademicTaskTypes {get; set;} = new List<AcademicTaskType>();
     }   

@@ -16,7 +16,7 @@
         var savedID = Microsoft.Maui.Storage.Preferences.Default.Get("latestUser", string.Empty);
 
         if (!string.IsNullOrEmpty(savedID))
-        {
+        {   
             var user = await IdEngine.GetUserById(savedID);
 
             if (user != null)
@@ -31,7 +31,12 @@
             {
                 // safety check : if the user was deleted from DB but the ID is still in Prefs
                 Microsoft.Maui.Storage.Preferences.Default.Remove("latestUser");
-            }            
+                Nav.NavigateTo("/");
+            }
+        }
+        else if (!string.IsNullOrEmpty(savedID))
+        {
+            Microsoft.Maui.Storage.Preferences.Default.Remove("latestUser");
         }
     }
 }

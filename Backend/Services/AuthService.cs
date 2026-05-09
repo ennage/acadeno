@@ -9,13 +9,11 @@ namespace Acadeno.Backend.Services
     public class AuthService
     {
         private readonly AppDbContext _db;
-        private readonly IdService _idService;
         public User? CurrentUser {get; private set;}
 
-        public AuthService(AppDbContext db, IdService idService)
+        public AuthService(AppDbContext db)
         {
             _db = db;
-            _idService = idService;
         }
 
         private bool IsDBLocked(Exception ex)
@@ -54,7 +52,7 @@ namespace Acadeno.Backend.Services
         private bool IsDBFull(Exception ex)
         {
             return ex.HResult == unchecked((int)0x80070070) || 
-                     ex.Message.Contains("There is not enough space on the Database", StringComparison.OrdinalIgnoreCase);
+                    ex.Message.Contains("There is not enough space on the Database", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<bool> RegisterUser(User newUser, string password)
@@ -63,8 +61,8 @@ namespace Acadeno.Backend.Services
             bool exists = await _db.Users.AnyAsync(u => u.Email == cleanEmail);
             if (exists) return false;
 
+            newUser.UserID = Guid.NewGuid().ToString();
             newUser.Email = cleanEmail;
-            newUser.UserID = await _idService.GenerateNextUserID();
             newUser.Password = HashPassword(password);
 
             _db.Users.Add(newUser);
