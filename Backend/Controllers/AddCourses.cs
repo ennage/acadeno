@@ -22,7 +22,6 @@ namespace Acadeno.Backend.Controllers
 
                 CourseCode = courseCode,
                 Name = name,
-                Room = scheduleEntry.Room,
 
                 ScheduleEntrys = new List<ScheduleEntry> { scheduleEntry }
             };

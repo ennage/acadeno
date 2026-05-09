@@ -9,6 +9,9 @@ namespace Acadeno.Backend.Models
         //  Foreign Key
         public string TypeID {get; set;} = string.Empty;
         public string CourseID {get; set;}  = string.Empty;
+
+        // Navigation Property
+        public virtual Course Course { get; set; } = null!;
         
 
         //  Link to other tables

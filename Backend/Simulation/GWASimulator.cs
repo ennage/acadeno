@@ -1,13 +1,12 @@
 using Acadeno.Backend.Tools;
-using Acadeno.Backend.Core;
 using Acadeno.Backend.Enums;
 
-namespace Acadeno.Backend.Controllers
+namespace Acadeno.Backend.Simulation
 {
     public class GWASimulator
     {
         private readonly AppDbContext _db;
-       private readonly GradingEngine _engine;
+        private readonly GradingEngine _engine;
 
         public GWASimulator(AppDbContext db)
         {
@@ -23,8 +22,8 @@ namespace Acadeno.Backend.Controllers
         }
         public object SimulateAcademicStatus(string userId, string termId, List<SimulatedTaskInput> inputs)
         {
-           double totalWeightedScore = 0;
-           double totalWeight = 0;
+            double totalWeightedScore = 0;
+            double totalWeight = 0;
 
             foreach (var input in inputs)
             {

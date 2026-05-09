@@ -1,7 +1,7 @@
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Enums;
 
-namespace Acadeno.Backend.Core
+namespace Acadeno.Backend.Simulation
 {
     public class GradingEngine
     {
@@ -30,13 +30,13 @@ namespace Acadeno.Backend.Core
 
         public double CalculateCourseGrade(Grade grade)
         {
-           double totalWeightedGrade = 0;
-           double totalWeight = 0;
+            double totalWeightedGrade = 0;
+            double totalWeight = 0;
 
             foreach (var type in grade.AcademicTaskTypes)
             {
                 if (type.AcademicTasks == null || !type.AcademicTasks.Any()) continue;
-               
+
                 totalWeightedGrade += CalculateCategoryGrade(type);
                 totalWeight += type.Weight;
             }
@@ -47,7 +47,7 @@ namespace Acadeno.Backend.Core
 
         public double CalculateTermGrade(Term term)
         {
-           var coursesWithGrades = term.Courses
+            var coursesWithGrades = term.Courses
                 .Where(c => c.ActualGrade != null && (c.Units ?? 0) > 0)
                 .ToList(); 
 

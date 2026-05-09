@@ -4,7 +4,7 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
-@using Acadeno.Frontend.Components.Popups
+@using Acadeno.Frontend.Components.DashboardPopups
 @using Microsoft.EntityFrameworkCore
 
 @using BaseTask = Acadeno.Backend.Models.BaseTask
@@ -24,14 +24,14 @@
     <NavMenu />
 
     <main class="main-content">
-        @*<div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
+        @* <div class="debug-monitor" style="background: #1e293b; color: #38bdf8; padding: 15px; font-family: monospace; font-size: 12px; border-radius: 8px; margin: 20px;">
         <div><strong>DATABASE STATUS:</strong> @_dbStatus</div>
         <div><strong>LOGGED IN AS:</strong> @_userStatus</div>
         <div><strong>RAW DB COUNTS:</strong> Tasks: @_rawTaskCount | Schedule: @_rawScheduleCount</div>
         @if (!string.IsNullOrEmpty(_idMismatchCheck))
         {
             <div style="color: #fb7185;"><strong>ID MISMATCH CHECK:</strong> @_idMismatchCheck</div>
-        }</div>@* *@
+        }</div> *@
         
         <header class="welcome-card clock-grade-card">
             <!-- DATE AND TIME -->
@@ -43,10 +43,11 @@
 
         <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
-            <div class="card-header">
-                <h3 class="reminder-title">REMINDERS</h3>
-                <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
-            </div>
+                <div class="card-header">
+                    <button class="btn-view-all" @onclick="NavigateToAllTasks">View All</button>
+                    <h3 class="reminder-title">REMINDERS</h3>
+                    <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
+                </div>
 
                 <div class="card-content-area">
                     <div class="reminder-list">
@@ -55,30 +56,38 @@
                             @foreach (var task in _priorityTasks)
                             {
                                 var PriorityScore = PriorityService.CalculatePriorityScore(task);
-                                
-                                // UI Logic: If it's Critical Risk or the score is high, it gets the 'alert' class
                                 var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
 
                                 <div class="reminder-item @(isUrgent ? "alert" : "")">
+                                    @* 1. Left side content *@
                                     <div class="reminder-text">
-                                        @if (task is AcademicTask)
+                                        @if (task is AcademicTask academicTask)
                                         {
-                                            <h4>✎ @task.Name</h4>
-                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
+                                            <h4>@task.Name</h4>
+                                            <h5><strong>@task.RiskLevel ⸺ @task.DueDate.ToString("MMM dd, hh:mm tt")</strong></h5>
+                                            <p>@academicTask.Course?.Name</p>
                                         }
                                         else
                                         {
-                                            <h4>𖦹 @task.Name</h4>
-                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
+                                            <h4>@task.Name</h4>
+                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd, hh:mm tt")</h5>
                                         }
                                     </div>
-                                    <button class="btn-complete" @onclick="() => MarkAsComplete(task)"> ✔ </button>
+
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-complete" @onclick="() => MarkAsComplete(task)">
+                                            ✔
+                                        </button>
+                                        <button class="btn-action btn-edit">
+                                            ✎
+                                        </button>
+                                    </div>
                                 </div>
                             }
                         }
                         else
                         {
-                            <div class="empty-state"> ✨ All caught up! </div>
+                            <div class="empty-state"> All caught up! </div>
                         }
                     </div>
                 </div>
@@ -173,6 +182,11 @@
     private bool _showModal = false;
     private void ShowModal() => _showModal = true;
     private void HideModal() => _showModal = false;
+    private string _dbStatus = "Checking...";
+    private string _userStatus = "Checking...";
+    private string _idMismatchCheck = "";
+    private int _rawTaskCount = 0;
+    private int _rawScheduleCount = 0;
     private DateTime _startOfWeek;
     private System.Timers.Timer? _timer;
 
@@ -198,6 +212,10 @@
         StateHasChanged();
     }
 
+    private void NavigateToAllTasks()
+    {
+        // Adjust the path to wherever your full task list lives
+    }
         private async Task MarkAsComplete(BaseTask task)
     {
         task.TaskStatus = Status.Completed;
@@ -211,17 +229,13 @@
         await LoadTasks();
     }
 
-    private string _dbStatus = "Checking...";
-    private string _userStatus = "Checking...";
-    private string _idMismatchCheck = "";
-    private int _rawTaskCount = 0;
-    private int _rawScheduleCount = 0;
+
 
     private async Task LoadTasks()
     {
         try 
         {
-            // 1. Check UserService
+            // Check UserService
             var currentUser = UserService.CurrentUser;
             if (currentUser == null) {
                 _userStatus = "NULL - UserService is not holding a user!";
@@ -231,15 +245,19 @@
             string searchId = currentUser.UserID.ToString().ToLower();
             _userStatus = $"Logged in as {currentUser.Name} ({searchId})";
 
-            // 2. Check Raw Database Connectivity
-            var allDbTasks = await _db.Tasks.ToListAsync();
+            // Check Raw Database Connectivity
+            var allDbTasks = await _db.Tasks
+                .Include("Course")
+                .Include("Type")
+                .AsNoTracking()
+                .ToListAsync();
             var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
             
             _rawTaskCount = allDbTasks.Count;
             _rawScheduleCount = allDbSchedule.Count;
             _dbStatus = _db != null ? "Connected" : "Disconnected";
 
-            // 3. Check for ID Mismatch
+            // Check for ID Mismatch
             if (allDbTasks.Any())
             {
                 var sampleId = allDbTasks.First().UserID.ToString().ToLower();
@@ -257,7 +275,7 @@
                 _idMismatchCheck = "No tasks found in the table to compare IDs with.";
             }
 
-            // 4. Perform the filter
+            // Perform the filter
             _allTasks = allDbTasks
                 .Where(t => t.UserID.ToString().ToLower() == searchId && 
                             t.TaskStatus != Status.Completed)
@@ -276,7 +294,7 @@
         }
     }
 
-    @* ----- REMAINDER OF YOUR CLOCK/MARK-AS-COMPLETE LOGIC ----- *@
+    @* ----- REMAINDER OF YOUR CLOCK ----- *@
     private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);

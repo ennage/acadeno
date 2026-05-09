@@ -22,13 +22,13 @@ namespace Acadeno.Backend.Tools
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // --- 1. USERS ---
+            // --- USERS ---
             modelBuilder.Entity<User>(entity => {
                 entity.ToTable("users");
                 entity.HasKey(u => u.UserID); 
             });
 
-            // --- 2. TASK HIERARCHY (Table-Per-Hierarchy) ---
+            // --- TASK HIERARCHY (Table-Per-Hierarchy) ---
             modelBuilder.Entity<BaseTask>()
                 .ToTable("tasks") 
                 .HasDiscriminator<int>("IsAcademic") 
@@ -44,7 +44,7 @@ namespace Acadeno.Backend.Tools
                 entity.Property(t => t.UserID).IsRequired();
             });
 
-            // --- 3. SCHEDULE ENTRIES ---
+            // --- SCHEDULE ENTRIES ---
             modelBuilder.Entity<ScheduleEntry>(entity => {
                 entity.ToTable("scheduleentries");
                 entity.HasKey(e => e.EntryID);
@@ -52,7 +52,7 @@ namespace Acadeno.Backend.Tools
                 entity.Property(e => e.EndTime).HasColumnName("EndTime");
             });
 
-            // --- 4. CALENDAR ENTRIES ---
+            // --- CALENDAR ENTRIES ---
             modelBuilder.Entity<CalendarEntry>(entity => {
                 entity.ToTable("calendarentries");
                 entity.Property(e => e.Year).HasColumnName("EntryYear");
@@ -60,7 +60,7 @@ namespace Acadeno.Backend.Tools
                 entity.Property(e => e.Day).HasColumnName("EntryDay");
             });
 
-            // --- 5. REMAINING TABLES ---
+            // --- REMAINING TABLES ---
             modelBuilder.Entity<Course>(entity => {
                 entity.ToTable("courses");
                 entity.HasKey(c => c.CourseID);
