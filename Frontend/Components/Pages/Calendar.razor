@@ -91,9 +91,9 @@
             DatabaseSchedules = await _db.ScheduleEntries
                 .Where(s => s.UserID == currentUserId)
                 .ToListAsync();
-            Events = await _db.CalendarEntries
+            @* Events = await _db.CalendarEntries
                 .Where(e => e.UserID == currentUserId)
-                .ToListAsync();
+                .ToListAsync(); *@
         }
     }
 

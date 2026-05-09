@@ -60,6 +60,7 @@
                                 var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
 
                                 <div class="reminder-item @(isUrgent ? "alert" : "")">
+                                    <button class="btn-complete" @onclick="() => MarkAsComplete(task)"> ✔ </button>
                                     <div class="reminder-text">
                                         @if (task is AcademicTask)
                                         {
@@ -72,7 +73,6 @@
                                             <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
                                         }
                                     </div>
-                                    <button class="btn-complete" @onclick="() => MarkAsComplete(task)"> ✔ </button>
                                 </div>
                             }
                         }

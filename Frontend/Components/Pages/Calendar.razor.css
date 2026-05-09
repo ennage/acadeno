@@ -4,7 +4,7 @@
     width: 100vw;
     height: 100vh;
     background-color: #F1F5F9;
-    overflow: hidden;
+    overflow-y: hidden;
 }
 
 /* Calendar Main Area */

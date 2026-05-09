@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Acadeno.Backend.Models
 {
@@ -14,7 +15,11 @@ namespace Acadeno.Backend.Models
         public double? TermCalculatedGenAve {get; set;} 
 
         //  Foreign Key
+        [ForeignKey("AcademicYear")]
         public string YearID {get; set;}  = string.Empty;
+
+        // Navigation Property
+        public virtual AcademicYear AcademicYear {get; set;} = null!;
         
         //  Holds many Courses
         public List<Course> Courses {get; set;} = new List<Course>();

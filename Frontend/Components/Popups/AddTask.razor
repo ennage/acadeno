@@ -2,6 +2,7 @@
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.EntityFrameworkCore
 @inject Acadeno.Backend.Tools.AppDbContext _db
 @inject UserService UserService
 
@@ -9,6 +10,11 @@
 {
     <div class="modal-overlay">
         <div class="modal-card">
+
+            @* --- VISUAL DEBUGGER BOX --- *@
+            <div style="background: #fff4f4; border: 1px solid #ffcccc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.75rem; color: #cc0000; font-family: monospace;">
+                <strong>Debug Log:</strong> @_debugStatus
+            </div>
             
             <div class="modal-header">
                 <h2 class="modal-title">Create New Task</h2>
@@ -17,6 +23,7 @@
 
             <EditForm Model="@_newTask" OnValidSubmit="HandleSave">
                 <div class="modal-body">
+
                     <div class="form-group">
                         <label>Task Name</label>
                         <InputText @bind-Value="_newTask.Name" class="input-field" placeholder="e.g. Finish Project Documentation" />
@@ -60,15 +67,21 @@
                             <span>This is an Academic Task</span>
                         </label>
                     </div>
-
                     @if (_isAcademicTask)
                     {
                         <div class="academic-container">
+
                             <div class="form-group">
-                                <label>Course ID</label>
-                                @* Bind to the helper property instead of the Guid directly *@
-                                <InputText @bind-Value="CourseIdString" class="input-field" placeholder="e.g. a1b2c3d4..." />
+                                <label>Select Course (@_userCourses.Count found)</label>
+                                <select class="input-field" @bind="_courseId">
+                                    <option value="">SELECT</option>
+                                    @foreach (var course in _userCourses)
+                                    {
+                                        <option value="@course.CourseID">@course.CourseCode: @course.Name</option>
+                                    }
+                                </select>
                             </div>
+
                             <div class="form-row three-cols">
                                 <div class="field-container">
                                     <label>Target</label>
@@ -207,9 +220,9 @@
 </style>
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback OnTaskAdded { get; set; }
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public EventCallback OnTaskAdded {get; set;}
 
     private BaseTask _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
     private bool _isAcademicTask = false;
@@ -217,6 +230,87 @@
     private double _targetScore = 0;
     private double _score = 0;
     private double _maxScore = 0;
+    private string _debugStatus = "Waiting...";
+
+    private List<Course> _userCourses = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible)
+        {
+            var userId = UserService.CurrentUser?.UserID;
+            
+            try 
+            {
+                if (string.IsNullOrEmpty(userId)) return;
+
+                // Use direct filtering now that we have the UserID in Course
+                _userCourses = await _db.Courses
+                    .AsNoTracking()
+                    .Where(c => c.UserID == userId)
+                    .ToListAsync();
+
+                if (!_userCourses.Any())
+                {
+                    _debugStatus = $"No courses found for User: {userId}";
+                }
+                else
+                {
+                    _debugStatus = $"Success: Found {_userCourses.Count} courses.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _debugStatus = $"CRASH: {ex.Message}";
+            }
+
+            try 
+            {
+                // STEP 1: Academic Years
+                var yearIds = await _db.AcademicYears
+                    .Where(y => y.UserID == userId)
+                    .Select(y => y.YearID)
+                    .ToListAsync();
+
+                if (!yearIds.Any())
+                {
+                    _debugStatus = $"User '{userId}' has 0 AcademicYears in DB.";
+                    return;
+                }
+
+                // STEP 2: Terms
+                var termIds = await _db.Terms
+                    .Where(t => yearIds.Contains(t.YearID))
+                    .Select(t => t.TermID)
+                    .ToListAsync();
+
+                if (!termIds.Any())
+                {
+                    _debugStatus = $"Found {yearIds.Count} Years, but 0 Terms linked to them.";
+                    return;
+                }
+
+                // STEP 3: Courses
+                _userCourses = await _db.Courses
+                    .AsNoTracking()
+                    .Where(c => termIds.Contains(c.TermID))
+                    .ToListAsync();
+
+                if (!_userCourses.Any())
+                {
+                    _debugStatus = $"Found {termIds.Count} Terms, but 0 Courses linked to them.";
+                }
+                else
+                {
+                    _debugStatus = $"Success! Loaded {_userCourses.Count} courses.";
+                }
+            }
+            catch (Exception ex)
+            {
+                _debugStatus = $"CRASH: {ex.Message}";
+            }
+        }
+    }
 
     private async Task HandleSave()
     {
@@ -225,6 +319,11 @@
 
         if (_isAcademicTask)
         {
+            if (string.IsNullOrEmpty(_courseId))
+            {
+                return;
+            }
+            
             var academic = new AcademicTask 
             { 
                 TaskID = newTaskId, 
@@ -251,7 +350,6 @@
             _newTask.TaskStatus = Status.Pending;
             _db.Tasks.Add(_newTask);
         }
-
         await _db.SaveChangesAsync();
         await OnTaskAdded.InvokeAsync();
         ResetForm();
@@ -269,6 +367,7 @@
         _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
         _isAcademicTask = false;
         _courseId = string.Empty; _targetScore = 0; _score = 0; _maxScore = 0;
+        _userCourses.Clear();
     }
     private async Task Close() => await OnClose.InvokeAsync();
 }

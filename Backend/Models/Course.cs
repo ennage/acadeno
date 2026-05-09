@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Acadeno.Backend.Models
 {
@@ -11,11 +12,14 @@ namespace Acadeno.Backend.Models
         public string Name {get; set;} = string.Empty;
         public int? Units {get; set;}
         public Grade ActualGrade {get; set;} = new Grade();
-        public string Room {get; set;} = string.Empty;
         
         // Foreign Keys
+        [ForeignKey("Term")]
         public string TermID {get; set;} = string.Empty;
         public string UserID {get; set;} = string.Empty;
+
+        // Navigation Property
+        public virtual Term Term {get; set;} = null!;
 
         // Holds Schedule Entries
         public List<ScheduleEntry> ScheduleEntrys {get; set;} = new List<ScheduleEntry>();
