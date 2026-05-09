@@ -1,6 +1,6 @@
 using Acadeno.Backend.Models;
 
-namespace Acadeno.Backend.Core;
+namespace Acadeno.Backend.Simulation;
 
 public class GenAveSimulator
 {
@@ -14,8 +14,8 @@ public class GenAveSimulator
 
     public double PredictRequiredCategoryScore(Grade currentGrade, double targetCourseGrade)
     {
-       double currentWeightedGrade = 0;
-       double remainWeight = 0;
+        double currentWeightedGrade = 0;
+        double remainWeight = 0;
 
         foreach (var type in currentGrade.AcademicTaskTypes)
         {
@@ -43,7 +43,7 @@ public class GenAveSimulator
         if (scoreNeededFromRemaining <= 0) return 0;
 
         double requiredAverage = scoreNeededFromRemaining / (remainWeight / 100);
-       
+        
         return requiredAverage;
     }
 

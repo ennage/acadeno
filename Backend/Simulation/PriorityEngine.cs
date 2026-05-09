@@ -1,7 +1,7 @@
 using BaseTask = Acadeno.Backend.Models.BaseTask;
 using AcademicTask = Acadeno.Backend.Models.AcademicTask;
 
-namespace Acadeno.Backend.Core
+namespace Acadeno.Backend.Simulation
 {
     public class PriorityEngine
     {
