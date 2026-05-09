@@ -260,10 +260,10 @@
 }
 
 .btn-complete {
-    color: #166534;
+    color: #475569;
 }
 .btn-complete:hover {
-    background-color: rgba(34, 197, 94, 0.1);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .btn-edit {
@@ -304,6 +304,35 @@
 /*  ==========================================================================
     TIMETABLE GRID SYSTEM
     ========================================================================== */
+
+.day-header.is-today {
+    background-color: #6366f1 !important;
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.day-header.is-today .month-indicator,
+.day-header.is-today .day-name,
+.day-header.is-today .day-number {
+    color: #ffffff !important;
+    opacity: 1; /* Full visibility */
+}
+
+.day-header.is-today .month-indicator {
+    font-weight: 900;
+}
+
+.timetable-day-column.is-today {
+    background-color: rgba(99, 102, 241, 0.03);
+    border-left: 1px solid rgba(99, 102, 241, 0.1);
+    border-right: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+
+.timetable-cell.header.is-today {
+    border-bottom: 2px solid rgba(64, 66, 190, 0.5);
+}
 
 .timetable-huge {
     grid-column: auto;
@@ -424,22 +453,48 @@
     text-align: center;
 }
 
-.day-header { /* Day Headers (MON 4, etc.) */
+.time-label-cell {
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    justify-content: center;
+    height: 70px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.month-indicator {
+    position: absolute;
+    top: 5px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #4f46e5;
+    text-transform: uppercase;
+}
+
+.day-header {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 10px 0;
-    line-height: 1.1;
+    justify-content: center;
+    position: relative;
+    padding: 15px 10px 5px 10px !important; /* Unified padding */
+    height: 60px; /* Explicit minimum height to ensure uniformity */
 }
 
-.day-header.is-today {
-    background: #f0f9ff;
-    border-bottom: 4px solid #38bdf8 !important;
+.day-name {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: -2px;
 }
 
-.day-name { font-size: 0.65rem; color: #64748b; font-weight: 800; }
-.day-number { font-size: 1.1rem; font-weight: 900; color: var(--navy); }
+.day-number {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.day-header:has(.month-indicator) {
+    border-left: 1px solid rgba(79, 70, 229, 0.1);
+}
 
 /*  ==========================================================================
     TIMETABLE ENTRIES (TASKS & SCHEDULES)

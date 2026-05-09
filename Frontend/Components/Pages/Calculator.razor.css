@@ -1,0 +1,45 @@
+/* Update these specific sections in your CSS */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f7fb;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    overflow-x: hidden;
+}
+
+/* This is the master wrapper that sits beside your NavMenu */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* The NavMenu usually has a fixed width (e.g., 280px) */
+/* We make the main container fill the rest of the space */
+.container {
+    flex: 1; /* This is the magic line */
+    max-width: 1450px;
+    margin: 0; /* Remove margin: auto so it stays next to the NavMenu */
+    padding: 30px;
+    height: 100vh;
+    overflow-y: auto; /* Allows scrolling only the calculator part */
+}
+
+/* Add a transition to the grid for smaller screens */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px; /* Fixed width for the sidebar calculator summary */
+    gap: 30px; /* More breathing room */
+    align-items: start;
+}
+
+/* Responsive fix: Stack when screen is too small for side-by-side */
+@media (max-width: 1100px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+    .sidebar {
+        position: static;
+    }
+}

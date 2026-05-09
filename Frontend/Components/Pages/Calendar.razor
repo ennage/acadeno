@@ -36,10 +36,18 @@
                 @for (int i = 0; i < 42; i++)
                 {
                     DateTime day = startDate.AddDays(i);
-                    // Filter Manual Notes
-                    var dayEvents = Events.Where(e => e.Year == day.Year && (int)e.Month == day.Month && e.Day == day.Day).ToList();
-                    // Filter Database Schedule Entries (Classes), we compare the date part of StartTime to the current grid day
-                    var daySchedules = DatabaseSchedules.Where(s => s.StartTime.Date == day.Date).ToList();
+                    var dayEvents = Events.Where(e => 
+                        e.Year == day.Year 
+                        && (int)e.Month == day.Month
+                        && e.Day == day.Day)
+                        .ToList();
+                    var daySchedules = DatabaseSchedules.Where(s => 
+                        // Case A: Exact date match
+                        s.StartTime.Date == day.Date || 
+                        // Case B: It's a repeating day, AND we are on or after the start date
+                        (s.IsRepeating && s.StartTime.DayOfWeek == day.DayOfWeek && day.Date >= s.StartTime.Date))
+                        .OrderBy(s => s.StartTime.TimeOfDay)
+                        .ToList();
 
                     bool isToday = day.Date == DateTime.Today;
                     <div class="grid-cell @(day.Month != _currentViewDate.Month ? "muted" : "") @(isToday ? "active-day" : "")" 
@@ -49,7 +57,9 @@
                         <div class="event-container">
                             @foreach (var sched in daySchedules) // Display Database Classes (ScheduleEntry)
                             {
-                                <div class="event-tag schedule-entry-tag">
+                                <div class="event-tag schedule-entry-tag @(sched.IsRepeating ? "repeating" : "")">
+                                    @if(sched.IsRepeating) {
+                                    <span class="repeat-icon">🔄</span> }
                                     <strong>@sched.Label</strong>
                                     <span class="entry-time">@sched.StartTime.ToString("h:mm tt")</span>
                                 </div>

@@ -115,19 +115,26 @@
                 </div>
                 
                 <div class="timetable-grid">
-                    <div class="timetable-cell header">TIME</div> <!--- HEADER ROW --->
-                        @for (int i = 0; i <= 6; i++)
-                        {
-                            var dateForColumn = _startOfWeek.AddDays(i);
-                            var dayName = dateForColumn.ToString("ddd").ToUpper();
-                            var dayNumber = dateForColumn.Day;
-                            var isToday = dateForColumn == DateTime.Today;
+                    <div class="time-label-cell timetable-cell header day-header ">
+                        <span class="day-name">TIME</span>
+                    </div> <!--- HEADER ROW --->
+                    @for (int i = 0; i <= 6; i++)
+                    {
+                        var dateForColumn = _startOfWeek.AddDays(i);
+                        var dayName = dateForColumn.ToString("ddd").ToUpper();
+                        var dayNumber = dateForColumn.Day;
+                        var isToday = dateForColumn == DateTime.Today;
+                        bool showMonth = (i == 0) || (dateForColumn.Day == 1);
 
-                            <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
-                                <span class="day-name">@dayName</span>
-                                <span class="day-number">@dayNumber</span>
-                            </div>
-                        }
+                        <div class="timetable-cell header day-header @(isToday ? "is-today" : "")">
+                            @if (showMonth)
+                            {
+                                <span class="month-indicator">@dateForColumn.ToString("MMM").ToUpper()</span>
+                            }
+                            <span class="day-name">@dayName</span>
+                            <span class="day-number">@dayNumber</span>
+                        </div>
+                    }
                     <div class="time-axis" style="grid-column: 1;"">
                         @for (int h = 0; h <= 23; h++)
                         {
@@ -206,31 +213,6 @@
         await LoadTasks(); // One source of truth for loading
     }
 
-    private void ChangeWeek(int days)
-    {
-        _startOfWeek = _startOfWeek.AddDays(days);
-        StateHasChanged();
-    }
-
-    private void NavigateToAllTasks()
-    {
-        // Adjust the path to wherever your full task list lives
-    }
-        private async Task MarkAsComplete(BaseTask task)
-    {
-        task.TaskStatus = Status.Completed;
-        _db.Tasks.Update(task);
-        await _db.SaveChangesAsync();
-        await LoadTasks(); 
-    }
-
-    private async Task RefreshDashboard()
-    {
-        await LoadTasks();
-    }
-
-
-
     private async Task LoadTasks()
     {
         try 
@@ -294,7 +276,44 @@
         }
     }
 
-    @* ----- REMAINDER OF YOUR CLOCK ----- *@
+    // ----- REMINDERS -----
+    
+    private void NavigateToAllTasks()
+    {
+        // Adjust the path to wherever your full task list lives
+    }
+    private async Task MarkAsComplete(BaseTask task)
+    {
+        task.TaskStatus = Status.Completed;
+        _db.Tasks.Update(task);
+        await _db.SaveChangesAsync();
+        await LoadTasks(); 
+    }
+
+    // ----- COURSE TIMETABLE -----
+    private void ChangeWeek(int days)
+    {
+        _startOfWeek = _startOfWeek.AddDays(days);
+        StateHasChanged();
+    }
+
+    private string GetWeekMonthRange()
+    {
+        var endOfWeek = _startOfWeek.AddDays(6);
+        
+        // If the week starts and ends in the same month
+        if (_startOfWeek.Month == endOfWeek.Month)
+        {
+            return _startOfWeek.ToString("MMMM yyyy").ToUpper();
+        }
+        
+        // If the week spans across two different months
+        return $"{_startOfWeek.ToString("MMM").ToUpper()} - {endOfWeek.ToString("MMM").ToUpper()} {endOfWeek.Year}";
+    }
+
+    
+
+    // ----- CLOCK ----- 
     private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);
@@ -314,5 +333,11 @@
     {
         _timer?.Stop();
         _timer?.Dispose();
+    }
+
+    // ----- MISC -----
+        private async Task RefreshDashboard()
+    {
+        await LoadTasks();
     }
 }

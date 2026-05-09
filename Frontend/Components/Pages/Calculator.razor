@@ -1,0 +1,106 @@
+@page "/calculator"
+
+<div class="dashboard-layout" style="display: flex;">
+    <NavMenu />
+
+    <div class="container" style="flex: 1; overflow-y: auto; height: 100vh;">
+        <div class="header">
+            <div class="branding">
+                <h1>Acadeno Grade Calculator</h1>
+                <p>Dynamic grading dashboard with quizzes, activities, projects, and exams.</p>
+            </div>
+            <div class="badge">AY 2025–2026</div>
+        </div>
+
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Courses Window</div>
+                    <button class="primary-btn">+</button>
+                </div>
+
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-header-left">
+                            <button class="collapse-btn">▼</button>
+                            <div>
+                                <h2 class="course-title">Web Development</h2>
+                                <p class="course-subtitle">BSCS • 3 Units</p>
+                            </div>
+                        </div>
+                        <button class="delete-btn">×</button>
+                    </div>
+
+                    <div class="course-top">
+                        <input type="text" placeholder="Code">
+                        <input type="text" placeholder="Course Name">
+                        <select>
+                            <option>3 Units</option>
+                            <option>2 Units</option>
+                            <option>5 Units</option>
+                        </select>
+                    </div>
+
+                    <div class="category-box">
+                        <div class="category-header">
+                            <div class="category-left"><h3>Quizzes</h3></div>
+                            <input class="weight-input" type="number" value="30">
+                        </div>
+                        <div class="test-item">
+                            <input type="text" placeholder="Quiz 1">
+                            <div class="score-group">
+                                <input type="number" placeholder="18">
+                                <span>/</span>
+                                <input type="number" placeholder="20">
+                            </div>
+                            <input class="computed-score" type="text" value="90%" readonly>
+                            <button class="delete-btn">×</button>
+                        </div>
+                    </div>
+
+                    <div class="final-grade">
+                        <div>
+                            <small>Computed Final Grade</small>
+                            <h2>91.40%</h2>
+                        </div>
+                        <div class="grade-letter" style="font-size: 1.5rem; font-weight: bold;">A</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="sidebar">
+                    <div class="gwa-circle">
+                        <svg viewBox="0 0 200 200">
+                            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="circle-center">
+                            <h1>1.25</h1>
+                            <p>Cumulative Grade</p>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-label">Total Courses</div>
+                            <div class="summary-value">6</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Average Grade</div>
+                            <div class="summary-value">91.40%</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Highest Grade</div>
+                            <div class="summary-value">98.20%</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-label">Academic Standing</div>
+                            <div class="summary-value">Dean's Lister</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
