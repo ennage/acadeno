@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Services;
 using Acadeno.Backend.Tools;
-using Acadeno.Backend.Core;
+using Acadeno.Backend.Simulation;
 
 namespace Acadeno
 {

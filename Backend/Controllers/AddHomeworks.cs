@@ -21,7 +21,6 @@ namespace Acadeno.Backend.AddControl
                 CourseID = courseId,
                 Name = name,
                 DueDate = dueDate,
-                DueTime = dueDate.TimeOfDay,
                 TypeID = "Homework"
             };
             _db.AcademicTasks.Add(homework);
