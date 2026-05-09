@@ -65,45 +65,44 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows10.0.19041.0
  UndockedRegFreeWinRT-AutoInitializer.cs
  WindowsAppRuntimeAutoInitializer.cs
 App.xaml.cs
-Backend/
- AddControl/AddHomeworks.cs
- Controllers/
-  AddActivities.cs
-  AddCourses.cs
-  AddExams.cs
-  GWASimulator.cs
-  SimulatedTask.cs
-  ViewAllCourses.cs
-  ViewAllExams.cs
-  ViewAllHomework.cs
- Core/
-  GenAveSimulator.cs
-  GradingEngine.cs
-  PriorityEngine.cs
- Enums/
-  GradeScaleType.cs
-  Month.cs
-  RiskLevel.cs
-  Status.cs
- Models/
-  AcademicTask.cs
-  AcademicTaskType.cs
-  AcademicYear.cs
-  BaseTask.cs
-  CalendarEntry.cs
-  Course.cs
-  Grade.cs
-  ScheduleEntry.cs
-  Term.cs
-  User.cs
- Services/
-  AuthService.cs
-  CalendarService.cs
-  IdService.cs
-  ScheduleService.cs
-  TaskService.cs
-  UserService.cs
- Tools/AppDBContext.cs
+Backend/Controllers/
+ AddActivities.cs
+ AddCourses.cs
+ AddExams.cs
+ AddHomeworks.cs
+ GWASimulator.cs
+ SimulatedTask.cs
+ ViewAllCourses.cs
+ ViewAllExams.cs
+ ViewAllHomework.cs
+Backend/Core/
+ GenAveSimulator.cs
+ GradingEngine.cs
+ PriorityEngine.cs
+Backend/Enums/
+ GradeScaleType.cs
+ Month.cs
+ RiskLevel.cs
+ Status.cs
+Backend/Models/
+ AcademicTask.cs
+ AcademicTaskType.cs
+ AcademicYear.cs
+ BaseTask.cs
+ CalendarEntry.cs
+ Course.cs
+ Grade.cs
+ ScheduleEntry.cs
+ Term.cs
+ User.cs
+Backend/Services/
+ AuthService.cs
+ CalendarService.cs
+ IdService.cs
+ ScheduleService.cs
+ TaskService.cs
+ UserService.cs
+Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
 obj/Debug/net10.0-windows10.0.19041.0/win-x64/
@@ -419,6 +418,11 @@ Frontend/Components/Popups/
  UpcomingTest.razor
 Frontend/Components/
  Routes.razor
+ ViewAll/
+  CalculateGWA.razor
+  ViewAllCourses.razor
+  ViewAllHomework.razor
+  ViewAllTest.razor
  _Imports.razor
 MainPage.xaml
 
@@ -440,4 +444,9 @@ Frontend/Components/Popups/
  UpcomingTest.razor
 Frontend/Components/
  Routes.razor
+ ViewAll/
+  CalculateGWA.razor
+  ViewAllCourses.razor
+  ViewAllHomework.razor
+  ViewAllTest.razor
  _Imports.razor
