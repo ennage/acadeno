@@ -1,435 +1,102 @@
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+@page "/calculator"
 
-<div class="container">
-    <NavMenu/>
+<div class="dashboard-layout" style="display: flex;">
+    <NavMenu />
 
-    <!-- HEADER -->
-    <div class="header">
-        <div class="branding">
-            <h1>Acadeno Grade Calculator</h1>
-            <p>
-                Dynamic grading dashboard with quizzes,
-                activities, projects, and exams.
-            </p>
-        </div>
-
-        <div class="badge">
-            AY 2025–2026
-        </div>
-
-    </div>
-
-    <!-- MAIN GRID -->
-    <div class="main-grid">
-
-        <!-- LEFT -->
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">
-                    Courses Window
-                </div>
-                <button class="primary-btn">
-                    +
-                </button>
+    <div class="container" style="flex: 1; overflow-y: auto; height: 100vh;">
+        <div class="header">
+            <div class="branding">
+                <h1>Acadeno Grade Calculator</h1>
+                <p>Dynamic grading dashboard with quizzes, activities, projects, and exams.</p>
             </div>
+            <div class="badge">AY 2025–2026</div>
+        </div>
 
-            <!-- COURSE -->
-            <div class="course-card">
-                <div class="course-header">
-                    <div class="course-header-left">
-                        <button class="collapse-btn">
-                            ▼
-                        </button>
+        <div class="main-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Courses Window</div>
+                    <button class="primary-btn">+</button>
+                </div>
 
+                <div class="course-card">
+                    <div class="course-header">
+                        <div class="course-header-left">
+                            <button class="collapse-btn">▼</button>
+                            <div>
+                                <h2 class="course-title">Web Development</h2>
+                                <p class="course-subtitle">BSCS • 3 Units</p>
+                            </div>
+                        </div>
+                        <button class="delete-btn">×</button>
+                    </div>
+
+                    <div class="course-top">
+                        <input type="text" placeholder="Code">
+                        <input type="text" placeholder="Course Name">
+                        <select>
+                            <option>3 Units</option>
+                            <option>2 Units</option>
+                            <option>5 Units</option>
+                        </select>
+                    </div>
+
+                    <div class="category-box">
+                        <div class="category-header">
+                            <div class="category-left"><h3>Quizzes</h3></div>
+                            <input class="weight-input" type="number" value="30">
+                        </div>
+                        <div class="test-item">
+                            <input type="text" placeholder="Quiz 1">
+                            <div class="score-group">
+                                <input type="number" placeholder="18">
+                                <span>/</span>
+                                <input type="number" placeholder="20">
+                            </div>
+                            <input class="computed-score" type="text" value="90%" readonly>
+                            <button class="delete-btn">×</button>
+                        </div>
+                    </div>
+
+                    <div class="final-grade">
                         <div>
-                            <h2 class="course-title">
-                                Web Development
-                            </h2>
-                            <p class="course-subtitle">
-                                BSCS • 3 Units
-                            </p>
+                            <small>Computed Final Grade</small>
+                            <h2>91.40%</h2>
                         </div>
-                    </div>
-                    <button class="delete-btn">
-                        ×
-                    </button>
-                </div>
-
-                <div class="course-top">
-
-                    <input type="text" placeholder="Code">
-
-                    <input type="text" placeholder="Course Name">
-
-                    <select>
-                        <option>3 Units</option>
-                        <option>2 Units</option>
-                        <option>5 Units</option>
-                    </select>
-
-                </div>
-
-                <!-- QUIZZES -->
-
-                <div class="category-box">
-
-                    <div class="category-header">
-
-                        <div class="category-left">
-                            <h3>Quizzes</h3>
-                        </div>
-
-                        <input
-                            class="weight-input"
-                            type="number"
-                            value="30"
-                        >
-
-                    </div>
-
-                    <div class="test-item">
-
-                        <input
-                            type="text"
-                            placeholder="Quiz 1"
-                        >
-
-                        <div class="score-group">
-
-                            <input
-                                type="number"
-                                placeholder="18"
-                            >
-
-                            /
-
-                            <input
-                                type="number"
-                                placeholder="20"
-                            >
-
-                        </div>
-
-                        <input
-                            class="computed-score"
-                            type="text"
-                            value="90%"
-                            readonly
-                        >
-
-                        <button class="delete-btn">
-                            ×
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- ACTIVITIES -->
-
-                <div class="category-box">
-
-                    <div class="category-header">
-
-                        <div class="category-left">
-                            <h3>Activities</h3>
-                        </div>
-
-                        <input
-                            class="weight-input"
-                            type="number"
-                            value="20"
-                        >
-
-                    </div>
-
-                    <div class="test-item">
-
-                        <input
-                            type="text"
-                            placeholder="Activity 1"
-                        >
-
-                        <div class="score-group">
-
-                            <input
-                                type="number"
-                                placeholder="45"
-                            >
-
-                            /
-
-                            <input
-                                type="number"
-                                placeholder="50"
-                            >
-
-                        </div>
-
-                        <input
-                            class="computed-score"
-                            type="text"
-                            value="90%"
-                            readonly
-                        >
-
-                        <button class="delete-btn">
-                            ×
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- PROJECTS -->
-
-                <div class="category-box">
-
-                    <div class="category-header">
-
-                        <div class="category-left">
-                            <h3>Projects</h3>
-                        </div>
-
-                        <input
-                            class="weight-input"
-                            type="number"
-                            value="20"
-                        >
-
-                    </div>
-
-                    <div class="test-item">
-
-                        <input
-                            type="text"
-                            placeholder="Project"
-                        >
-
-                        <div class="score-group">
-
-                            <input
-                                type="number"
-                                placeholder="95"
-                            >
-
-                            /
-
-                            <input
-                                type="number"
-                                placeholder="100"
-                            >
-
-                        </div>
-
-                        <input
-                            class="computed-score"
-                            type="text"
-                            value="95%"
-                            readonly
-                        >
-
-                        <button class="delete-btn">
-                            ×
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- MIDTERM -->
-
-                <div class="category-box">
-
-                    <div class="category-header">
-
-                        <div class="category-left">
-                            <h3>Midterm Exam</h3>
-                        </div>
-
-                        <input
-                            class="weight-input"
-                            type="number"
-                            value="15"
-                        >
-
-                    </div>
-
-                    <div class="test-item">
-
-                        <input
-                            type="text"
-                            placeholder="Midterm"
-                        >
-
-                        <div class="score-group">
-
-                            <input
-                                type="number"
-                                placeholder="85"
-                            >
-
-                            /
-
-                            <input
-                                type="number"
-                                placeholder="100"
-                            >
-
-                        </div>
-
-                        <input
-                            class="computed-score"
-                            type="text"
-                            value="85%"
-                            readonly
-                        >
-
-                        <button class="delete-btn">
-                            ×
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <!-- FINAL -->
-
-                <div class="category-box">
-
-                    <div class="category-header">
-
-                        <div class="category-left">
-                            <h3>Final Exam</h3>
-                        </div>
-
-                        <input
-                            class="weight-input"
-                            type="number"
-                            value="15"
-                        >
-
-                    </div>
-
-                    <div class="test-item">
-
-                        <input
-                            type="text"
-                            placeholder="Final Exam"
-                        >
-
-                        <div class="score-group">
-
-                            <input
-                                type="number"
-                                placeholder="92"
-                            >
-
-                            /
-
-                            <input
-                                type="number"
-                                placeholder="100"
-                            >
-
-                        </div>
-
-                        <input
-                            class="computed-score"
-                            type="text"
-                            value="92%"
-                            readonly
-                        >
-                        <button class="delete-btn">
-                            ×
-                        </button>
-                    </div>
-                </div>
-
-                <!-- FINAL GRADE -->
-                <div class="final-grade">
-                    <div>
-                        <small>
-                            Computed Final Grade
-                        </small>
-                        <h2>
-                            91.40%
-                        </h2>
-                    </div>
-                    <div>
-                        A
+                        <div class="grade-letter" style="font-size: 1.5rem; font-weight: bold;">A</div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- RIGHT -->
-        <div class="card">
-            <div class="sidebar">
-                <div class="gwa-circle">
-                    <svg viewBox="0 0 200 200">
-                        <circle
-                            class="circle-bg"
-                            cx="100"
-                            cy="100"
-                            r="90">
-                        </circle>
-
-                        <circle
-                            class="circle-progress"
-                            cx="100"
-                            cy="100"
-                            r="90">
-                        </circle>
-                    </svg>
-
-                    <div class="circle-center">
-                        <h1>
-                            1.25
-                        </h1>
-                        <p>
-                            Cumulative Grade
-                        </p>
-                    </div>
-                </div>
-
-                <!-- SUMMARY -->
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <div class="summary-label">
-                            Total Courses
-                        </div>
-                        <div class="summary-value">
-                            6
+            <div class="card">
+                <div class="sidebar">
+                    <div class="gwa-circle">
+                        <svg viewBox="0 0 200 200">
+                            <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+                        </svg>
+                        <div class="circle-center">
+                            <h1>1.25</h1>
+                            <p>Cumulative Grade</p>
                         </div>
                     </div>
 
-                    <div class="summary-card">
-
-                        <div class="summary-label">
-                            Average Grade
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="summary-label">Total Courses</div>
+                            <div class="summary-value">6</div>
                         </div>
-
-                        <div class="summary-value">
-                            91.40%
+                        <div class="summary-card">
+                            <div class="summary-label">Average Grade</div>
+                            <div class="summary-value">91.40%</div>
                         </div>
-                    </div>
-
-                    <div class="summary-card">
-                        <div class="summary-label">
-                            Highest Grade
+                        <div class="summary-card">
+                            <div class="summary-label">Highest Grade</div>
+                            <div class="summary-value">98.20%</div>
                         </div>
-                        <div class="summary-value">
-                            98.20%
-                        </div>
-                    </div>
-
-                    <div class="summary-card">
-                        <div class="summary-label">
-                            Academic Standing
-                        </div>
-                        <div class="summary-value">
-                            Dean's Lister
+                        <div class="summary-card">
+                            <div class="summary-label">Academic Standing</div>
+                            <div class="summary-value">Dean's Lister</div>
                         </div>
                     </div>
                 </div>
