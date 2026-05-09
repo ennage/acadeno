@@ -161,29 +161,54 @@
 .reminder-list {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 10px 20px;
+    padding: 5px 10px;
+}
+
+.task-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: stretch; /* Makes buttons same height as card if needed */
 }
 
 .reminder-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid #e2e8f0;
-    transition: transform 0.2s;
+    justify-content: space-between;
+    align-items: stretch; /* Stretches buttons to card height */
+    padding: 0; /* Remove default padding to let buttons fit flush */
+    background-color: #f0fdf4; /* Your existing background color logic */
+    border-radius: 16px;
+    margin-bottom: 12px;
+    overflow: hidden; /* Clips button corners to match card radius */
+    border-left: 4px solid #22c55e;
+    background: #72ff824f;
 }
-
+    
 .reminder-item.alert {
     border-left: 4px solid #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-    padding: 10px;
-    border-radius: 8px;
+    background: #ff7f7f4f;
 }
 
-.reminder-text { 
-    color: #64748b;
+.reminder-text {
+    flex-grow: 1;
+    padding: 15px; /* Spacing for text since parent padding is 0 */
+}
+
+.reminder-text p {
+    font-size: 0.75rem;
+    margin: 0 0 0 5px;
+    color: #757575; /* Slightly lighter gray */
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+
+.reminder-text h5 { 
+    color: #626262;
     flex-grow: 1;
     font-size: 0.75rem; 
-    margin: 0 0 0 15px;
+    margin: 0 0 0 5px;
     text-transform: uppercase;
 }
 
@@ -196,6 +221,40 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 50px; /* Fixed width for the button column */
+}
+
+.btn-action {
+    flex: 1; /* Each button takes 50% height */
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+/* Hover effects since they are inside the card now */
+.btn-complete {
+    color: #166534;
+}
+.btn-complete:hover {
+    background-color: rgba(34, 197, 94, 0.1);
+}
+
+.btn-edit {
+    color: #475569;
+}
+
+.btn-edit:hover {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .btn-add-reminder {
@@ -216,7 +275,7 @@
     transition: background 0.2s ease;
 }
 
-.btn-complete {
+/* .btn-complete {
     align-items: center;
     background: transparent;
     border-radius: 50%;
@@ -228,13 +287,9 @@
     justify-content: center;
     transition: all 0.2s ease;
     width: 32px;
-}
+} */
 
-.btn-complete:hover {
-    background: #28a745;
-    color: white;
-    transform: scale(1.1);
-}
+
 
 .btn-add-task {
     margin-top: 20px;

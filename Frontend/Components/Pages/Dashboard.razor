@@ -55,23 +55,32 @@
                             @foreach (var task in _priorityTasks)
                             {
                                 var PriorityScore = PriorityService.CalculatePriorityScore(task);
-                                
-                                // UI Logic: If it's Critical Risk or the score is high, it gets the 'alert' class
                                 var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
 
                                 <div class="reminder-item @(isUrgent ? "alert" : "")">
-                                    <button class="btn-complete" @onclick="() => MarkAsComplete(task)"> ✔ </button>
+                                    @* 1. Left side content *@
                                     <div class="reminder-text">
-                                        @if (task is AcademicTask)
+                                        @if (task is AcademicTask academicTask)
                                         {
-                                            <h4>✎ @task.Name</h4>
-                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
+                                            <h4>@task.Name</h4>
+                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd")</h5>
+                                            <p>@academicTask.Course?.Name</p>
                                         }
                                         else
                                         {
-                                            <h4>𖦹 @task.Name</h4>
-                                            <p>@task.DueDate.ToString("MMM dd") — <strong>@task.RiskLevel</strong></p>
+                                            <h4>@task.Name</h4>
+                                            <h5><strong>@task.RiskLevel</strong> ⸺ @task.DueDate.ToString("MMM dd")</h5>
                                         }
+                                    </div>
+
+                                    @* 2. Right side buttons (Now inside the card) *@
+                                    <div class="action-buttons">
+                                        <button class="btn-action btn-complete" @onclick="() => MarkAsComplete(task)">
+                                            ✔
+                                        </button>
+                                        <button class="btn-action btn-edit">
+                                            ✎
+                                        </button>
                                     </div>
                                 </div>
                             }
@@ -232,7 +241,11 @@
             _userStatus = $"Logged in as {currentUser.Name} ({searchId})";
 
             // Check Raw Database Connectivity
-            var allDbTasks = await _db.Tasks.ToListAsync();
+            var allDbTasks = await _db.Tasks
+                .Include("Course")
+                .Include("Type")
+                .AsNoTracking()
+                .ToListAsync();
             var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
             
             _rawTaskCount = allDbTasks.Count;
@@ -276,7 +289,7 @@
         }
     }
 
-    @* ----- REMAINDER OF YOUR CLOCK/MARK-AS-COMPLETE LOGIC ----- *@
+    @* ----- REMAINDER OF YOUR CLOCK ----- *@
     private void GetClock()
     {
         _timer = new System.Timers.Timer(1000);
