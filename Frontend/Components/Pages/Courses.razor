@@ -25,7 +25,9 @@
                                 <h2 class="section-title">My Courses</h2>
                                 <button class="btn-add" title="Add New Course" @onclick="OpenAddCourseModal">+</button>
                             </div>
-                            <a href="#" class="accent-link">View all courses &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
+                                View all courses &rsaquo;
+                            </a>
                         </div>
 
                         <div class="course-cards-row">
@@ -164,7 +166,21 @@
     </div>
 </div>
 
+@* <AddNewCourse 
+    IsVisible="_showAddCourseModal" 
+    OnClose="() => _showAddCourseModal = false" 
+    OnCourseAdded="RefreshCourses" /> *@
+
+<ViewAllCoursesPopup 
+    IsVisible="_showViewAllCoursesPopup" 
+    UserId="@_userId"
+    OnClose="() => _showViewAllCoursesPopup = false" />
+
 @code {
+    private bool _showAddCourseModal = false;
+    private bool _showViewAllCoursesPopup = false;
+    private string _userId = "";
+
     private List<Course> _courses = new();
     private List<AcademicTask> _upcomingTests = new();
     private List<AcademicTask> _homeworks = new();
@@ -204,5 +220,19 @@
         _ => "badge-notstarted"
     };
 
-    private void OpenAddCourseModal() { /* logic */ }
+    private void OpenAddCourseModal() 
+    { 
+        _showAddCourseModal = true;
+    }
+
+    private void OpenViewAllCoursesModal()
+    {
+        _showViewAllCoursesPopup = true;
+    }
+
+    @* private async Task RefreshCourses()
+    {
+        // Re-run the initialization method to grab the updated list from the database
+        await OnInitializedAsync();
+    } *@
 }

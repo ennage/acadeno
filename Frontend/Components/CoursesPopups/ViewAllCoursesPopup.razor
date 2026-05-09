@@ -1,3 +1,110 @@
+@using Acadeno.Backend.Models
+@using Microsoft.EntityFrameworkCore
+@inject Acadeno.Backend.Tools.AppDbContext _db
+
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="courses-window">
+            <div class="window-header">
+                <div class="header-left">
+                    <h1>All Enrolled Courses</h1>
+                    <p>Manage and monitor your enrolled subjects for the current semester.</p>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" 
+                                placeholder="Search courses..." 
+                                @bind-value="SearchQuery" 
+                                @bind-value:event="oninput">
+                    </div>
+                </div>
+            </div>
+
+            <div class="window-body">
+                <div class="course-grid">
+                    @if (FilteredCourses != null && FilteredCourses.Any())
+                    {
+                        @foreach (var course in FilteredCourses)
+                        {
+                            <div class="course-card">
+                                <div class="side-line @GetColorClass(_courses.IndexOf(course))"></div>
+
+                                <div class="course-content">
+                                    <div class="course-top">
+                                        <div>
+                                            <h3 class="course-title">@course.Name</h3>
+                                            <p class="course-code">@course.CourseCode</p>
+                                        </div>
+                                        <span class="grade">@(course.ActualGrade?.CourseGrade > 0 ? $"{course.ActualGrade.CourseGrade}%" : "--")</span>
+                                    </div>
+
+                                    <div class="course-info">
+                                        @* Placeholder for schedule logic *@
+                                        🕒 Schedule TBD <br>
+                                        📍 Location TBD
+                                    </div>
+
+                                    <div class="course-footer">
+                                        <span class="term-tag">@course.Term?.Name</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #64748b;">
+                            <p>No courses found matching "@SearchQuery"</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="window-footer">
+                <button class="btn btn-secondary" @onclick="Close">Close</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string UserId { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private List<Course> _courses = new();
+    private string SearchQuery { get; set; } = "";
+
+    // Dynamic filtering logic
+    private IEnumerable<Course> FilteredCourses => string.IsNullOrWhiteSpace(SearchQuery)
+        ? _courses
+        : _courses.Where(c => c.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) || 
+                                c.CourseCode.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && !string.IsNullOrEmpty(UserId))
+        {
+            _courses = await _db.Courses
+                .Include(c => c.ActualGrade)
+                .Include(c => c.Term)
+                .Where(c => c.UserID == UserId)
+                .ToListAsync();
+        }
+    }
+
+    private string GetColorClass(int index)
+    {
+        string[] colors = { "purple", "blue", "orange", "green", "red", "pink" };
+        return colors[index % colors.Length];
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -254,208 +361,3 @@ body{
     }
 }
 </style>
-
-<body>
-    
-<div class="modal-overlay">
-
-    <div class="courses-window">
-
-        <!-- HEADER -->
-        <div class="window-header">
-
-            <div class="header-left">
-                <h1>All Enrolled Courses</h1>
-                <p>Manage and monitor your enrolled subjects for the current semester.</p>
-            </div>
-
-            <div class="header-actions">
-                <div class="search-box">
-                    <input type="text" placeholder="Search courses...">
-                </div>
-            </div>
-
-        </div>
-
-        <!-- BODY -->
-        <div class="window-body">
-
-            <div class="course-grid">
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line purple"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">Graphic Fundamentals</h3>
-                                <p class="course-code">ART101</p>
-                            </div>
-
-                            <span class="grade">94%</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 9:00 AM – 10:30 AM <br>
-                            📍 Studio A
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line blue"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">User Experience Research</h3>
-                                <p class="course-code">UXD301</p>
-                            </div>
-
-                            <span class="grade">88%</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 11:00 AM – 12:30 PM <br>
-                            📍 Lab 2
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line orange"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">Advanced Web Design</h3>
-                                <p class="course-code">ITD201</p>
-                            </div>
-
-                            <span class="grade">91%</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 1:30 PM – 3:00 PM <br>
-                            📍 Lab 3
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line green"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">3D Animation</h3>
-                                <p class="course-code">ANI301</p>
-                            </div>
-
-                            <span class="grade">--</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 2:00 PM – 5:00 PM <br>
-                            📍 Animation Studio
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line red"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">Data Structures</h3>
-                                <p class="course-code">CS201</p>
-                            </div>
-
-                            <span class="grade">96%</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 8:00 AM – 9:30 AM <br>
-                            📍 Room 302
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- CARD -->
-                <div class="course-card">
-                    <div class="side-line pink"></div>
-
-                    <div class="course-content">
-
-                        <div class="course-top">
-                            <div>
-                                <h3 class="course-title">Mobile Application Development</h3>
-                                <p class="course-code">MAD401</p>
-                            </div>
-
-                            <span class="grade">89%</span>
-                        </div>
-
-                        <div class="course-info">
-                            🕒 4:00 PM – 6:00 PM <br>
-                            📍 Innovation Lab
-                        </div>
-
-                        <div class="course-footer">
-                            <span class="term-tag">1st Semester</span>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="window-footer">
-            <button class="btn btn-secondary">Close</button>
-        </div>
-
-    </div>
-
-</div>
-
-</body>
-
