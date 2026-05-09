@@ -6,7 +6,7 @@ namespace Acadeno.Backend.Models
     public class User
     {
         [Key]
-        public Guid UserID {get; set;} = Guid.NewGuid();
+        public string UserID {get; set;} = string.Empty;
         
         public string Name {get; set;} = string.Empty;
         public string University {get; set;} = string.Empty;

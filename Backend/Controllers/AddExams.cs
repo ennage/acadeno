@@ -13,19 +13,21 @@ namespace Acadeno.Backend.Controllers
             _db = db;
         }
 
-        public void AddNewExam(Guid userId, Guid courseId, Guid typeId, string name, DateTime date, string description, Status status)
+        public void AddNewExam(string userId, string courseId, string typeId, string name, DateTime date, string description, Status status)
         {
             var exam = new AcademicTask
             {
-                TaskID = Guid.NewGuid(),
-                UserID = userId,
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
                 CourseID = courseId,
                 TypeID = typeId,
+
                 Name = name,
                 DueDate = date,
                 Description = description,
                 TaskStatus = status
             };
+            
             _db.Tasks.Add(exam);
             _db.SaveChanges();
         }

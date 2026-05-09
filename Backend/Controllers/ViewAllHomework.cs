@@ -10,7 +10,7 @@ namespace Acadeno.Backend.Services
         {
             _db = db;
         }
-        public List<AcademicTask> GetAllActivities(Guid typeId)
+        public List<AcademicTask> GetAllActivities(string typeId)
         {
         return _db.AcademicTasks
         .Where(t => t.TypeID == typeId)

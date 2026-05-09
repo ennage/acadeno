@@ -7,7 +7,7 @@ namespace Acadeno.Backend.Models
     public class BaseTask
     {
         [Key]
-        public Guid TaskID {get; set;} = Guid.NewGuid();
+        public string TaskID {get; set;}= string.Empty;
 
         public string Name {get; set;} = string.Empty;
         public string? Description {get; set;} = string.Empty;
@@ -20,6 +20,6 @@ namespace Acadeno.Backend.Models
         public RiskLevel RiskLevel {get; set;}
 
         //  Foreign Key
-        public Guid UserID {get; set;}
+        public string UserID {get; set;} = string.Empty;
     }
 }

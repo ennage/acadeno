@@ -6,7 +6,7 @@ namespace Acadeno.Backend.Models;
 public class CalendarEntry
 {
     [Key]
-    public Guid CalendarID {get;set;} = Guid.NewGuid();
+    public string CalendarID {get;set;} = string.Empty;
 
     public string Title {get;set;} = string.Empty;
     public string? Description {get;set;}
@@ -22,7 +22,7 @@ public class CalendarEntry
     public DateTime Date => new DateTime(Year, (int)Month, Day);
 
     // Foreign Key
-    public Guid UserID {get;set;}
+    public string UserID {get;set;}  = string.Empty;
 
     // Holds Calendar events?
     public List<CalendarEntry> Event {get;set;} = new();    

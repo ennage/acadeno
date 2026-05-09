@@ -7,8 +7,8 @@ namespace Acadeno.Backend.Models
         public double MaxScore {get; set;}
 
         //  Foreign Key
-        public Guid TypeID {get; set;}
-        public Guid CourseID {get; set;}
+        public string TypeID {get; set;} = string.Empty;
+        public string CourseID {get; set;}  = string.Empty;
         
 
         //  Link to other tables

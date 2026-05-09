@@ -11,14 +11,15 @@ namespace Acadeno.Backend.Controllers
             _db = db;
         }
 
-        public AddActivities(AppDbContext db, Guid userId, Guid courseId, Guid typeId, string name, DateTime dueDate)
+        public AddActivities(AppDbContext db, string userId, string courseId, string typeId, string name, DateTime dueDate)
         {
             _db = db;
             var activity = new AcademicTask
             {
-                TaskID = Guid.NewGuid(),
-                UserID = userId,
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
                 CourseID = courseId,
+                
                 Name = name,
                 DueDate = dueDate,
                 TypeID = typeId

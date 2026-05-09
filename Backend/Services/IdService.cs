@@ -13,7 +13,7 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
-        public async Task<User?> GetUserById(Guid id)
+        public async Task<User?> GetUserById(string id)
         {
             // This tells Entity Framework: "Find the first user whose UserID matches this id"
             return await _db.Users.FirstOrDefaultAsync(u => u.UserID == id);

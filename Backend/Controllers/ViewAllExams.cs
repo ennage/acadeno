@@ -11,7 +11,7 @@ namespace Acadeno.Backend.Services
         {
             _db = db;
         }
-        public List<AcademicTask> GetAllExams(Guid typeId)
+        public List<AcademicTask> GetAllExams(string typeId)
         {
         return _db.AcademicTasks
         .Include(t => t.Type)

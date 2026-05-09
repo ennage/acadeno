@@ -213,33 +213,40 @@
 
     private BaseTask _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
     private bool _isAcademicTask = false;
-    private Guid _courseId = Guid.Empty;
+    private string _courseId = string.Empty;
     private double _targetScore = 0;
     private double _score = 0;
     private double _maxScore = 0;
 
     private async Task HandleSave()
     {
-        Guid userId = UserService.CurrentUser?.UserID ?? Guid.Empty;
-        Guid id = Guid.NewGuid();
+        string userId = UserService.CurrentUser?.UserID ?? string.Empty;
+        string newTaskId = Guid.NewGuid().ToString();
 
         if (_isAcademicTask)
         {
             var academic = new AcademicTask 
             { 
-                TaskID = id, UserID = userId, 
-                Name = _newTask.Name, Description = _newTask.Description,
-                StartDate = _newTask.StartDate, DueDate = _newTask.DueDate, 
-                Difficulty = _newTask.Difficulty, RiskLevel = _newTask.RiskLevel, 
+                TaskID = newTaskId, 
+                UserID = userId, 
+                Name = _newTask.Name, 
+                Description = _newTask.Description,
+                StartDate = _newTask.StartDate, 
+                DueDate = _newTask.DueDate, 
+                Difficulty = _newTask.Difficulty, 
+                RiskLevel = _newTask.RiskLevel, 
                 TaskStatus = Status.Pending,
-                CourseID = _courseId, TargetScore = _targetScore,
-                Score = _score, MaxScore = _maxScore
+
+                CourseID = _courseId, 
+                TargetScore = _targetScore,
+                Score = _score, 
+                MaxScore = _maxScore
             };
             _db.Tasks.Add(academic);
         }
         else
         {
-            _newTask.TaskID = id;
+            _newTask.TaskID = newTaskId;
             _newTask.UserID = userId;
             _newTask.TaskStatus = Status.Pending;
             _db.Tasks.Add(_newTask);
@@ -253,15 +260,15 @@
 
     private string CourseIdString
     {
-        get => _courseId == Guid.Empty ? string.Empty : _courseId.ToString();
-        set => Guid.TryParse(value, out _courseId);
+        get => _courseId;
+        set => _courseId = value;
     }
 
     private void ResetForm()
     {
         _newTask = new() { StartDate = DateTime.Now, DueDate = DateTime.Now.AddDays(1) };
         _isAcademicTask = false;
-        _courseId = Guid.Empty; _targetScore = 0; _score = 0; _maxScore = 0;
+        _courseId = string.Empty; _targetScore = 0; _score = 0; _maxScore = 0;
     }
     private async Task Close() => await OnClose.InvokeAsync();
 }

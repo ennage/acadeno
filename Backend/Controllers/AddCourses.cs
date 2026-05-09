@@ -12,18 +12,22 @@ namespace Acadeno.Backend.Controllers
             _db = db;
         }
 
-        public void AddNewCourse(Guid userId, Guid termId, string courseCode, string name, ScheduleEntry scheduleEntry)
+        public void AddNewCourse(string userId, string termId, string courseCode, string name, ScheduleEntry scheduleEntry)
         {
             var course = new Course
             {
-                CourseID = Guid.NewGuid(),
+                CourseID = Guid.NewGuid().ToString(),
                 UserID = userId,
                 TermID = termId,
+
                 CourseCode = courseCode,
                 Name = name,
                 Room = scheduleEntry.Room,
+
                 ScheduleEntrys = new List<ScheduleEntry> { scheduleEntry }
             };
+            scheduleEntry.CourseID = course.CourseID;
+            
             _db.Courses.Add(course);
             _db.SaveChanges();
         }

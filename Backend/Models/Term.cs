@@ -5,7 +5,7 @@ namespace Acadeno.Backend.Models
     public class Term
     {
         [Key]
-        public Guid TermID {get; set;} = Guid.NewGuid();
+        public string TermID {get; set;} = string.Empty;
         
         public string Name {get; set;} = string.Empty;
         public bool IsCurrent {get; set;}
@@ -14,7 +14,7 @@ namespace Acadeno.Backend.Models
         public double? TermCalculatedGenAve {get; set;} 
 
         //  Foreign Key
-        public Guid YearID {get; set;}
+        public string YearID {get; set;}  = string.Empty;
         
         //  Holds many Courses
         public List<Course> Courses {get; set;} = new List<Course>();

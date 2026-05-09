@@ -6,12 +6,12 @@ namespace Acadeno.Backend.Models
     public class ScheduleEntry
     {
         [Key]
-        public Guid EntryID {get; set;} = Guid.NewGuid();
+        public string EntryID {get; set;}= string.Empty;
 
         // Foreign Key
-        public Guid UserID {get; set;}
+        public string UserID {get; set;} = string.Empty;
         [ForeignKey("UserID")]
-        public Guid CourseID {get; set;}
+        public string CourseID {get; set;} = string.Empty;
         [ForeignKey("CourseID")]
 
         public Course? Course {get; set;}

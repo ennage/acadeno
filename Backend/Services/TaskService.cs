@@ -13,7 +13,7 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
-        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAllTasks(Guid userId)
+        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAllTasks(string userId)
         {
             return await _db.AcademicTasks
                 .Where(t => t.UserID == userId)
@@ -21,7 +21,7 @@ namespace Acadeno.Backend.Services
                 .ToListAsync();
         }
 
-        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAcademicTasks(Guid UserId)
+        public async System.Threading.Tasks.Task<List<AcademicTask>> GetAcademicTasks(string UserId)
         {
             return await _db.AcademicTasks
                 .Where(t => t.UserID == UserId)

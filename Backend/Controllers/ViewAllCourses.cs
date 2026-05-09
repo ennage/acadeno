@@ -17,7 +17,7 @@ namespace Acadeno.Backend.Services
             return _db.Courses.ToList();
         }
 
-        public List<Course> GetStudentCourses(Guid userId)
+        public List<Course> GetStudentCourses(string userId)
         {
             return _db.Courses
             .Where(c => c.UserID == userId)

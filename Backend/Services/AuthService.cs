@@ -52,7 +52,7 @@ namespace Acadeno.Backend.Services
         private bool IsDBFull(Exception ex)
         {
             return ex.HResult == unchecked((int)0x80070070) || 
-                     ex.Message.Contains("There is not enough space on the Database", StringComparison.OrdinalIgnoreCase);
+                    ex.Message.Contains("There is not enough space on the Database", StringComparison.OrdinalIgnoreCase);
         }
 
         public async Task<bool> RegisterUser(User newUser, string password)
@@ -61,6 +61,7 @@ namespace Acadeno.Backend.Services
             bool exists = await _db.Users.AnyAsync(u => u.Email == cleanEmail);
             if (exists) return false;
 
+            newUser.UserID = Guid.NewGuid().ToString();
             newUser.Email = cleanEmail;
             newUser.Password = HashPassword(password);
 

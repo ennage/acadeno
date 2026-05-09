@@ -13,7 +13,7 @@ public class CalendarService
         _db = db;
     }
 
-    public async Task<CalendarEntry> GetCalendarView(int year, Month month, Guid userId)
+    public async Task<CalendarEntry> GetCalendarView(int year, Month month, string userId)
     {
         var events = await _db.CalendarEntries
             .Where(e => e.UserID == userId && e.Year == year && e.Month == month)
@@ -42,9 +42,9 @@ public class CalendarService
     public async Task<bool> AddCalendarEvent(CalendarEntry newEvent)
     {
         // Ensure the ID is generated if not already set
-        if (newEvent.CalendarID == Guid.Empty)
+        if (newEvent.CalendarID == string.Empty)
         {
-            newEvent.CalendarID = Guid.NewGuid();
+            newEvent.CalendarID = Guid.NewGuid().ToString();
         }
         _db.CalendarEntries.Add(newEvent);
         var result =await _db.SaveChangesAsync();
