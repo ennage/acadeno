@@ -1,0 +1,289 @@
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* MODAL OVERLAY */
+        .modal-overlay {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* MAIN WINDOW */
+        .courses-window {
+            width: 1000px;
+            max-height: 85vh;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .window-header {
+            padding: 30px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .header-left h1 {
+            font-size: 1.6rem;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .header-left p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        /* BODY / GRID - SCROLLABLE AREA */
+        .window-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8fafc;
+        }
+
+        /* Custom Scrollbar */
+        .window-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .window-body::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        /* CARD DESIGN */
+        .course-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .course-card:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* STATUS LINE (Left Side) */
+        .side-line {
+            width: 5px;
+            border-radius: 10px;
+            height: 160px;
+            align-self: center;
+        }
+
+        .urgent { background: #ef4444; } /* Red */
+        .pending { background: #f59e0b; } /* Orange */
+        .stable { background: #10b981; }  /* Green */
+
+        .course-content {
+            flex: 1;
+        }
+
+        .course-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .course-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .course-meta {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .meta-urgent { color: #ef4444; }
+        .meta-pending { color: #f59e0b; }
+
+        .course-info {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        /* FOOTER TAGS */
+        .course-footer {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subject-tag {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .due-tag {
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        /* WINDOW FOOTER */
+        .window-footer {
+            padding: 20px 30px;
+            background: #fff;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-close {
+            background: #4338ca;
+            color: #f1f5f9;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #e2e8f0;
+        }
+
+        /* Mobile Responsive */
+        /* media (max-width: 768px) {
+            .course-grid { grid-template-columns: 1fr; }
+            .courses-window { width: 100%; height: 95vh; }
+        }*/
+    </style>
+<body>
+
+<div class="modal-overlay">
+    <div class="courses-window">
+        <header class="window-header">
+            <div class="header-left">
+                <h1>Important Reminders</h1>
+                <p>Stay on top of your academic workload. Monitor pending quizzes, activities, and project deadlines across all subjects.</p>
+            </div>
+        </header>
+
+        <main class="window-body">
+            <div class="course-grid">
+                
+                <div class="course-card">
+                    <div class="side-line urgent"></div>
+                    <div class="course-content">
+                        <div class="course-meta meta-urgent">WARNING</div>
+                        <div class="course-top">
+                            <h3 class="course-title">Quiz 2: Normalization</h3>
+                            <span class="due-tag">TODAY</span>
+                        </div>
+                        <p class="course-info">Complete the 3rd Normal Form exercises before the 11:59 PM cutoff.</p>
+                        <div class="course-footer">
+                            <span class="subject-tag">Database Management Systems</span>
+                            <span class="due-tag">Apr 26</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="side-line urgent"></div>
+                    <div class="course-content">
+                        <div class="course-meta meta-urgent">WARNING</div>
+                        <div class="course-top">
+                            <h3 class="course-title">Activity 1: ERD Drawing</h3>
+                            <span class="due-tag">2 DAYS LEFT</span>
+                        </div>
+                        <p class="course-info">Finalize the Crow's Foot notation for the Library System project.</p>
+                        <div class="course-footer">
+                            <span class="subject-tag">Database Management Systems</span>
+                            <span class="due-tag">Apr 28</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="side-line urgent"></div>
+                    <div class="course-content">
+                        <div class="course-meta meta-urgent">WARNING</div>
+                        <div class="course-top">
+                            <h3 class="course-title">Project: FloodWatchPH</h3>
+                            <span class="due-tag">NEXT WEEK</span>
+                        </div>
+                        <p class="course-info">Initial schema design for flood-prone area tracking module.</p>
+                        <div class="course-footer">
+                            <span class="subject-tag">Software Engineering</span>
+                            <span class="due-tag">May 05</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="side-line urgent"></div>
+                    <div class="course-content">
+                        <div class="course-meta">STABLE</div>
+                        <div class="course-top">
+                            <h3 class="course-title">C++ Logic Implementation</h3>
+                            <span class="due-tag">PENDING</span>
+                        </div>
+                        <p class="course-info">Implement the greedy algorithm for medical restocking decisions.</p>
+                        <div class="course-footer">
+                            <span class="subject-tag">Algorithms</span>
+                            <span class="due-tag">May 10</span>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+        </main>
+
+        <footer class="window-footer">
+            <button class="btn-close">Close </button>
+        </footer>
+    </div>
+</div>
+
+</body>
