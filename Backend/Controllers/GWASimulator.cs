@@ -33,16 +33,24 @@ namespace Acadeno.Backend.Controllers
         {
            double totalWeightedScore = 0;
            double totalWeight = 0;
+           double highestGrade = 0;
 
             foreach (var input in inputs)
             {
                 double CategoryPercentage = (input.MaxScore > 0) ? input.score / input.MaxScore * 100 : 0;
+
+                if (CategoryPercentage > highestGrade)
+                {
+                    highestGrade = CategoryPercentage;
+                }
 
                 totalWeightedScore += CategoryPercentage *(input.Weight / 100);
                 totalWeight += input.Weight;
             }
 
             double finalPercentage = (totalWeight > 0) ? (totalWeightedScore / (totalWeight / 100)) : 0;
+
+            double averageGrade = finalPercentage;
 
             double simulatedGWA = _engine.ConvertToGWA(finalPercentage  , GradeScaleType.Default);
             string academicStanding = GetAcademicStanding(simulatedGWA);
@@ -51,15 +59,25 @@ namespace Acadeno.Backend.Controllers
             {
                 simulatedGWA = Math.Round(simulatedGWA, 2),
                 academicStanding = academicStanding,
-                RawPercentage = Math.Round(finalPercentage, 2)
+                AverageGrade = $"{Math.Round(averageGrade, 2)}%",
+                HighestGrade = $"{Math.Round(highestGrade, 2)}%",
+                TotalCourse = inputs.Count
             };
         }
         public string GetAcademicStanding(double gwa)
         {
-            if (gwa <= 1.25) return "Excellent";
-            if (gwa <= 1.75) return "Good";
+            if (gwa >= 1.00 && gwa<= 1.25)
+            {
+                return "President Lister";
+            }
+
+            if (gwa > 1.25 && gwa <= 1.75)
+            {
+                return "Dean's Lister";
+            }
+
             if (gwa <= 2.25) return "Satisfactory";
-            if (gwa <= 3.00) return "Needs Improvement";
+            if (gwa <= 3.00) return "Passing";
 
             return "Failing";
         }

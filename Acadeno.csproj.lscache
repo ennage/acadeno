@@ -88,11 +88,13 @@ Backend/Models/
  Course.cs
  Grade.cs
  ScheduleEntry.cs
+ TaskTypeDefinitions.cs
  Term.cs
  User.cs
 Backend/Services/
  AuthService.cs
  CalendarService.cs
+ CourseService.cs
  IdService.cs
  ScheduleService.cs
  TaskService.cs
@@ -405,17 +407,20 @@ App.xaml
 Frontend/Components/
  CalendarPopups/CalendarPopUp.razor
  CoursesPopups/
-  CalculateGWA.razor
-  EnrolledCourses.razor
-  HomeworkPopUp.razor
-  UpcomingTest.razor
-  ViewAllCourses.razor
-  ViewAllHomework.razor
-  ViewAllTest.razor
- DashboardPopups/AddTask.razor
+  AddHomework.razor
+  AddNewCourse.razor
+  AddTest.razor
+  ViewAllCoursesPopup.razor
+  ViewAllHomeworkPopup.razor
+  ViewAllTestsPopup.razor
+ DashboardPopups/
+  AddTask.razor
+  EditReminder.razor
+  ViewAllReminders.razor
  Pages/
   About.razor
   Access.razor
+  Calculator.razor
   Calendar.razor
   Courses.razor
   Dashboard.razor
@@ -430,17 +435,20 @@ MainPage.xaml
 Frontend/Components/
  CalendarPopups/CalendarPopUp.razor
  CoursesPopups/
-  CalculateGWA.razor
-  EnrolledCourses.razor
-  HomeworkPopUp.razor
-  UpcomingTest.razor
-  ViewAllCourses.razor
-  ViewAllHomework.razor
-  ViewAllTest.razor
- DashboardPopups/AddTask.razor
+  AddHomework.razor
+  AddNewCourse.razor
+  AddTest.razor
+  ViewAllCoursesPopup.razor
+  ViewAllHomeworkPopup.razor
+  ViewAllTestsPopup.razor
+ DashboardPopups/
+  AddTask.razor
+  EditReminder.razor
+  ViewAllReminders.razor
  Pages/
   About.razor
   Access.razor
+  Calculator.razor
   Calendar.razor
   Courses.razor
   Dashboard.razor
