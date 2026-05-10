@@ -13,6 +13,27 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
+        public async System.Threading.Tasks.Task<bool> CreateTask(AcademicTask task)
+        {
+            if (task == null) return false;
+
+            _db.AcademicTasks.Add(task);
+            await _db.SaveChangesAsync();   
+            return true;
+        }
+
+        public async Task<bool> SaveNewTaskAsync(BaseTask task)
+        {
+            if (task == null) return false;
+
+            // Clear tracker to prevent Entity Framework confusion
+            _db.ChangeTracker.Clear();
+            
+            _db.Tasks.Add(task);
+            await _db.SaveChangesAsync();   
+            return true;
+        }
+
         public async System.Threading.Tasks.Task<List<AcademicTask>> GetAllTasks(string userId)
         {
             return await _db.AcademicTasks
@@ -29,14 +50,14 @@ namespace Acadeno.Backend.Services
                 .ToListAsync();
         }
 
-        public async System.Threading.Tasks.Task<bool> CreateTask(AcademicTask task)
+        public async Task<List<AcademicTaskType>> GetTaskTypesAsync()
         {
-            if (task == null) return false;
-
-            _db.AcademicTasks.Add(task);
-            await _db.SaveChangesAsync();   
-            return true;
+            return await _db.AcademicTaskTypes
+                .AsNoTracking()
+                .ToListAsync();
         }
+
+        
 
         public int CalculateRiskLevel(string taskid)
         {

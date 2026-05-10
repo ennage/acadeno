@@ -1,0 +1,296 @@
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Services
+@using Microsoft.EntityFrameworkCore
+@inject TaskService TaskService
+@inject CourseService CourseService
+@inject UserService UserAccess
+
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="modal-card">
+
+            <div class="modal-header">
+                <h2 class="modal-title">Add Homework</h2>
+                <button type="button" class="close-x" @onclick="Close">&times;</button>
+            </div>
+
+            <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label>Homework Name</label>
+                        <InputText @bind-Value="_newTask.Name" placeholder="e.g. Website Mockup Design" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Course Name</label>
+                        <InputSelect @bind-Value="_newTask.CourseID" required>
+                            <option value="" disabled selected>Select a course</option>
+                            @foreach (var course in _availableCourses)
+                            {
+                                <option value="@course.CourseID">@course.Name (@course.CourseCode)</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <InputTextArea @bind-Value="_newTask.Description" placeholder="Enter homework details, instructions, or notes..." />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Submission Date</label>
+                            <input type="date" @bind="_uiDate" @bind:format="yyyy-MM-dd" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Submission Time</label>
+                            <input type="time" @bind="_uiTime" @bind:format="HH:mm" required />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Save Homework</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public EventCallback OnTaskAdded {get; set;}
+
+    private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    private DateTime _uiDate = DateTime.Today.AddDays(1); // Default: Tomorrow
+    private DateTime _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);
+    
+    private List<Course> _availableCourses = new();
+    private string _homeworkTypeId = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Safe loading: Waits for the modal to open before querying EF Core
+        if (IsVisible && !_availableCourses.Any())
+        {
+            var userId = UserAccess.CurrentUser?.UserID;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // Fetch Courses
+                _availableCourses = await CourseService.GetUserCoursesAsync(userId);
+                
+                // Fetch Task Types and secretly grab the "Activity/Homework" ID
+                var allTypes = await TaskService.GetTaskTypesAsync();
+                var hwType = allTypes.FirstOrDefault(t => t.DefID == "22222222-2222-2222-2222-222222222222");
+                if (hwType != null) 
+                {
+                    _homeworkTypeId = hwType.TypeID;
+                }
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // Merge Date and Time right before saving!
+        _newTask.DueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
+        
+        // Auto-assign properties
+        _newTask.TaskID = Guid.NewGuid().ToString();
+        _newTask.UserID = userId;
+        _newTask.StartDate = DateTime.Now;
+        _newTask.TypeID = _homeworkTypeId; // Assigns it as Homework
+
+        // Save
+        await TaskService.SaveNewTaskAsync(_newTask);
+
+        // Refresh Dashboard and Close
+        await OnTaskAdded.InvokeAsync();
+        await Close();
+
+        // Reset the form
+        _newTask = new() { TaskStatus = Status.Pending };
+        _uiDate = DateTime.Today.AddDays(1);
+        _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
+    /* OVERLAY */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.20);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 9999;
+    }
+
+    /* MODAL CARD */
+    .modal-card {
+        width: 100%;
+        max-width: 560px;
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+        animation: modalSlideUp 0.35s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    @@keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HEADER */
+    .modal-header {
+        padding: 28px 30px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+    }
+
+    .modal-title {
+        font-size: 1.45rem;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        color: #111827;
+        margin: 0;
+    }
+
+    .close-x {
+        width: 42px;
+        height: 42px;
+        border: none;
+        border-radius: 12px;
+        background: #f9fafb;
+        color: #6b7280;
+        font-size: 1.4rem;
+        cursor: pointer;
+        transition: 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-x:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+    /* BODY */
+    .modal-body {
+        padding: 30px;
+        background: #ffffff;
+    }
+
+    /* FORM */
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    /* LABELS */
+    label {
+        display: block;
+        margin-bottom: 8px;
+        padding-left: 2px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #6b7280;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* INPUTS */
+    input,
+    select,
+    textarea {
+        width: 100%;
+        padding: 13px 15px;
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        color: #111827;
+        outline: none;
+        transition: 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    textarea {
+        resize: none;
+        min-height: 110px;
+        line-height: 1.6;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: #111827;
+        box-shadow: none;
+    }
+
+    /* FOOTER */
+    .modal-footer {
+        padding: 20px 30px;
+        border-top: 1px solid #f1f5f9;
+        background: #ffffff;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* BUTTONS */
+    .btn {
+        padding: 12px 22px;
+        border: none;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-submit {
+        background: #4f46e5;
+        color: #ffffff;
+    }
+
+    .btn-submit:hover {
+        background: #000000;
+    }
+</style>

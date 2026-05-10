@@ -3,8 +3,9 @@
 @using Acadeno.Backend.Models
 @using Microsoft.EntityFrameworkCore
 @inject Acadeno.Backend.Tools.AppDbContext _db
-@inject CourseService CourseController
-@inject Acadeno.Backend.Services.UserService UserAccess
+@inject CourseService CourseService
+@inject TermService TermService
+@inject UserService UserAccess
 
 @if (IsVisible)
 {
@@ -57,11 +58,11 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Start Time</label>
-                                <input type="time" @bind="_schedule.StartTime" required />
+                                <input type="time" @bind="_schedule.StartTime" @bind:format="HH:mm" required />
                             </div>
                             <div class="form-group">
                                 <label>End Time</label>
-                                <input type="time" @bind="_schedule.EndTime" required />
+                                <input type="time" @bind="_schedule.EndTime" @bind:format="HH:mm" required />
                             </div>
                         </div>
 
@@ -95,13 +96,19 @@
     [Parameter] public EventCallback OnCourseAdded {get; set;}
 
     private Course _newCourse = new();
-    private ScheduleEntry _schedule = new();
+    private ScheduleEntry _schedule = new() { 
+        StartTime = DateTime.Today.AddHours(8),                     // 8:00 AM
+        EndTime = DateTime.Today.AddHours(9).AddMinutes(30)   // 9:30 AM
+    };
     private List<Term> _availableTerms = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        // Fetch terms so the dropdown works
-        _availableTerms = await _db.Terms.ToListAsync();
+        // This forces the popup to wait until IsVisible becomes true before it queries the database!
+        if (IsVisible && !_availableTerms.Any())
+        {
+            _availableTerms = await TermService.GetAvailableTermsAsync();
+        }
     }
 
     private async Task HandleSubmit()
@@ -110,7 +117,7 @@
         if (string.IsNullOrEmpty(userId)) return;
 
         // Aligning perfectly with your CourseService signature
-        await CourseController.AddNewCourseAsync(
+        await CourseService.AddNewCourseAsync(
             userId: userId, 
             termId: _newCourse.TermID, 
             courseCode: _newCourse.CourseCode, 
@@ -124,9 +131,13 @@
         
         // Reset form for the next time it opens
         _newCourse = new();
-        _schedule = new();
+        _schedule = new()
+        { 
+            StartTime = DateTime.Today.AddHours(8), 
+            EndTime = DateTime.Today.AddHours(9).AddMinutes(30) 
+        };
     }
-
+    
     private async Task Close() => await OnClose.InvokeAsync();
 }
 
