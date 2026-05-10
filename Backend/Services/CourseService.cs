@@ -1,5 +1,9 @@
-using Acadeno.Backend.Tools;
 using Acadeno.Backend.Models;
+using Acadeno.Backend.Tools;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Acadeno.Backend.Services
 {
@@ -30,6 +34,14 @@ namespace Acadeno.Backend.Services
             await _db.SaveChangesAsync();
 
             return course;
+        }
+
+        public async Task<List<Course>> GetUserCoursesAsync(string userId)
+        {
+            return await _db.Courses
+                .AsNoTracking()
+                .Where(c => c.UserID == userId)
+                .ToListAsync();
         }
 
     }

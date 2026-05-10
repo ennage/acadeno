@@ -28,7 +28,7 @@
             <p style="color:red; font-weight:bold;">@errorMsg</p>
         }
 
-        <form @onsubmit="HandleSubmit">
+        <form @onsubmit="HandleSubmit" @onsubmit:preventDefault="true">
             @if (isRegisterMode)
             {
                 <div class="input-group">

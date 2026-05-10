@@ -1,0 +1,296 @@
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Services
+
+@inject CourseService CourseService
+@inject TaskService TaskService
+@inject UserService UserAccess
+
+@if (IsVisible)
+{
+    <div class="modal-overlay" id="testModalOverlay">
+        <div class="modal-card">
+
+            <div class="modal-header">
+                <h2 class="modal-title">📝 Add New Test</h2>
+                <button type="button" class="close-x" @onclick="Close">&times;</button>
+            </div>
+
+            <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label>Exam Name</label>
+                        <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Examination" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Course</label>
+                        <InputSelect @bind-Value="_newTask.CourseID" required>
+                            <option value="" disabled selected>Select a course</option>
+                            @foreach (var course in _availableCourses)
+                            {
+                                <option value="@course.CourseID">@course.Name (@course.CourseCode)</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Schedule</label>
+                            <input type="datetime-local" @bind="_uiDueDate" @bind:format="yyyy-MM-ddTHH:mm" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Room</label>
+                            <input type="text" @bind="_tempRoom" placeholder="e.g. Lab 3" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <InputSelect @bind-Value="_newTask.TaskStatus" required>
+                                <option value="@Status.Pending">Pending</option>
+                                <option value="@Status.Ongoing">In Progress</option>
+                                <option value="@Status.Completed">Completed</option>
+                            </InputSelect>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type</label>
+                            <InputSelect @bind-Value="_newTask.TypeID" required>
+                                <option value="" disabled selected>Select Type</option>
+                                @foreach (var type in _availableTypes)
+                                {
+                                    <option value="@type.TypeID">@type.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Schedule Test</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskAdded { get; set; }
+
+    private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    
+    // UI-specific variables to prevent binding crashes
+    private DateTime _uiDueDate = DateTime.Today.AddDays(7).AddHours(10); 
+    private string _tempRoom = string.Empty;
+    
+    private List<Course> _availableCourses = new();
+    private List<AcademicTaskType> _availableTypes = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible && !_availableCourses.Any())
+        {
+            var userId = UserAccess.CurrentUser?.UserID;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // Fetch courses via CourseService
+                _availableCourses = await CourseService.GetUserCoursesAsync(userId);
+                
+                // Fetch task types via TaskService
+                var allTypes = await TaskService.GetTaskTypesAsync();
+                _availableTypes = allTypes
+                    .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || 
+                                t.DefID == "33333333-3333-3333-3333-333333333333")
+                    .ToList();
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // Map the safe UI date over to the actual object
+        _newTask.DueDate = _uiDueDate;
+        
+        _newTask.TaskID = Guid.NewGuid().ToString();
+        _newTask.UserID = userId;
+        _newTask.StartDate = DateTime.Now;
+
+        if (!string.IsNullOrWhiteSpace(_tempRoom))
+        {
+            _newTask.Description = $"Location/Room: {_tempRoom}";
+        }
+
+        await TaskService.SaveNewTaskAsync(_newTask);
+
+        await OnTaskAdded.InvokeAsync();
+        await Close();
+
+        // Reset the form safely
+        _newTask = new() { TaskStatus = Status.Pending };
+        _uiDueDate = DateTime.Today.AddDays(7).AddHours(10);
+        _tempRoom = string.Empty;
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
+    /* OVERLAY */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+    /* MODAL CARD */
+    .modal-card {
+        background: #ffffff;
+        width: 100%;
+        max-width: 620px;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        font-family: 'Poppins', sans-serif;
+        animation: modalSlideUp 0.35s ease;
+    }
+
+    @@keyframes modalSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* HEADER */
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+    }
+
+    .modal-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .close-x {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: 0.2s;
+        line-height: 1;
+    }
+
+    .close-x:hover {
+        color: #64748b;
+    }
+
+    /* FORM */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    input,
+    select {
+        width: 100%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        background: #fff;
+        transition: all 0.2s ease;
+        box-sizing: border-box; /* Fixes width overflow */
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    /* FOOTER */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-cancel {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    .btn-cancel:hover {
+        background: #f8fafc;
+    }
+
+    .btn-submit {
+        background: #4f46e5;
+        border: none;
+        color: #fff;
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-submit:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
+</style>

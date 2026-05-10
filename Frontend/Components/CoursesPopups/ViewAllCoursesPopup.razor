@@ -75,9 +75,14 @@
             </div>
 
             <div class="window-footer">
-                <button class="btn btn-secondary" @onclick="Close">Close</button>
+                <span class="footer-text">
+                    Showing @(Courses?.Count() ?? 0) course(s)
+                </span>
+
+                <div class="footer-buttons">
+                    <button class="btn btn-secondary" @onclick="Close">Close</button>
+                </div>
             </div>
-            
         </div>
     </div>
 }
