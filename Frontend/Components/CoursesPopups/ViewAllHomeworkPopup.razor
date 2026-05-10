@@ -1,356 +1,331 @@
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="homework-window">
+
+            <div class="window-header">
+                <div class="header-left">
+                    <h1>All Homeworks</h1>
+                    <p>Track all assignments, projects, and pending activities.</p>
+                </div>
+                </div>
+
+            <div class="window-body">
+                <div class="homework-grid">
+                    @if (Tasks != null && Tasks.Any())
+                    {
+                        @foreach (var hw in Tasks)
+                        {
+                            <div class="homework-card">
+                                <div class="side-line @GetColorClass(Tasks.IndexOf(hw))"></div>
+                                
+                                <div class="card-content">
+                                    <div class="card-header">
+                                        <div>
+                                            <h3 class="homework-title">@hw.Name</h3>
+                                            <p class="subject-name">@(hw.Course?.Name ?? "Unassigned")</p>
+                                        </div>
+                                        <span class="status-badge @GetStatusBadgeClass(hw)">
+                                            @(IsOverdue(hw) ? "Overdue" : hw.TaskStatus.ToString())
+                                        </span>
+                                    </div>
+
+                                    <p class="homework-description">
+                                        @(string.IsNullOrWhiteSpace(hw.Description) ? "No description provided." : hw.Description)
+                                    </p>
+
+                                    <div class="card-footer">
+                                        <span class="due-date">🕒 @GetDueText(hw.DueDate)</span>
+                                        <span class="deadline-tag">@hw.DueDate.ToString("h:mm tt")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 40px;">
+                            <p>You have no pending homework. Great job!</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="window-footer">
+                <span class="footer-text">
+                    Showing @(Tasks?.Count() ?? 0) homework activities
+                </span>
+
+                <div class="footer-buttons">
+                    <button class="btn btn-secondary" @onclick="Close">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public List<AcademicTask> Tasks { get; set; } = new();
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    // Helpers for visual styling
+    private string GetColorClass(int index)
+    {
+        string[] colors = { "red", "orange", "blue", "green", "purple", "pink" };
+        if (index < 0) return colors[0];
+        return colors[index % colors.Length];
+    }
+
+    private bool IsOverdue(AcademicTask task)
+    {
+        return task.DueDate < DateTime.Now && task.TaskStatus != Status.Completed;
+    }
+
+    private string GetStatusBadgeClass(AcademicTask task)
+    {
+        if (IsOverdue(task)) return "overdue";
+        
+        return task.TaskStatus switch
+        {
+            Status.Completed => "completed",
+            Status.Ongoing => "ongoing", // I added CSS for this below to match the tests popup
+            _ => "pending" 
+        };
+    }
+
+    // Dynamic Due Date Text (e.g., "Due in 2 days", "Due today")
+    private string GetDueText(DateTime dueDate)
+    {
+        var span = dueDate.Date - DateTime.Now.Date;
+        
+        if (span.Days < 0) return "Overdue";
+        if (span.Days == 0) return "Due today";
+        if (span.Days == 1) return "Due tomorrow";
+        
+        return $"Due in {span.Days} days";
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
 
 <style>
+    /* OVERLAY */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.45);
+        backdrop-filter: blur(4px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 1000;
+    }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+    /* WINDOW */
+    .homework-window {
+        width: 1150px;
+        height: 720px;
+        max-width: 100%;
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px rgba(15,23,42,0.12);
+    }
 
-body{
-    font-family:'Inter',sans-serif;
-    background:#f1f5f9;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+    /* HEADER */
+    .window-header {
+        padding: 30px 35px;
+        border-bottom: 1px solid #eef2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-/* OVERLAY */
-.modal-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,0.45);
-    backdrop-filter:blur(4px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
+    .header-left h1 {
+        font-size: 1.55rem;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
 
-/* WINDOW */
-.homework-window{
-    width:1150px;
-    height:720px;
-    background:#ffffff;
-    border-radius:24px;
-    border:1px solid #e2e8f0;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    box-shadow:0 25px 50px rgba(15,23,42,0.12);
-}
+    .header-left p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+    }
 
-/* HEADER */
-.window-header{
-    padding:30px 35px;
-    border-bottom:1px solid #eef2f7;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
+    /* BODY */
+    .window-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px 35px;
+        background: #f8fafc;
+    }
 
-.header-left h1{
-    font-size:1.55rem;
-    font-family:'Poppins',sans-serif;
-    font-weight:700;
-    color:#0f172a;
-    margin-bottom:4px;
-}
+    /* GRID */
+    .homework-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+    }
 
-.header-left p{
-    font-size:0.85rem;
-    color:#64748b;
-}
+    /* CARD */
+    .homework-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 20px;
+        display: flex;
+        gap: 18px;
+        transition: 0.25s ease;
+    }
 
-.header-actions{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
+    .homework-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(15,23,42,0.08);
+    }
 
-.search-box input{
-    width:260px;
-    padding:12px 15px;
-    border-radius:12px;
-    border:1px solid #dbe4ee;
-    background:#f8fafc;
-    font-family:'Inter',sans-serif;
-    outline:none;
-    transition:0.2s ease;
-}
+    /* SIDE INDICATOR */
+    .side-line {
+        width: 5px;
+        border-radius: 20px;
+        flex-shrink: 0; /* Prevents line from squishing */
+    }
 
-.search-box input:focus{
-    border-color:#4f46e5;
-    background:#fff;
-    box-shadow:0 0 0 4px rgba(79,70,229,0.08);
-}
-/* BODY */
-.window-body{
-    flex:1;
-    overflow-y:auto;
-    padding:30px 35px;
-    background:#f8fafc;
-}
+    .red { background: #ef4444; }
+    .orange { background: #f97316; }
+    .blue { background: #3b82f6; }
+    .green { background: #10b981; }
+    .purple { background: #8b5cf6; }
+    .pink { background: #ec4899; }
 
-/* GRID */
-.homework-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:22px;
-}
+    /* CONTENT */
+    .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-/* CARD */
-.homework-card{
-    background:#ffffff;
-    border:1px solid #e2e8f0;
-    border-radius:18px;
-    padding:20px;
-    display:flex;
-    gap:18px;
-    transition:0.25s ease;
-}
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        gap: 10px;
+    }
 
-.homework-card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 12px 24px rgba(15,23,42,0.08);
-}
+    .homework-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
 
-/* SIDE INDICATOR */
-.side-line{
-    width:5px;
-    border-radius:20px;
-}
+    .subject-name {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-top: 3px;
+    }
 
-.red{ background:#ef4444; }
-.orange{ background:#f97316; }
-.blue{ background:#3b82f6; }
-.green{ background:#10b981; }
-.purple{ background:#8b5cf6; }
-.pink{ background:#ec4899; }
+    /* DESCRIPTION */
+    .homework-description {
+        font-size: 0.83rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 18px;
+    }
 
-/* CONTENT */
-.card-content{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
+    /* CARD FOOTER */
+    .card-footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px dashed #e2e8f0;
+        padding-top: 14px;
+    }
 
-.card-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    margin-bottom:10px;
-}
+    .due-date {
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 500;
+    }
 
-.homework-title{
-    font-family:'Poppins',sans-serif;
-    font-size:1rem;
-    font-weight:700;
-    color:#0f172a;
-}
+    .deadline-tag {
+        background: #eef2ff;
+        color: #4f46e5;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
 
-.subject-name{
-    font-size:0.8rem;
-    color:#94a3b8;
-    margin-top:3px;
-}
+    /* STATUS BADGES */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
 
-/* DESCRIPTION */
-.homework-description{
-    font-size:0.83rem;
-    color:#64748b;
-    line-height:1.6;
-    margin-bottom:18px;
-}
+    .pending { background: #fef3c7; color: #b45309; }
+    .ongoing { background: #dbeafe; color: #1d4ed8; } /* Added Ongoing for consistency */
+    .completed { background: #dcfce7; color: #15803d; }
+    .overdue { background: #fee2e2; color: #b91c1c; }
 
-/* FOOTER */
-.card-footer{
-    margin-top:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-top:1px dashed #e2e8f0;
-    padding-top:14px;
-}
+    /* WINDOW FOOTER */
+    .window-footer {
+        padding: 18px 30px;
+        border-top: 1px solid #eef2f7;
+        background: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-.due-date{
-    font-size:0.82rem;
-    color:#64748b;
-}
+    .footer-text {
+        font-size: 0.82rem;
+        color: #64748b;
+    }
 
-.deadline-tag{
-    background:#eef2ff;
-    color:#4f46e5;
-    padding:5px 10px;
-    border-radius:8px;
-    font-size:0.72rem;
-    font-weight:700;
-}
+    .footer-buttons {
+        display: flex;
+        gap: 12px;
+    }
 
-/* STATUS */
-.status-badge{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    padding:5px 12px;
-    border-radius:999px;
-    font-size:0.72rem;
-    font-weight:700;
-}
+    .btn {
+        padding: 11px 18px;
+        border: none;
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
 
-.pending{
-    background:#fef3c7;
-    color:#b45309;
-}
+    .btn-secondary {
+        background: #4f46e5;
+        color: #fff;
+    }
 
-.completed{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-.overdue{
-    background:#fee2e2;
-    color:#b91c1c;
-}
-
-/* FOOTER */
-.window-footer{
-    padding:18px 30px;
-    border-top:1px solid #eef2f7;
-    background:#fff;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.footer-text{
-    font-size:0.82rem;
-    color:#64748b;
-}
-
-.footer-buttons{
-    display:flex;
-    gap:12px;
-}
-
-.btn{
-    padding:11px 18px;
-    border:none;
-    border-radius:10px;
-    font-family:'Poppins',sans-serif;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.2s ease;
-}
-
-.btn-secondary{
-    background:#4f46e5;
-    color:#fff;
-}
-
-.btn:hover{
-    transform:translateY(-1px);
-}
-
+    .btn-secondary:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
 </style>
-
-<body>
-
-<div class="modal-overlay">
-
-    <div class="homework-window">
-
-        <!-- HEADER -->
-        <div class="window-header">
-
-            <div class="header-left">
-                <h1>All Homeworks</h1>
-                <p>Track all assignments, projects, and pending activities.</p>
-            </div>
-
-            <div class="header-actions">
-
-                <div class="search-box">
-                    <input type="text" placeholder="Search homework...">
-                </div>
-            </div>
-
-        </div>
-
-        <!-- BODY -->
-        <div class="window-body">
-
-            <div class="homework-grid">
-                <!-- CARD -->
-                <div class="homework-card">
-                    <div class="side-line red"></div>
-                    <div class="card-content">
-                        <div class="card-header">
-                            <div>
-                                <h3 class="homework-title">Design Project 1</h3>
-                                <p class="subject-name">Graphic Fundamentals</p>
-                            </div>
-                            <span class="status-badge pending">Pending</span>
-                        </div>
-                        <p class="homework-description">
-                            Create a modern poster design using typography and color theory principles.
-                        </p>
-                        <div class="card-footer">
-                            <span class="due-date">🕒 Due in 2 days</span>
-                            <span class="deadline-tag">11:59 PM</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- CARD -->
-                <div class="homework-card">
-
-                    <div class="side-line pink"></div>
-
-                    <div class="card-content">
-
-                        <div class="card-header">
-                            <div>
-                                <h3 class="homework-title">Mobile UI Prototype</h3>
-                                <p class="subject-name">Mobile Development</p>
-                            </div>
-
-                            <span class="status-badge pending">Pending</span>
-                        </div>
-
-                        <p class="homework-description">
-                            Design and prototype a mobile e-commerce application UI.
-                        </p>
-
-                        <div class="card-footer">
-                            <span class="due-date">🕒 Due in 1 week</span>
-                            <span class="deadline-tag">11:00 PM</span>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="window-footer">
-
-            <span class="footer-text">
-                Showing 6 homework activities
-            </span>
-
-            <div class="footer-buttons">
-                <button class="btn btn-secondary">Close</button>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-</body>

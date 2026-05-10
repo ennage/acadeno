@@ -80,7 +80,7 @@
                                 <h2 class="section-title">Upcoming Tests</h2>
                                 <button class="btn-add" title="Add New Test">+</button>
                             </div>
-                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View all tests &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View All Tests &rsaquo;</a>
                         </div>
                         <div class="data-table-card">
                             <table class="styled-table">
@@ -163,23 +163,35 @@
                                 <h2 class="section-title">Homeworks</h2>
                                 <button class="btn-add" title="Add New Homework">+</button>
                             </div>
-                            <a href="#" class="accent-link">View all &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all &rsaquo;</a>
                         </div>
                         
-                        @foreach (var hw in _homeworks)
+                        @if (_homeworks != null && _homeworks.Any())
                         {
-                            <div class="mini-card">
-                                <div class="side-indicator blue-line"></div>
-                                <div class="card-inner">
-                                    <div class="card-header-flex">
-                                        <h3 class="course-name">@hw.Name</h3>
-                                    </div>
-                                    <p class="course-subtitle">@(hw.Course?.Name ?? "Unassigned")</p>
-                                    <div class="card-footer-info">
-                                        <p class="due-date">🕒 Due @hw.DueDate.ToString("MMM dd")</p>
-                                        <span class="deadline-tag">@hw.DueDate.ToString("t")</span>
+                            @foreach (var hw in _homeworks)
+                            {
+                                // Reusing your existing color method so the cards look dynamic!
+                                var colorClass = GetColorByIndex(_homeworks.IndexOf(hw));
+
+                                <div class="mini-card">
+                                    <div class="side-indicator @colorClass"></div>
+                                    <div class="card-inner">
+                                        <div class="card-header-flex">
+                                            <h3 class="course-name">@hw.Name</h3>
+                                        </div>
+                                        <p class="course-subtitle">@(hw.Course?.Name ?? "Unassigned")</p>
+                                        <div class="card-footer-info">
+                                            <p class="due-date">🕒 Due @hw.DueDate.ToString("MMM dd")</p>
+                                            <span class="deadline-tag">@hw.DueDate.ToString("t")</span>
+                                        </div>
                                     </div>
                                 </div>
+                            }
+                        }
+                        else
+                        {
+                            <div style="text-align: center; color: #64748b; padding: 20px 0;">
+                                <p>No pending homework. Enjoy your free time!</p>
                             </div>
                         }
                     </div>
@@ -194,20 +206,22 @@
     Courses="_courses" 
     OnClose="() => _showViewAllCoursesPopup = false" />
 
-@* <AddTest 
-    IsVisible="_showAddTestModal" 
-    OnClose="() => _showAddTestModal = false" 
-    OnTaskAdded="RefreshTasks" /> *@
-
 <ViewAllTestsPopup 
     IsVisible="_showViewAllTestsModal" 
     Tasks="_upcomingTests" 
     OnClose="() => _showViewAllTestsModal = false" />
 
+<ViewAllHomeworkPopup 
+    IsVisible="_showViewAllHomeworkModal" 
+    Tasks="_homeworks" 
+    OnClose="() => _showViewAllHomeworkModal = false" />
+
 @code {
     private bool _showAddCourseModal = false;
-    private bool _showViewAllCoursesPopup = false;
+    private bool _showAddHomeworkModal = false;
     private bool _showAddTestModal = false;
+    private bool _showViewAllCoursesPopup = false;
+    private bool _showViewAllHomeworkModal = false;
     private bool _showViewAllTestsModal = false;
     private string _userId = string.Empty;
     private string _currentTermDisplay = "your current term";
@@ -312,5 +326,16 @@
     private void OpenViewAllTestsModal()
     {
         _showViewAllTestsModal = true;
+    }
+
+    // ----- HOMEWORK -----
+    private void OpenAddHomeworkModal() 
+    {
+        _showAddHomeworkModal = true;
+    }
+
+    private void OpenViewAllHomeworkModal()
+    {
+        _showViewAllHomeworkModal = true;
     }
 }
