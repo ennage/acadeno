@@ -189,90 +189,122 @@
     align-items: stretch; /* Makes buttons same height as card if needed */
 }
 
+/* ==========================================================================  
+   MODERN REMINDER CARD — MATCH COURSE CARD DESIGN
+   ========================================================================== */
+
 .reminder-item {
     display: flex;
-    justify-content: space-between;
-    align-items: stretch; /* Stretches buttons to card height */
-    padding: 0; /* Remove default padding to let buttons fit flush */
-    background-color: #f0fdf4; /* Your existing background color logic */
-    border-radius: 16px;
-    margin-bottom: 12px;
-    overflow: hidden; /* Clips button corners to match card radius */
-    border-left: 4px solid #22c55e;
-    background: #72ff824f;
-}
-    
-.reminder-item.alert {
-    border-left: 4px solid #ef4444;
-    background: #ff7f7f4f;
+    align-items: stretch;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 14px;
+    transition: all 0.2s ease;
+    min-height: 95px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
 }
 
+/* Hover effect same as course cards */
+.reminder-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+}
+
+/* LEFT ACCENT LINE */
+.reminder-item::before {
+    content: "";
+    width: 4px;
+    background: #10b981; /* default green */
+    flex-shrink: 0;
+}
+
+/* URGENT / ALERT */
+.reminder-item.alert::before {
+    background: #ef4444;
+}
+
+/* MAIN CONTENT */
 .reminder-text {
-    flex-grow: 1;
-    padding: 15px; /* Spacing for text since parent padding is 0 */
+    flex: 1;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.reminder-text p {
-    font-size: 0.75rem;
-    margin: 0 0 0 5px;
-    color: #757575; /* Slightly lighter gray */
+/* TITLE */
+.reminder-text h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
 }
 
-.reminder-text h5 { 
-    color: #626262;
-    flex-grow: 1;
-    font-size: 0.75rem; 
-    margin: 0 0 0 5px;
+/* PRIORITY + DATE */
+.reminder-text h5 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+    color: #f97316;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.reminder-text h4 { 
-    color: var(--text-on-light);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.90rem;
-    font-weight: bold;
+/* COURSE NAME */
+.reminder-text p {
+    font-size: 0.78rem;
+    color: #94a3b8;
     margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.2;
 }
 
+/* ACTION BUTTON COLUMN */
 .action-buttons {
     display: flex;
     flex-direction: column;
-    width: 50px; /* Fixed width for the button column */
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 12px 10px 0;
 }
 
+/* BUTTON STYLE */
 .btn-action {
-    flex: 1; /* Each button takes 50% height */
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
     border: none;
-    cursor: pointer;
+    background: #f8fafc;
+    color: #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    background: transparent;
-    transition: background 0.2s;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
 }
 
-.btn-complete {
-    color: #475569;
-}
+/* COMPLETE BUTTON */
 .btn-complete:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background: #dcfce7;
+    color: #15803d;
+    transform: scale(1.08);
+}
+
+/* EDIT BUTTON */
+.btn-edit:hover {
+    background: #eef2ff;
+    color: #4f46e5;
+    transform: scale(1.08);
 }
 
 .btn-edit {
     color: #475569;
 }
 
-.btn-edit:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
 
 .btn-add-reminder {
     display: flex;
@@ -495,10 +527,6 @@
 .day-header:has(.month-indicator) {
     border-left: 1px solid rgba(79, 70, 229, 0.1);
 }
-
-/*  ==========================================================================
-    TIMETABLE ENTRIES (TASKS & SCHEDULES)
-    ========================================================================== */
 
 .task-entry {
     background: #fef2f2;
