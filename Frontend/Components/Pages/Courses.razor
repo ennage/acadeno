@@ -24,7 +24,7 @@
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">My Courses</h2>
-                                <button class="btn-add" title="Add New Course" @onclick="OpenAddCourseModal">+</button>
+                                <button class="btn-add" title="Add New Course">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
                                 View All Courses &rsaquo;
@@ -201,32 +201,82 @@
     </div>
 </div>
 
+@* <AddNewCourse 
+    IsVisible="_showAddCourseModal" 
+    OnClose="CloseAddCourseModal" 
+    OnCourseAdded="RefreshDashboard" />
+
+<AddHomework 
+    IsVisible="_showAddHomeworkModal" 
+    OnClose="CloseAddHomeworkModal" 
+    OnTaskAdded="RefreshDashboard" />
+
+<AddTask 
+    IsVisible="_showAddTestModal" 
+    OnClose="CloseAddTestModal" 
+    OnTaskAdded="RefreshDashboard" /> *@
+
 <ViewAllCoursesPopup 
     IsVisible="_showViewAllCoursesPopup" 
     Courses="_courses" 
-    OnClose="() => _showViewAllCoursesPopup = false" />
+    OnClose="CloseViewAllCoursesModal" />
 
 <ViewAllTestsPopup 
-    IsVisible="_showViewAllTestsModal" 
+    IsVisible="_showViewAllTestsPopup" 
     Tasks="_upcomingTests" 
-    OnClose="() => _showViewAllTestsModal = false" />
+    OnClose="CloseViewAllTestsModal" />
 
 <ViewAllHomeworkPopup 
-    IsVisible="_showViewAllHomeworkModal" 
+    IsVisible="_showViewAllHomeworkPopup" 
     Tasks="_homeworks" 
-    OnClose="() => _showViewAllHomeworkModal = false" />
+    OnClose="CloseViewAllHomeworkModal" />
 
 @code {
+    // --- MODAL STATES ---
     private bool _showAddCourseModal = false;
     private bool _showAddHomeworkModal = false;
     private bool _showAddTestModal = false;
+
     private bool _showViewAllCoursesPopup = false;
-    private bool _showViewAllHomeworkModal = false;
-    private bool _showViewAllTestsModal = false;
+    private bool _showViewAllHomeworkPopup = false;
+    private bool _showViewAllTestsPopup = false;
+
+    // --- COURSE MODAL METHODS ---
+    private void OpenAddCourseModal() => _showAddCourseModal = true;
+    private void CloseAddCourseModal() => _showAddCourseModal = false;
+
+    private void OpenViewAllCoursesModal() => _showViewAllCoursesPopup = true;
+    private void CloseViewAllCoursesModal() => _showViewAllCoursesPopup = false;
+
+    // --- TEST MODAL METHODS ---
+    private void OpenAddTestModal() => _showAddTestModal = true;
+    private void CloseAddTestModal() => _showAddTestModal = false;
+
+    private void OpenViewAllTestsModal() => _showViewAllTestsPopup = true;
+    private void CloseViewAllTestsModal() => _showViewAllTestsPopup = false;
+
+    // --- HOMEWORK MODAL METHODS ---
+    private void OpenAddHomeworkModal() => _showAddHomeworkModal = true;
+    private void CloseAddHomeworkModal() => _showAddHomeworkModal = false;
+
+    private void OpenViewAllHomeworkModal() => _showViewAllHomeworkPopup = true;
+    private void CloseViewAllHomeworkModal() => _showViewAllHomeworkPopup = false;
+
+    // --- GLOBAL REFRESH ---
+    private async Task RefreshDashboard()
+    {
+        // Close all "Add" modals simultaneously
+        _showAddCourseModal = false;
+        _showAddHomeworkModal = false;
+        _showAddTestModal = false;
+
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
     private string _userId = string.Empty;
     private string _currentTermDisplay = "your current term";
     
-
     private List<Course> _courses = new();
     private List<Course> _priorityCourses = new();
     private List<AcademicTask> _upcomingTests = new();
@@ -293,6 +343,7 @@
             .ToList();
     }
 
+    // ----- DETAILS -----
     private string GetColorByIndex(int index)
     {
         string[] colors = { "purple-line", "blue-line", "orange-line", "green-line" };
@@ -305,37 +356,4 @@
         Status.Ongoing => "badge-inprogress",
         _ => "badge-notstarted"
     };
-
-    // ----- COURSES -----
-    private void OpenAddCourseModal() 
-    { 
-        _showAddCourseModal = true;
-    }
-
-    private void OpenViewAllCoursesModal()
-    {
-        _showViewAllCoursesPopup = true;
-    }
-
-    // ----- TESTS -----
-    private void OpenAddTestModal() 
-    {
-        _showAddTestModal = true;
-    }
-
-    private void OpenViewAllTestsModal()
-    {
-        _showViewAllTestsModal = true;
-    }
-
-    // ----- HOMEWORK -----
-    private void OpenAddHomeworkModal() 
-    {
-        _showAddHomeworkModal = true;
-    }
-
-    private void OpenViewAllHomeworkModal()
-    {
-        _showViewAllHomeworkModal = true;
-    }
 }

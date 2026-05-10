@@ -83,9 +83,9 @@
 }
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public List<Course> Courses { get; set; } = new();
-    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public List<Course> Courses {get; set;} = new();
+    [Parameter] public EventCallback OnClose {get; set;}
 
     private string GetColorClass(int index)
     {
