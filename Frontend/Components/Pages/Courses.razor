@@ -32,25 +32,36 @@
                         </div>
 
                         <div class="course-cards-row">
-                            @if (_courses != null && _courses.Any())
+                            @if (_priorityCourses != null && _priorityCourses.Any())
                             {
-                                @foreach (var course in _courses)
+                                @foreach (var course in _priorityCourses)
                                 {
-                                    var colorClass = GetColorByIndex(_courses.IndexOf(course));
+                                    var colorClass = GetColorByIndex(_priorityCourses.IndexOf(course));
 
                                     <div class="modern-card">
                                         <div class="side-indicator @colorClass"></div>
                                         <div class="card-inner">
                                             <div class="card-header-flex">
                                                 <h3 class="course-name">@course.Name</h3>
-                                                <span class="course-grade">@(course.ActualGrade.CourseGrade > 0 ? $"{course.ActualGrade.CourseGrade}%" : "--")</span>
+                                                <span class="course-grade">
+                                                    @(course.ActualGrade?.CourseGrade > 0 ? $"{course.ActualGrade.CourseGrade}" : "--")
+                                                </span>
                                             </div>
                                             <p class="course-id">@course.CourseCode</p>
                                             
                                             <div class="card-footer-info">
-                                                @* Logic for dynamic schedule/location would go here *@
-                                                <div class="course-details">🕒 TBD | 📍 TBD</div>
-                                                <div class="term-tag">@course.TermID</div>
+                                                <div class="course-details">
+                                                    @if (course.ScheduleEntries != null && course.ScheduleEntries.Any())
+                                                    {
+                                                        var schedule = course.ScheduleEntries.First();
+                                                        <span>🕒 @schedule.StartTime.ToString("h:mm tt") | 📍 @schedule.Room</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>🕒 TBD | 📍 TBD</span>
+                                                    }
+                                                </div>
+                                                <div class="term-tag">@(course.Term?.Name ?? "No Term")</div>
                                             </div>
                                         </div>
                                     </div>
@@ -180,6 +191,7 @@
     
 
     private List<Course> _courses = new();
+    private List<Course> _priorityCourses = new();
     private List<AcademicTask> _upcomingTests = new();
     private List<AcademicTask> _homeworks = new();
 
@@ -195,7 +207,6 @@
 
         if (activeTerm != null)
         {
-            // E.g., "1st Semester, AY 2025-2026"
             _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
         }
 
@@ -212,10 +223,23 @@
             .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
             .OrderBy(t => t.DueDate)
             .ToListAsync();
+        
+        // Determine Top 4 Priority Courses
+        var urgentCourseIds = allTasks
+            .Where(t => !string.IsNullOrEmpty(t.CourseID))
+            .Select(t => t.CourseID)
+            .Distinct()
+            .ToList();
+
+        // Sort courses by urgency, then take 4. Courses with no tasks are pushed to the back.
+        _priorityCourses = _courses
+            .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
+            .Take(4)
+            .ToList();
 
         // Categorize
         _upcomingTests = allTasks.Where(t => t.TypeID == "Exam" || t.TypeID == "Quiz").Take(5).ToList();
-        _homeworks = allTasks.Where(t => t.TypeID == "Homework").Take(3).ToList();
+        _homeworks = allTasks.Where(t => t.TypeID == "Homework").Take(5).ToList();
     }
 
     private string GetColorByIndex(int index)
