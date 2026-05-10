@@ -21,7 +21,7 @@ namespace Acadeno.Backend.Services
                 TermID = termId,
                 CourseCode = courseCode,
                 Name = name,
-                ScheduleEntrys = new List<ScheduleEntry> { scheduleEntry }
+                ScheduleEntries = new List<ScheduleEntry> { scheduleEntry }
             };
 
             scheduleEntry.CourseID = course.CourseID;

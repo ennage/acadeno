@@ -87,16 +87,50 @@
     </div>
 }
 
-<style>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    body {
-        margin: 0;
-        padding: 0;
-        font-family: 'Inter', sans-serif;
-        background-color: #f8fafc;
+
+
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public EventCallback OnCourseAdded {get; set;}
+
+    private Course _newCourse = new();
+    private ScheduleEntry _schedule = new();
+    private List<Term> _availableTerms = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch terms so the dropdown works
+        _availableTerms = await _db.Terms.ToListAsync();
     }
 
+    private async Task HandleSubmit()
+    {
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // Aligning perfectly with your CourseService signature
+        await CourseController.AddNewCourseAsync(
+            userId: userId, 
+            termId: _newCourse.TermID, 
+            courseCode: _newCourse.CourseCode, 
+            name: _newCourse.Name, 
+            scheduleEntry: _schedule
+        );
+        
+        // Notify parent to refresh the grid and close
+        await OnCourseAdded.InvokeAsync();
+        await Close();
+        
+        // Reset form for the next time it opens
+        _newCourse = new();
+        _schedule = new();
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -248,44 +282,3 @@
         font-family: 'Inter', sans-serif;
     }
 </style>
-
-@code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback OnCourseAdded { get; set; }
-
-    private Course _newCourse = new();
-    private ScheduleEntry _schedule = new();
-    private List<Term> _availableTerms = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Fetch terms so the dropdown works
-        _availableTerms = await _db.Terms.ToListAsync();
-    }
-
-    private async Task HandleSubmit()
-    {
-        var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
-
-        // Aligning perfectly with your CourseService signature
-        await CourseController.AddNewCourseAsync(
-            userId: userId, 
-            termId: _newCourse.TermID, 
-            courseCode: _newCourse.CourseCode, 
-            name: _newCourse.Name, 
-            scheduleEntry: _schedule
-        );
-        
-        // Notify parent to refresh the grid and close
-        await OnCourseAdded.InvokeAsync();
-        await Close();
-        
-        // Reset form for the next time it opens
-        _newCourse = new();
-        _schedule = new();
-    }
-
-    private async Task Close() => await OnClose.InvokeAsync();
-}

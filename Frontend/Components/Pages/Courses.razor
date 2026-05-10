@@ -1,4 +1,5 @@
 @page "/courses"
+
 @using Microsoft.EntityFrameworkCore
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Enums
@@ -13,7 +14,7 @@
             
             <header class="dashboard-header">
                 <h1 class="page-title">Enrolled Courses</h1>
-                <p class="welcome-subtitle">Welcome back! Here is your academic overview for Semester 3.</p>
+                <p class="welcome-subtitle">Welcome back! Here is your academic overview for <strong>@_currentTermDisplay</strong>.</p>
             </header>
 
             <div class="dashboard-grid-layout">
@@ -26,7 +27,7 @@
                                 <button class="btn-add" title="Add New Course" @onclick="OpenAddCourseModal">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
-                                View all courses &rsaquo;
+                                View All Courses &rsaquo;
                             </a>
                         </div>
 
@@ -166,20 +167,17 @@
     </div>
 </div>
 
-@* <AddNewCourse 
-    IsVisible="_showAddCourseModal" 
-    OnClose="() => _showAddCourseModal = false" 
-    OnCourseAdded="RefreshCourses" /> *@
-
 <ViewAllCoursesPopup 
     IsVisible="_showViewAllCoursesPopup" 
-    UserId="@_userId"
+    Courses="_courses" 
     OnClose="() => _showViewAllCoursesPopup = false" />
 
 @code {
     private bool _showAddCourseModal = false;
     private bool _showViewAllCoursesPopup = false;
-    private string _userId = "";
+    private string _userId = string.Empty;
+    private string _currentTermDisplay = "your current term";
+    
 
     private List<Course> _courses = new();
     private List<AcademicTask> _upcomingTests = new();
@@ -191,7 +189,20 @@
         if (string.IsNullOrEmpty(userId)) return;
 
         // Fetch data
+        var activeTerm = await _db.Terms
+            .Include(t => t.AcademicYear)
+            .FirstOrDefaultAsync(t => t.IsCurrent && t.AcademicYear.UserID == userId);
+
+        if (activeTerm != null)
+        {
+            // E.g., "1st Semester, AY 2025-2026"
+            _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
+        }
+
         _courses = await _db.Courses
+            .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
+            .Include(c => c.Term)        // <--- EF Core joins the Terms table here
+            .Include(c => c.ScheduleEntries)
             .Where(c => c.UserID == userId)
             .ToListAsync();
 
@@ -229,10 +240,4 @@
     {
         _showViewAllCoursesPopup = true;
     }
-
-    @* private async Task RefreshCourses()
-    {
-        // Re-run the initialization method to grab the updated list from the database
-        await OnInitializedAsync();
-    } *@
 }

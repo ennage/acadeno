@@ -1,5 +1,8 @@
-
-
+.dashboard-root {
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+}
 
 .title-group {
     display: flex;
@@ -39,15 +42,6 @@
     min-height: 32px;
 }
 
-/* Layout: Full Width & Fluid */
-.dashboard-root {
-    display: flex;
-    min-height: 100vh;
-    background-color: #F1F5F9;
-    font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
-    overflow: hidden;
-}
-
 /* Page: Full Width & Fluid */
 .main-content-wrapper {
     flex: 1;
@@ -64,7 +58,6 @@
     background: #cbd5e1;
     border-radius: 10px;
 }
-
 
 .dashboard-grid-layout {
     display: grid;
