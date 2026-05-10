@@ -528,10 +528,6 @@
     border-left: 1px solid rgba(79, 70, 229, 0.1);
 }
 
-/*  ==========================================================================
-    TIMETABLE ENTRIES (TASKS & SCHEDULES)
-    ========================================================================== */
-
 .task-entry {
     background: #fef2f2;
     border-left: 4px solid #ef4444;
