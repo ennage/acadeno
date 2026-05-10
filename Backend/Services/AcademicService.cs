@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Acadeno.Backend.Services
 {
-    public class AcademicService
+    public class DashboardService
     {
         private readonly AppDbContext _db;
        
-        public AcademicService(AppDbContext db)
+        public DashboardService(AppDbContext db)
         {
             _db = db;
         }
