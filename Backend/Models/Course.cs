@@ -22,6 +22,6 @@ namespace Acadeno.Backend.Models
         public virtual Term Term {get; set;} = null!;
 
         // Holds Schedule Entries
-        public List<ScheduleEntry> ScheduleEntrys {get; set;} = new List<ScheduleEntry>();
+        public List<ScheduleEntry> ScheduleEntries {get; set;} = new List<ScheduleEntry>();
     }
 }

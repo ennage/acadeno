@@ -1,5 +1,11 @@
 @page "/courses"
 
+@using Microsoft.EntityFrameworkCore
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject Acadeno.Backend.Services.UserService UserAccess
+
 <div class="dashboard-root">
     <NavMenu /> 
     
@@ -8,94 +14,73 @@
             
             <header class="dashboard-header">
                 <h1 class="page-title">Enrolled Courses</h1>
-                <p class="welcome-subtitle">Welcome back! Here is your academic overview for Semester 3.</p>
+                <p class="welcome-subtitle">Welcome back! Here is your academic overview for <strong>@_currentTermDisplay</strong>.</p>
             </header>
 
             <div class="dashboard-grid-layout">
                 <div class="primary-column">
                     
-                <section class="content-section">
-                    <div class="section-top-bar">
-                        <div class="title-group">
-                            <h2 class="section-title">My Courses</h2>
-                            <button class="btn-add" title="Add New Course">+</button>
-                        </div>
-                        <a href="#" class="accent-link">View all courses &rsaquo;</a>
-                    </div>
-
-                    <div class="course-cards-row">
-                        <div class="modern-card">
-                            <div class="side-indicator purple-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">Graphic Fundamentals</h3>
-                                    <span class="course-grade">94%</span> </div>
-                                <p class="course-id">ART101</p>
-                                
-                                <div class="card-footer-info">
-                                    <div class="course-details">🕒 9:00 AM – 10:30 AM | 📍 Studio A</div>
-                                    <div class="term-tag">Term 1, 2026</div> </div>
+                    <section class="content-section">
+                        <div class="section-top-bar">
+                            <div class="title-group">
+                                <h2 class="section-title">My Courses</h2>
+                                <button class="btn-add" title="Add New Course" @onclick="OpenAddCourseModal">+</button>
                             </div>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
+                                View All Courses &rsaquo;
+                            </a>
                         </div>
 
-                        <div class="modern-card">
-                            <div class="side-indicator blue-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">User Experience Research</h3>
-                                    <span class="course-grade">88%</span>
-                                </div>
-                                <p class="course-id">UXD301</p>
-                                
-                                <div class="card-footer-info">
-                                    <div class="course-details">🕒 11:00 AM – 12:30 PM | 📍 Lab 2</div>
-                                    <div class="term-tag">Term 1, 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <div class="course-cards-row">
+                            @if (_priorityCourses != null && _priorityCourses.Any())
+                            {
+                                @foreach (var course in _priorityCourses)
+                                {
+                                    var colorClass = GetColorByIndex(_priorityCourses.IndexOf(course));
 
-                    <div class="course-cards-row">
-                        <div class="modern-card">
-                            <div class="side-indicator orange-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">Advanced Web Design</h3>
-                                    <span class="course-grade">91%</span>
-                                </div>
-                                <p class="course-id">ITD201</p>
-                                
-                                <div class="card-footer-info">
-                                    <div class="course-details">🕒 1:30 PM – 3:00 PM | 📍 Lab 3</div>
-                                    <div class="term-tag">Term 1, 2026</div>
-                                </div>
-                            </div>
+                                    <div class="modern-card">
+                                        <div class="side-indicator @colorClass"></div>
+                                        <div class="card-inner">
+                                            <div class="card-header-flex">
+                                                <h3 class="course-name">@course.Name</h3>
+                                                <span class="course-grade">
+                                                    @(course.ActualGrade?.CourseGrade > 0 ? $"{course.ActualGrade.CourseGrade}" : "--")
+                                                </span>
+                                            </div>
+                                            <p class="course-id">@course.CourseCode</p>
+                                            
+                                            <div class="card-footer-info">
+                                                <div class="course-details">
+                                                    @if (course.ScheduleEntries != null && course.ScheduleEntries.Any())
+                                                    {
+                                                        var schedule = course.ScheduleEntries.First();
+                                                        <span>🕒 @schedule.StartTime.ToString("h:mm tt") | 📍 @schedule.Room</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>🕒 TBD | 📍 TBD</span>
+                                                    }
+                                                </div>
+                                                <div class="term-tag">@(course.Term?.Name ?? "No Term")</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <p class="welcome-subtitle">No courses found. Click the + to get started.</p>
+                            }
                         </div>
+                    </section>
 
-                        <div class="modern-card">
-                            <div class="side-indicator green-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">3D Animation</h3>
-                                    <span class="course-grade">--</span>
-                                </div>
-                                <p class="course-id">ANI301</p>
-                                
-                                <div class="card-footer-info">
-                                    <div class="course-details">🕒 2:00 PM – 5:00 PM | 📍 Animation Studio</div>
-                                    <div class="term-tag">Term 1, 2026</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
                     <section class="content-section">
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Upcoming Tests</h2>
-                                <button class="btn-add" title="Add New Tests">+</button>
+                                <button class="btn-add" title="Add New Test">+</button>
                             </div>
-                            <a href="#" class="accent-link">View all tests &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View All Tests &rsaquo;</a>
                         </div>
                         <div class="data-table-card">
                             <table class="styled-table">
@@ -108,12 +93,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Graphic Design Finals</td>
-                                        <td>Design Fundamentals</td>
-                                        <td>Jan 25, 2026</td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                    </tr>
+                                    @if (_upcomingTests != null && _upcomingTests.Any())
+                                    {
+                                        @foreach (var test in _upcomingTests)
+                                        {
+                                            <tr>
+                                                <td>@test.Name</td>
+                                                <td>@(test.Course?.Name ?? "General")</td>
+                                                <td>@test.DueDate.ToString("MMM dd, yyyy")</td>
+                                                <td>
+                                                    <span class="badge @GetStatusBadgeClass(test.TaskStatus)">
+                                                        @test.TaskStatus
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">
+                                                No upcoming tests! Take a breather.
+                                            </td>
+                                        </tr>
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -145,23 +148,12 @@
                     <div class="calendar-card">
                         <div class="cal-nav">
                             <button class="cal-arrow">&lt;</button>
-                            <span class="cal-month-year">January 2026</span>
+                            <span class="cal-month-year">@DateTime.Now.ToString("MMMM yyyy")</span>
                             <button class="cal-arrow">&gt;</button>
                         </div>
+                        @* Your calendar grid logic would go here *@
                         <div class="cal-grid">
-                            <div class="cal-labels"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
-                            <div class="cal-days">
-                                <span></span><span></span><span></span>
-                                <span class="day-cell">1</span><span class="day-cell">2</span><span class="day-cell">3</span><span class="day-cell">4</span>
-                                <span class="day-cell">5</span><span class="day-cell">6</span><span class="day-cell">7</span><span class="day-cell">8</span>
-                                <span class="day-cell">9</span><span class="day-cell">10</span><span class="day-cell">11</span><span class="day-cell is-active">12</span>
-                                <span class="day-cell">13</span><span class="day-cell">14</span><span class="day-cell">15</span><span class="day-cell">16</span>
-                                <span class="day-cell">17</span><span class="day-cell">18</span><span class="day-cell">19</span><span class="day-cell">20</span>
-                                <span class="day-cell">20</span><span class="day-cell">21</span><span class="day-cell">22</span><span class="day-cell">23</span>
-                                <span class="day-cell">20</span><span class="day-cell">21</span><span class="day-cell">22</span><span class="day-cell">23</span>
-                                <span class="day-cell">24</span><span class="day-cell">25</span><span class="day-cell">26</span><span class="day-cell">27</span>
-                                <span class="day-cell">28</span><span class="day-cell">29</span><span class="day-cell">30</span><span class="day-cell">31</span>
-                                </div>
+                            <p style="font-size: 10px; color: gray; text-align: center;">Calendar Widget Active</p>
                         </div>
                     </div>
 
@@ -171,38 +163,179 @@
                                 <h2 class="section-title">Homeworks</h2>
                                 <button class="btn-add" title="Add New Homework">+</button>
                             </div>
-                            <a href="#" class="accent-link">View all &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all &rsaquo;</a>
                         </div>
                         
-                        <div class="mini-card">
-                            <div class="side-indicator red-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">Design Project 1</h3><p class="course-subtitle">Graphic Fundamentals</p> 
-                                </div>
-                                <div class="card-footer-info">
-                                    <p class="due-date">🕒 Due in 2 days</p>
-                                    <span class="deadline-tag">11:59 PM</span>
-                                </div>
-                            </div>
-                        </div>
+                        @if (_homeworks != null && _homeworks.Any())
+                        {
+                            @foreach (var hw in _homeworks)
+                            {
+                                // Reusing your existing color method so the cards look dynamic!
+                                var colorClass = GetColorByIndex(_homeworks.IndexOf(hw));
 
-                        <div class="mini-card">
-                            <div class="side-indicator orange-line"></div>
-                            <div class="card-inner">
-                                <div class="card-header-flex">
-                                    <h3 class="course-name">Website Mockup</h3>
+                                <div class="mini-card">
+                                    <div class="side-indicator @colorClass"></div>
+                                    <div class="card-inner">
+                                        <div class="card-header-flex">
+                                            <h3 class="course-name">@hw.Name</h3>
+                                        </div>
+                                        <p class="course-subtitle">@(hw.Course?.Name ?? "Unassigned")</p>
+                                        <div class="card-footer-info">
+                                            <p class="due-date">🕒 Due @hw.DueDate.ToString("MMM dd")</p>
+                                            <span class="deadline-tag">@hw.DueDate.ToString("t")</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="course-subtitle">Advanced Web Design</p>
-                                <div class="card-footer-info">
-                                    <p class="due-date">🕒 Due in 4 days</p>
-                                    <span class="deadline-tag">5:00 PM</span>
-                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div style="text-align: center; color: #64748b; padding: 20px 0;">
+                                <p>No pending homework. Enjoy your free time!</p>
                             </div>
-                        </div>
+                        }
                     </div>
                 </aside>
             </div>
         </div>
     </div>
 </div>
+
+<ViewAllCoursesPopup 
+    IsVisible="_showViewAllCoursesPopup" 
+    Courses="_courses" 
+    OnClose="() => _showViewAllCoursesPopup = false" />
+
+<ViewAllTestsPopup 
+    IsVisible="_showViewAllTestsModal" 
+    Tasks="_upcomingTests" 
+    OnClose="() => _showViewAllTestsModal = false" />
+
+<ViewAllHomeworkPopup 
+    IsVisible="_showViewAllHomeworkModal" 
+    Tasks="_homeworks" 
+    OnClose="() => _showViewAllHomeworkModal = false" />
+
+@code {
+    private bool _showAddCourseModal = false;
+    private bool _showAddHomeworkModal = false;
+    private bool _showAddTestModal = false;
+    private bool _showViewAllCoursesPopup = false;
+    private bool _showViewAllHomeworkModal = false;
+    private bool _showViewAllTestsModal = false;
+    private string _userId = string.Empty;
+    private string _currentTermDisplay = "your current term";
+    
+
+    private List<Course> _courses = new();
+    private List<Course> _priorityCourses = new();
+    private List<AcademicTask> _upcomingTests = new();
+    private List<AcademicTask> _homeworks = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // Fetch data
+        var activeTerm = await _db.Terms
+            .Include(t => t.AcademicYear)
+            .FirstOrDefaultAsync(t => t.IsCurrent && t.AcademicYear.UserID == userId);
+
+        if (activeTerm != null)
+        {
+            _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
+        }
+
+        var allTasks = await _db.AcademicTasks
+            .Include(t => t.Course)
+            .Include(t => t.Type)
+            
+            .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
+            .OrderBy(t => t.DueDate)
+            .ToListAsync();
+
+        _courses = await _db.Courses
+            .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
+            .Include(c => c.Term)        // <--- EF Core joins the Terms table here
+            .Include(c => c.ScheduleEntries)
+            .Where(c => c.UserID == userId)
+            .ToListAsync();
+        
+        // Determine Top 4 Priority Courses
+        var urgentCourseIds = allTasks
+            .Where(t => !string.IsNullOrEmpty(t.CourseID))
+            .Select(t => t.CourseID)
+            .Distinct()
+            .ToList();
+
+        // Sort courses by urgency, then take 4. Courses with no tasks are pushed to the back.
+        _priorityCourses = _courses
+            .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
+            .Take(4)
+            .ToList();
+        
+        // Categorize Tasks using DefID
+        // DefID '111...' = Quizzes, DefID '333...' = Exams
+        _upcomingTests = allTasks
+            .Where(t => t.Type != null && 
+                    (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
+                        t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
+            .Take(5)
+            .ToList();
+        
+        // Adjust this logic depending on what you consider "Homework"
+        // DefID '222...' = Activities
+        _homeworks = allTasks
+            .Where(t => t.Type != null && 
+                    (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
+            .Take(5)
+            .ToList();
+    }
+
+    private string GetColorByIndex(int index)
+    {
+        string[] colors = { "purple-line", "blue-line", "orange-line", "green-line" };
+        return colors[index % colors.Length];
+    }
+
+    private string GetStatusBadgeClass(Status status) => status switch
+    {
+        Status.Completed => "badge-success",
+        Status.Ongoing => "badge-inprogress",
+        _ => "badge-notstarted"
+    };
+
+    // ----- COURSES -----
+    private void OpenAddCourseModal() 
+    { 
+        _showAddCourseModal = true;
+    }
+
+    private void OpenViewAllCoursesModal()
+    {
+        _showViewAllCoursesPopup = true;
+    }
+
+    // ----- TESTS -----
+    private void OpenAddTestModal() 
+    {
+        _showAddTestModal = true;
+    }
+
+    private void OpenViewAllTestsModal()
+    {
+        _showViewAllTestsModal = true;
+    }
+
+    // ----- HOMEWORK -----
+    private void OpenAddHomeworkModal() 
+    {
+        _showAddHomeworkModal = true;
+    }
+
+    private void OpenViewAllHomeworkModal()
+    {
+        _showViewAllHomeworkModal = true;
+    }
+}

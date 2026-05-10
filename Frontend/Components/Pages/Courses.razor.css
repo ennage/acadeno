@@ -1,5 +1,8 @@
-
-/* ... Existing Styles ... */
+.dashboard-root {
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+}
 
 .title-group {
     display: flex;
@@ -39,17 +42,21 @@
     min-height: 32px;
 }
 
-/* Layout: Full Width & Fluid */
-.dashboard-root {
-    display: flex;
-    min-height: 100vh;
-    background-color: #F1F5F9;
-    font-family: 'Poppins', 'Inter', sans-serif; /* Matching design font */
-}
-
+/* Page: Full Width & Fluid */
 .main-content-wrapper {
     flex: 1;
-    padding: 30px 50px; /* Generous side padding */
+    height: 100vh;
+    overflow-y: auto;
+    padding: 30px 50px;
+    background-color: #F1F5F9;
+}
+
+.main-content-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+.main-content-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 .dashboard-grid-layout {

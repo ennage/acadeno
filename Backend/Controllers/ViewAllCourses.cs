@@ -32,7 +32,7 @@ namespace Acadeno.Backend.Services
                 {
                     c.CourseID,
                     c.Name,
-                    Schedule = c.ScheduleEntrys,
+                    Schedule = c.ScheduleEntries,
                     
                     CurrentGrade = c.ActualGrade != null ? c.ActualGrade.CourseGrade : 0,
                     Term = c.TermID

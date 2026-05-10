@@ -1,0 +1,283 @@
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="tests-window">
+
+            <div class="window-header">
+                <div class="header-left">
+                    <h1>All Upcoming Tests</h1>
+                    <p>Monitor your quizzes, major exams, and assessment schedules.</p>
+                </div>
+                </div>
+
+            <div class="window-body">
+                <div class="table-card">
+                    <table class="tests-table">
+                        <thead>
+                            <tr>
+                                <th>Exam Name</th>
+                                <th>Course</th>
+                                <th>Schedule</th>
+                                <th>Room</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Tasks != null && Tasks.Any())
+                            {
+                                @foreach (var test in Tasks)
+                                {
+                                    <tr>
+                                        <td>@test.Name</td>
+                                        <td class="course-name">@(test.Course?.Name ?? "General")</td>
+                                        <td>@test.DueDate.ToString("MMM dd, yyyy • h:mm tt")</td>
+                                        <td>
+                                            @* Safely extracting the room from the course's first schedule entry *@
+                                            @(test.Course?.ScheduleEntries?.FirstOrDefault()?.Room ?? "TBD")
+                                        </td>
+                                        <td>
+                                            <span class="status-badge @GetStatusBadgeClass(test)">
+                                                @(IsOverdue(test) ? "Overdue" : test.TaskStatus.ToString())
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="subject-tag">@(test.Type?.Name ?? "Assessment")</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" style="text-align: center; color: #64748b; padding: 40px;">
+                                        No upcoming tests.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="window-footer">
+                <span class="footer-text">
+                    Showing @(Tasks?.Count() ?? 0) assessment(s)
+                </span>
+
+                <div class="footer-buttons">
+                    <button class="btn btn-secondary" @onclick="Close">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    
+    // We bind directly to this list now without filtering it
+    [Parameter] public List<AcademicTask> Tasks {get; set;} = new();
+    
+    [Parameter] public EventCallback OnClose {get; set;}
+
+    // Helper to check if a task is overdue
+    private bool IsOverdue(AcademicTask task)
+    {
+        return task.DueDate < DateTime.Now && task.TaskStatus != Status.Completed;
+    }
+
+    // Dynamic Badge Color Logic
+    private string GetStatusBadgeClass(AcademicTask task)
+    {
+        if (IsOverdue(task)) return "overdue";
+        
+        return task.TaskStatus switch
+        {
+            Status.Completed => "completed",
+            Status.Ongoing => "ongoing",
+            _ => "pending" // Default for NotStarted or undefined
+        };
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
+    /* OVERLAY */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,23,42,0.45);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        z-index: 1000;
+    }
+
+    /* WINDOW */
+    .tests-window {
+        width: 1150px;
+        height: 720px;
+        max-width: 100%;
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 40px rgba(15,23,42,0.15);
+    }
+
+    /* HEADER */
+    .window-header {
+        padding: 28px 32px;
+        border-bottom: 1px solid #eef2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-left h1 {
+        font-size: 1.55rem;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+
+    .header-left p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* BODY */
+    .window-body {
+        flex: 1;
+        padding: 28px 32px;
+        overflow-y: auto;
+        background: #f8fafc;
+    }
+
+    /* TABLE CARD */
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    /* TABLE */
+    .tests-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .tests-table thead {
+        background: #f8fafc;
+    }
+
+    .tests-table th {
+        text-align: left;
+        padding: 18px 24px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .tests-table td {
+        padding: 22px 24px;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+        color: #0f172a;
+    }
+
+    .tests-table tbody tr {
+        transition: 0.2s ease;
+    }
+
+    .tests-table tbody tr:hover {
+        background: #fafcff;
+    }
+
+    /* COURSE */
+    .course-name {
+        color: #64748b;
+        font-size: 0.84rem;
+    }
+
+    /* BADGES */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+    }
+
+    .completed { background: #dcfce7; color: #15803d; }
+    .pending { background: #fef3c7; color: #b45309; }
+    .ongoing { background: #dbeafe; color: #1d4ed8; }
+    .overdue { background: #fee2e2; color: #b91c1c; }
+
+    /* SUBJECT TAG */
+    .subject-tag {
+        background: #eef2ff;
+        color: #4f46e5;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    /* FOOTER */
+    .window-footer {
+        padding: 18px 30px;
+        border-top: 1px solid #eef2f7;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+    }
+
+    .footer-text {
+        font-size: 0.82rem;
+        color: #64748b;
+    }
+
+    .footer-buttons {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 11px 18px;
+        border: none;
+        border-radius: 10px;
+        font-family: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn-secondary {
+        background: #4f46e5;
+        color: #ffffff;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+</style>

@@ -1,202 +1,284 @@
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
+@using Acadeno.Backend.Controllers
+@using Acadeno.Backend.Services
+@using Acadeno.Backend.Models
+@using Microsoft.EntityFrameworkCore
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject CourseService CourseController
+@inject Acadeno.Backend.Services.UserService UserAccess
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(30, 41, 59, 0.5); 
-            backdrop-filter: blur(5px);       
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-card {
-            background: #ffffff;
-            width: 90%;
-            max-width: 520px;
-            border-radius: 24px;
-            padding: 35px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            font-family: 'Poppins', sans-serif;
-            animation: modalSlideUp 0.4s ease-out;
-        }
-    
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-        }
-
-        .modal-title {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 0;
-        }
-
-        .close-x {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: #94a3b8;
-            cursor: pointer;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
-        .close-x:hover {
-            color: #64748b;
-        }
-
-        /* Form Fields */
-        .form-group {
-            margin-bottom: 22px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 8px;
-            padding-left: 2px;
-        }
-
-        input {
-            width: 100%;
-            padding: 13px 16px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            font-size: 0.95rem;
-            font-family: 'Inter', sans-serif;
-            color: #1e293b;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-        }
-
-        input::placeholder {
-            color: #cbd5e1;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 14px;
-            margin-top: 12px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .btn-cancel {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-        }
-
-        .btn-cancel:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        .btn-submit {
-            background: #4f46e5; 
-            border: none;
-            color: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-        }
-
-        .btn-submit:hover {
-            background: #4338ca;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 10px -1px rgba(79, 70, 229, 0.3);
-        }
-
-        .hidden {
-            display: none;
-        }
-         </style>
-<body>
-    <div class="modal-overlay" id="modalOverlay">
+@if (IsVisible)
+{
+    <div class="modal-overlay">
         <div class="modal-card">
-            
             <div class="modal-header">
                 <h2 class="modal-title">Add New Course</h2>
-                <button class="close-x" id="closeX" aria-label="Close">&times;</button>
+                <button class="close-x" @onclick="Close">&times;</button>
             </div>
 
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Course Name</label>
-                    <input type="text" placeholder="e.g. Graphic Fundamentals">
+            <EditForm Model="_newCourse" OnValidSubmit="HandleSubmit">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Course Name</label>
+                        <InputText @bind-Value="_newCourse.Name" placeholder="e.g. Graphic Fundamentals" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Course Code</label>
+                            <InputText @bind-Value="_newCourse.CourseCode" placeholder="ART101" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Term</label>
+                            <InputSelect @bind-Value="_newCourse.TermID" class="form-control">
+                                <option value="" disabled selected>Select Term</option>
+                                @foreach (var term in _availableTerms)
+                                {
+                                    <option value="@term.TermID">@term.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Day of the Week</label>
+                            <select @bind="_schedule.Day">
+                                <option value="" disabled selected>Select Day</option>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="0">Sunday</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Start Time</label>
+                                <input type="time" @bind="_schedule.StartTime" required />
+                            </div>
+                            <div class="form-group">
+                                <label>End Time</label>
+                                <input type="time" @bind="_schedule.EndTime" required />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Room</label>
+                                <InputText @bind-Value="_schedule.Room" placeholder="Studio A" />
+                            </div>
+                            <div class="form-group">
+                                <label>Building</label>
+                                <InputText @bind-Value="_schedule.Building" placeholder="Main Campus" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Course Code</label>
-                        <input type="text" placeholder="ART101">
-                    </div>
-                    <div class="form-group">
-                        <label>Term</label>
-                        <select>
-                            <option value="" disabled selected>Select Term</option>
-                            <option value="1st Semester">1st Semester</option>
-                            <option value="2nd Semester">2nd Semester</option>
-                            <option value="Summer">Summer</option>
-                        </select>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
+                    <button type="submit" class="btn btn-submit">Add Course</button>
                 </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Time</label>
-                        <input type="text" placeholder="9:00 AM - 10:30 AM">
-                    </div>
-                    <div class="form-group">
-                        <label>Location</label>
-                        <input type="text" placeholder="Studio A">
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-cancel" id="cancelBtn">Cancel</button>
-                <button class="btn btn-submit" id="submitBtn">Add Course</button>
-            </div>
+            </EditForm>
         </div>
     </div>
-</body>
+}
+
+
+
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public EventCallback OnCourseAdded {get; set;}
+
+    private Course _newCourse = new();
+    private ScheduleEntry _schedule = new();
+    private List<Term> _availableTerms = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch terms so the dropdown works
+        _availableTerms = await _db.Terms.ToListAsync();
+    }
+
+    private async Task HandleSubmit()
+    {
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // Aligning perfectly with your CourseService signature
+        await CourseController.AddNewCourseAsync(
+            userId: userId, 
+            termId: _newCourse.TermID, 
+            courseCode: _newCourse.CourseCode, 
+            name: _newCourse.Name, 
+            scheduleEntry: _schedule
+        );
+        
+        // Notify parent to refresh the grid and close
+        await OnCourseAdded.InvokeAsync();
+        await Close();
+        
+        // Reset form for the next time it opens
+        _newCourse = new();
+        _schedule = new();
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 41, 59, 0.5); 
+        backdrop-filter: blur(5px);       
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+
+    .modal-card {
+        background: #ffffff;
+        width: 90%;
+        max-width: 520px;
+        border-radius: 24px;
+        padding: 35px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        font-family: 'Poppins', sans-serif;
+        animation: modalSlideUp 0.4s ease-out;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 28px;
+    }
+
+    .modal-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .close-x {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        color: #94a3b8;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+
+    .close-x:hover {
+        color: #64748b;
+    }
+
+    /* Form Fields */
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+
+    input {
+        width: 100%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+        font-family: 'Inter', sans-serif;
+        color: #1e293b;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+
+    input::placeholder {
+        color: #cbd5e1;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 14px;
+        margin-top: 12px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-cancel {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+
+    .btn-cancel:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+
+    .btn-submit {
+        background: #4f46e5; 
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+    }
+
+    .btn-submit:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 10px -1px rgba(79, 70, 229, 0.3);
+    }
+
+    .hidden {
+        display: none;
+    }
+    select {
+        width: 100%;
+        padding: 13px 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.95rem;
+        background: white;
+        font-family: 'Inter', sans-serif;
+    }
+</style>
