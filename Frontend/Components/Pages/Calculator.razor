@@ -43,19 +43,94 @@
 
                     <div class="category-box">
                         <div class="category-header">
-                            <div class="category-left"><h3>Quizzes</h3></div>
-                            <input class="weight-input" type="number" value="30">
+                            <div class="category-left">
+                                <select class="category-dropdown">
+                                    <option selected disabled>
+                                        Select Category
+                                    </option>
+                                    <option>
+                                        Quizzes
+                                    </option>
+                                    <option>
+                                        Activities
+                                    </option>
+                                    <option>
+                                        Assignments
+                                    </option>
+                                    <option>
+                                        Projects
+                                    </option>
+                                    <option>
+                                        Laboratory
+                                    </option>
+                                    <option>
+                                        Seatwork
+                                    </option>
+                                    <option>
+                                        Recitation
+                                    </option>
+                                    <option>
+                                        Attendance
+                                    </option>
+                                    <option>
+                                        Performance Task
+                                    </option>
+                                    <option>
+                                        Midterm Exam
+                                    </option>
+                                    <option>
+                                        Final Exam
+                                    </option>
+                                    <option>
+                                        Research
+                                    </option>
+                                    <option>
+                                        Portfolio
+                                    </option>
+                                </select>
+                            </div>
+
+                            <input
+                                class="weight-input"
+                                type="number"
+                                placeholder="%"
+                                value="30"
+                            >
+
                         </div>
                         <div class="test-item">
-                            <input type="text" placeholder="Quiz 1">
+                            <input
+                                type="text"
+                                placeholder="Activity Name">
+
                             <div class="score-group">
-                                <input type="number" placeholder="18">
+                                <input
+                                    type="number"
+                                    placeholder="Score"
+                                >
                                 <span>/</span>
-                                <input type="number" placeholder="20">
+                                <input
+                                    type="number"
+                                    placeholder="Total"
+                                >
                             </div>
-                            <input class="computed-score" type="text" value="90%" readonly>
-                            <button class="delete-btn">×</button>
+                            <input
+                                class="computed-score"
+                                type="text"
+                                value="0%"
+                                readonly
+                            >
+
+                            <button class="delete-btn">
+                                ×
+                            </button>
+
                         </div>
+
+                            <button class="add-test-btn">
+                                + Add Test
+                            </button>
+
                     </div>
 
                     <div class="final-grade">
@@ -63,7 +138,7 @@
                             <small>Computed Final Grade</small>
                             <h2>91.40%</h2>
                         </div>
-                        <div class="grade-letter" style="font-size: 1.5rem; font-weight: bold;">A</div>
+                        <div class="grade-letter" style="font-size: 1.5rem; font-weight: bold;">1.75</div>
                     </div>
                 </div>
             </div>
