@@ -193,82 +193,74 @@
    MODERN REMINDER CARD — MATCH COURSE CARD DESIGN
    ========================================================================== */
 
+/* MODERN REMINDER CARD */
 .reminder-item {
     display: flex;
-    align-items: stretch;
+    align-items: center; 
     background: #ffffff;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-    margin-bottom: 14px;
-    transition: all 0.2s ease;
-    min-height: 95px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    border-radius: 18px;
+    border: 1px solid #eef2f6;
+    margin-bottom: 16px;
+    padding: 16px; /* Matches the inner spacing of your course cards */
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
-/* Hover effect same as course cards */
-.reminder-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-}
-
-/* LEFT ACCENT LINE */
-.reminder-item::before {
-    content: "";
-    width: 4px;
-    background: #10b981; /* default green */
+/* THE PILL-STYLE ACCENT LINE */
+.accent-line {
+    width: 4px;          
+    height: 75px;        
+    border-radius: 10px; 
+    margin-right: 18px;
     flex-shrink: 0;
 }
 
-/* URGENT / ALERT */
-.reminder-item.alert::before {
-    background: #ef4444;
-}
+/* Dynamic Colors based on the Parent Class */
+.reminder-item.stable .accent-line { background-color: #10b981; }
+.reminder-item.warning .accent-line { background-color: #f97316; }
+.reminder-item.critical .accent-line { background-color: #ef4444; }
 
-/* MAIN CONTENT */
+
+/* TEXT CONTENT */
 .reminder-text {
     flex: 1;
-    padding: 14px 16px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-/* TITLE */
-.reminder-text h4 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 4px 0;
-    font-family: 'Poppins', sans-serif;
-    line-height: 1.2;
+/* Text Content Tweaks */
+.reminder-text h5 {
+    font-size: 0.75rem;
+    margin: 0 0 2px 0;
+    color: #64748b; 
 }
 
-/* PRIORITY + DATE */
-.reminder-text h5 {
-    font-size: 0.72rem;
+/* Set specific color for the Warning/Critical text if desired */
+.reminder-item.warning h5 strong { color: #f97316; }
+.reminder-item.critical h5 strong { color: #ef4444; }
+.reminder-item.stable h5 strong { color: #10b981; }
+
+.reminder-text h4 {
+    font-size: 1.10rem;
     font-weight: 700;
-    margin: 0 0 6px 0;
-    color: #f97316;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin: 0;
 }
 
 /* COURSE NAME */
 .reminder-text p {
-    font-size: 0.78rem;
+    font-size: 0.80rem;
     color: #94a3b8;
     margin: 0;
     line-height: 1.2;
 }
 
-/* ACTION BUTTON COLUMN */
+/* BUTTONS */
 .action-buttons {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 12px 10px 0;
+    gap: 8px;
+    margin-left: 10px;
 }
 
 /* BUTTON STYLE */
@@ -509,8 +501,8 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: 15px 10px 5px 10px !important; /* Unified padding */
-    height: 60px; /* Explicit minimum height to ensure uniformity */
+    padding: 15px 10px 5px 10px !important; 
+    height: 60px; 
 }
 
 .day-name {

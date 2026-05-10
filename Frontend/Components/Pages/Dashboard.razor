@@ -56,10 +56,16 @@
                             @foreach (var task in _priorityTasks)
                             {
                                 var PriorityScore = PriorityService.CalculatePriorityScore(task);
-                                var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
-
-                                <div class="reminder-item @(isUrgent ? "alert" : "")">
+                                    string reminderClass = task.RiskLevel switch
+                                    {
+                                        RiskLevel.Stable => "stable",
+                                        RiskLevel.Warning => "warning",
+                                        RiskLevel.Critical => "critical",
+                                        _ => "stable"
+                                    };
+                                <div class="reminder-item @reminderClass">                                    
                                     @* 1. Left side content *@
+                                    <div class="accent-line"></div>
                                     <div class="reminder-text">
                                         @if (task is AcademicTask academicTask)
                                         {
