@@ -34,10 +34,38 @@
         }</div> *@
         
         <header class="welcome-card clock-grade-card">
-            <!-- DATE AND TIME -->
-            <div class="live-clock-container">
-                <div class="live-date">@_currentDate</div>
-                <div class="live-time">@_currentTime</div>
+            <div class="header-split">
+                <div class="live-clock-container">
+                    <div class="live-date">@_currentDate</div>
+                    <div class="live-time">@_currentTime</div>
+                    <div class="school-tag">BATANGAS STATE UNIVERSITY</div>
+                </div>
+
+                <div class="header-kpi-panel">
+                    <div class="kpi-group">
+                        <div class="kpi-item">
+                            <span class="kpi-label">CURRENT GWA</span>
+                            <span class="kpi-value highlight">1.25</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">TERM GPA</span>
+                            <span class="kpi-value">1.40</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-divider"></div>
+
+                    <div class="kpi-group">
+                        <div class="kpi-item">
+                            <span class="kpi-label">UNITS LOADED</span>
+                            <span class="kpi-value">21</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-badge">
+                        <i class="fas fa-award"></i> EXCELLENT
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -56,10 +84,16 @@
                             @foreach (var task in _priorityTasks)
                             {
                                 var PriorityScore = PriorityService.CalculatePriorityScore(task);
-                                var isUrgent = task.RiskLevel == RiskLevel.Critical || PriorityScore > 15;
-
-                                <div class="reminder-item @(isUrgent ? "alert" : "")">
+                                    string reminderClass = task.RiskLevel switch
+                                    {
+                                        RiskLevel.Stable => "stable",
+                                        RiskLevel.Warning => "warning",
+                                        RiskLevel.Critical => "critical",
+                                        _ => "stable"
+                                    };
+                                <div class="reminder-item @reminderClass">                                    
                                     @* 1. Left side content *@
+                                    <div class="accent-line"></div>
                                     <div class="reminder-text">
                                         @if (task is AcademicTask academicTask)
                                         {
