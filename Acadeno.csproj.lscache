@@ -92,6 +92,7 @@ Backend/Models/
  Term.cs
  User.cs
 Backend/Services/
+ AcademicService.cs
  AuthService.cs
  CalendarService.cs
  CourseService.cs

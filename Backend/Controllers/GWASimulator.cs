@@ -1,6 +1,7 @@
 using Acadeno.Backend.Tools;
 using Acadeno.Backend.Simulation;
 using Acadeno.Backend.Enums;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Acadeno.Backend.Controllers
 {
@@ -66,16 +67,8 @@ namespace Acadeno.Backend.Controllers
         }
         public string GetAcademicStanding(double gwa)
         {
-            if (gwa >= 1.00 && gwa<= 1.25)
-            {
-                return "President Lister";
-            }
-
-            if (gwa > 1.25 && gwa <= 1.75)
-            {
-                return "Dean's Lister";
-            }
-
+            if (gwa >= 1.00 && gwa<= 1.25) return "President Lister";
+            if (gwa > 1.25 && gwa <= 1.75) return "Dean's Lister";
             if (gwa <= 2.25) return "Satisfactory";
             if (gwa <= 3.00) return "Passing";
 
