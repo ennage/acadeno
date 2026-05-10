@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Acadeno.Backend.Models
 {
@@ -13,6 +14,11 @@ namespace Acadeno.Backend.Models
 
         //  Foreign Key
         public string GradeID {get; set;} = string.Empty;
+        public string DefID {get; set;} = string.Empty;
+
+        // Navigation Property
+        [ForeignKey("DefID")]
+        public virtual TaskTypeDefinition? Definition { get; set; }
 
         //  Holds many Academic Tasks
         public List<AcademicTask> AcademicTasks {get; set;} = new List<AcademicTask>();

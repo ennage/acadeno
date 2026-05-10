@@ -78,9 +78,9 @@
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Upcoming Tests</h2>
-                                <button class="btn-add" title="Add New Tests">+</button>
+                                <button class="btn-add" title="Add New Test">+</button>
                             </div>
-                            <a href="#" class="accent-link">View all tests &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View all tests &rsaquo;</a>
                         </div>
                         <div class="data-table-card">
                             <table class="styled-table">
@@ -93,16 +93,27 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var test in _upcomingTests)
+                                    @if (_upcomingTests != null && _upcomingTests.Any())
+                                    {
+                                        @foreach (var test in _upcomingTests)
+                                        {
+                                            <tr>
+                                                <td>@test.Name</td>
+                                                <td>@(test.Course?.Name ?? "General")</td>
+                                                <td>@test.DueDate.ToString("MMM dd, yyyy")</td>
+                                                <td>
+                                                    <span class="badge @GetStatusBadgeClass(test.TaskStatus)">
+                                                        @test.TaskStatus
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
                                     {
                                         <tr>
-                                            <td>@test.Name</td>
-                                            <td>@(test.Course?.Name ?? "General")</td>
-                                            <td>@test.DueDate.ToString("MMM dd, yyyy")</td>
-                                            <td>
-                                                <span class="badge @GetStatusBadgeClass(test.TaskStatus)">
-                                                    @test.TaskStatus
-                                                </span>
+                                            <td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">
+                                                No upcoming tests! Take a breather.
                                             </td>
                                         </tr>
                                     }
@@ -183,9 +194,21 @@
     Courses="_courses" 
     OnClose="() => _showViewAllCoursesPopup = false" />
 
+@* <AddTest 
+    IsVisible="_showAddTestModal" 
+    OnClose="() => _showAddTestModal = false" 
+    OnTaskAdded="RefreshTasks" /> *@
+
+<ViewAllTestsPopup 
+    IsVisible="_showViewAllTestsModal" 
+    Tasks="_upcomingTests" 
+    OnClose="() => _showViewAllTestsModal = false" />
+
 @code {
     private bool _showAddCourseModal = false;
     private bool _showViewAllCoursesPopup = false;
+    private bool _showAddTestModal = false;
+    private bool _showViewAllTestsModal = false;
     private string _userId = string.Empty;
     private string _currentTermDisplay = "your current term";
     
@@ -220,6 +243,7 @@
         var allTasks = await _db.AcademicTasks
             .Include(t => t.Course)
             .Include(t => t.Type)
+            
             .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
             .OrderBy(t => t.DueDate)
             .ToListAsync();
@@ -237,9 +261,22 @@
             .Take(4)
             .ToList();
 
-        // Categorize
-        _upcomingTests = allTasks.Where(t => t.TypeID == "Exam" || t.TypeID == "Quiz").Take(5).ToList();
-        _homeworks = allTasks.Where(t => t.TypeID == "Homework").Take(5).ToList();
+        // Categorize Tasks using DefID
+        // DefID '111...' = Quizzes, DefID '333...' = Exams
+        _upcomingTests = allTasks
+            .Where(t => t.Type != null && 
+                    (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
+                        t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
+            .Take(5)
+            .ToList();
+        
+        // Adjust this logic depending on what you consider "Homework"
+        // DefID '222...' = Activities
+        _homeworks = allTasks
+            .Where(t => t.Type != null && 
+                    (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
+            .Take(5)
+            .ToList();
     }
 
     private string GetColorByIndex(int index)
@@ -255,6 +292,7 @@
         _ => "badge-notstarted"
     };
 
+    // ----- COURSES -----
     private void OpenAddCourseModal() 
     { 
         _showAddCourseModal = true;
@@ -263,5 +301,16 @@
     private void OpenViewAllCoursesModal()
     {
         _showViewAllCoursesPopup = true;
+    }
+
+    // ----- TESTS -----
+    private void OpenAddTestModal() 
+    {
+        _showAddTestModal = true;
+    }
+
+    private void OpenViewAllTestsModal()
+    {
+        _showViewAllTestsModal = true;
     }
 }
