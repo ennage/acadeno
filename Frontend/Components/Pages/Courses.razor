@@ -247,19 +247,19 @@
             _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
         }
 
-        _courses = await _db.Courses
-            .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
-            .Include(c => c.Term)        // <--- EF Core joins the Terms table here
-            .Include(c => c.ScheduleEntries)
-            .Where(c => c.UserID == userId)
-            .ToListAsync();
-
         var allTasks = await _db.AcademicTasks
             .Include(t => t.Course)
             .Include(t => t.Type)
             
             .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
             .OrderBy(t => t.DueDate)
+            .ToListAsync();
+
+        _courses = await _db.Courses
+            .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
+            .Include(c => c.Term)        // <--- EF Core joins the Terms table here
+            .Include(c => c.ScheduleEntries)
+            .Where(c => c.UserID == userId)
             .ToListAsync();
         
         // Determine Top 4 Priority Courses
@@ -274,7 +274,7 @@
             .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
             .Take(4)
             .ToList();
-
+        
         // Categorize Tasks using DefID
         // DefID '111...' = Quizzes, DefID '333...' = Exams
         _upcomingTests = allTasks
