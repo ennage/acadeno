@@ -71,14 +71,9 @@ Backend/Controllers/
  AddExams.cs
  AddHomeworks.cs
  GWASimulator.cs
- SimulatedTask.cs
  ViewAllCourses.cs
  ViewAllExams.cs
  ViewAllHomework.cs
-Backend/Core/
- GenAveSimulator.cs
- GradingEngine.cs
- PriorityEngine.cs
 Backend/Enums/
  GradeScaleType.cs
  Month.cs
@@ -93,15 +88,25 @@ Backend/Models/
  Course.cs
  Grade.cs
  ScheduleEntry.cs
+ TaskTypeDefinitions.cs
  Term.cs
  User.cs
 Backend/Services/
  AuthService.cs
  CalendarService.cs
+ CourseService.cs
+ DashboardService.cs
  IdService.cs
  ScheduleService.cs
  TaskService.cs
+ TermService.cs
  UserService.cs
+Backend/Simulation/
+ GenAveSimulator.cs
+ GradingEngine.cs
+ GWASimulator.cs
+ PriorityEngine.cs
+ SimulatedTask.cs
 Backend/Tools/AppDBContext.cs
 MainPage.xaml.cs
 MauiProgram.cs
@@ -401,52 +406,56 @@ obj/Debug/net10.0-windows10.0.19041.0/win-x64/Acadeno.GeneratedMSBuildEditorConf
 
 [additionalFiles]
 App.xaml
-Frontend/Components/Pages/
- About.razor
- Access.razor
- Calendar.razor
- Courses.razor
- Dashboard.razor
- MainLayout.razor
- NavMenu.razor
- NotFound.razor
-Frontend/Components/Popups/
- AddTask.razor
- CalendarPopUp.razor
- EnrolledCourses.razor
- HomeworkPopUp.razor
- UpcomingTest.razor
 Frontend/Components/
+ CalendarPopups/CalendarPopUp.razor
+ CoursesPopups/
+  AddNewCourse.razor
+  AddNewHomework.razor
+  AddNewTest.razor
+  ViewAllCoursesPopup.razor
+  ViewAllHomeworkPopup.razor
+  ViewAllTestsPopup.razor
+ DashboardPopups/
+  AddTask.razor
+  EditReminder.razor
+  ViewAllReminders.razor
+ Pages/
+  About.razor
+  Access.razor
+  Calculator.razor
+  Calendar.razor
+  Courses.razor
+  Dashboard.razor
+  MainLayout.razor
+  NavMenu.razor
+  NotFound.razor
  Routes.razor
- ViewAll/
-  CalculateGWA.razor
-  ViewAllCourses.razor
-  ViewAllHomework.razor
-  ViewAllTest.razor
  _Imports.razor
 MainPage.xaml
 
 [dynamicFiles]
-Frontend/Components/Pages/
- About.razor
- Access.razor
- Calendar.razor
- Courses.razor
- Dashboard.razor
- MainLayout.razor
- NavMenu.razor
- NotFound.razor
-Frontend/Components/Popups/
- AddTask.razor
- CalendarPopUp.razor
- EnrolledCourses.razor
- HomeworkPopUp.razor
- UpcomingTest.razor
 Frontend/Components/
+ CalendarPopups/CalendarPopUp.razor
+ CoursesPopups/
+  AddNewCourse.razor
+  AddNewHomework.razor
+  AddNewTest.razor
+  ViewAllCoursesPopup.razor
+  ViewAllHomeworkPopup.razor
+  ViewAllTestsPopup.razor
+ DashboardPopups/
+  AddTask.razor
+  EditReminder.razor
+  ViewAllReminders.razor
+ Pages/
+  About.razor
+  Access.razor
+  Calculator.razor
+  Calendar.razor
+  Courses.razor
+  Dashboard.razor
+  MainLayout.razor
+  NavMenu.razor
+  NotFound.razor
  Routes.razor
- ViewAll/
-  CalculateGWA.razor
-  ViewAllCourses.razor
-  ViewAllHomework.razor
-  ViewAllTest.razor
  _Imports.razor
