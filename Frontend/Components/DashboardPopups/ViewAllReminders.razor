@@ -14,8 +14,7 @@
             </header>
 
             <main class="window-body">
-                <div class="course-grid">
-                    @if (Tasks != null && Tasks.Any())
+                <div class="task-list"> @if (Tasks != null && Tasks.Any())
                     {
                         @foreach (var task in Tasks)
                         {
@@ -32,30 +31,28 @@
                                             (daysLeft == 1 ? "TOMORROW" : 
                                             (daysLeft < 0 ? "LATE" : $"{daysLeft} DAYS LEFT"));
 
-                            <div class="course-card">
+                            <div class="list-row">
                                 <div class="side-line @lineClass"></div>
-                                <div class="course-content">
-                                    <div class="course-meta @metaClass">@metaText</div>
-                                    <div class="course-top">
-                                        <h3 class="course-title">@task.Name</h3>
-                                        <span class="due-tag">@dueText</span>
-                                    </div>
-                                    
-                                    <p class="course-info">
-                                        @(string.IsNullOrWhiteSpace(task.Description) ? "No additional details provided." : task.Description)
-                                    </p>
-                                    
-                                    <div class="course-footer">
-                                        <span class="subject-tag">@(task is AcademicTask act ? (act.Course?.Name ?? "General") : "General Task")</span>
-                                        <span class="due-tag">@task.DueDate.ToString("MMM dd, yyyy")</span>
-                                    </div>
+                                
+                                <div class="row-main">
+                                    <h3 class="row-title">@task.Name</h3>
+                                    <span class="subject-tag">@(task is AcademicTask act ? (act.Course?.Name ?? "General") : "General Task")</span>
+                                </div>
+                                
+                                <div class="row-desc">
+                                    <p>@(string.IsNullOrWhiteSpace(task.Description) ? "No additional details provided." : task.Description)</p>
+                                </div>
+                                
+                                <div class="row-meta">
+                                    <span class="row-status @metaClass">@metaText &bull; @dueText</span>
+                                    <span class="row-date">@task.DueDate.ToString("MMM dd, yyyy")</span>
                                 </div>
                             </div>
                         }
                     }
                     else
                     {
-                        <div style="grid-column: span 2; text-align: center; padding: 40px; color: #64748b;">
+                        <div class="empty-state">
                             <h3>🎉 You're all caught up!</h3>
                             <p>There are no pending tasks in this category.</p>
                         </div>
@@ -152,7 +149,7 @@
     }
     .close-x:hover { color: #0f172a; }
 
-    /* BODY / GRID */
+    /* BODY */
     .window-body {
         flex: 1;
         overflow-y: auto;
@@ -163,89 +160,50 @@
     .window-body::-webkit-scrollbar { width: 8px; }
     .window-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-    .course-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    /* --- NEW LIST STYLING --- */
+    .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* Tighter gap for a list */
     }
 
-    /* CARD DESIGN */
-    .course-card {
+    .list-row {
         background: #fff;
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
-        padding: 20px;
+        border-radius: 12px;
+        padding: 16px 20px;
         display: flex;
-        gap: 15px;
-        transition: all 0.3s ease;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.2s ease;
     }
 
-    .course-card:hover {
+    .list-row:hover {
+        background: #f1f5f9;
         border-color: #cbd5e1;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     }
 
-    /* STATUS LINE */
     .side-line {
-        width: 5px;
-        border-radius: 10px;
-        align-self: stretch; /* Stretches to fit card height */
+        width: 4px;
+        height: 38px;
+        border-radius: 4px;
+        flex-shrink: 0;
     }
 
     .urgent { background: #ef4444; }
     .pending { background: #f59e0b; }
     .stable { background: #10b981; }
 
-    .course-content { flex: 1; }
-
-    .course-top {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        align-items: flex-start;
+    .row-main {
+        flex: 1.5;
+        min-width: 200px;
     }
 
-    .course-title {
+    .row-title {
         font-size: 1.05rem;
         font-weight: 700;
         color: #1e293b;
-        margin: 0;
-        line-height: 1.3;
-    }
-
-    .course-meta {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-    }
-
-    .meta-urgent { color: #ef4444; }
-    .meta-pending { color: #f59e0b; }
-    .meta-stable { color: #10b981; }
-
-    .course-info {
-        font-size: 0.85rem;
-        color: #64748b;
-        line-height: 1.5;
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Truncates super long descriptions */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* FOOTER TAGS */
-    .course-footer {
-        margin-top: 15px;
-        padding-top: 12px;
-        border-top: 1px dashed #e2e8f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        margin: 0 0 4px 0;
     }
 
     .subject-tag {
@@ -255,13 +213,54 @@
         font-family: 'Inter', sans-serif;
     }
 
-    .due-tag {
-        background: #f1f5f9;
-        padding: 4px 8px;
-        border-radius: 6px;
+    .row-desc {
+        flex: 2;
+        padding: 0 20px;
+        border-left: 1px solid #e2e8f0;
+    }
+
+    .row-desc p {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 1; /* Forces description to stay on ONE line */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .row-meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        min-width: 130px;
+    }
+
+    .row-status {
         font-size: 0.75rem;
-        font-weight: 600;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .meta-urgent { color: #ef4444; }
+    .meta-pending { color: #f59e0b; }
+    .meta-stable { color: #10b981; }
+
+    .row-date {
+        font-size: 0.85rem;
         color: #475569;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #64748b;
     }
 
     /* WINDOW FOOTER */

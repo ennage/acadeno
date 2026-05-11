@@ -93,10 +93,10 @@
 }
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public BaseTask? TaskToEdit { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback OnTaskUpdated { get; set; }
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public BaseTask? TaskToEdit {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public EventCallback OnTaskUpdated {get; set;}
 
     private BaseTask? _editTask;
     private DateTime _uiDate;
@@ -107,22 +107,25 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        // When the modal opens and a task is passed in, load its details!
         if (IsVisible && TaskToEdit != null)
         {
-            // We clone the task so if the user clicks "Cancel", it doesn't accidentally save halfway-typed text to the dashboard UI
-            _editTask = CloneTask(TaskToEdit);
-            
-            // Break apart the DueDate into our safe UI variables
-            _uiDate = _editTask.DueDate.Date;
-            _uiTime = DateTime.Today.Add(_editTask.DueDate.TimeOfDay);
-
-            // Load dropdown data
-            var userId = UserAccess.CurrentUser?.UserID;
-            if (!string.IsNullOrEmpty(userId) && !_availableCourses.Any())
+            // THE FIX: Only clone the data if we are opening a NEW task, 
+            // or if the popup was just opened (meaning _editTask is null)!
+            if (_editTask == null || _editTask.TaskID != TaskToEdit.TaskID)
             {
-                _availableCourses = await CourseService.GetUserCoursesAsync(userId);
-                _availableTypes = await TaskService.GetTaskTypesAsync();
+                _editTask = TaskService.CloneTask(TaskToEdit);
+                if (_editTask != null)
+                {
+                    _uiDate = _editTask.DueDate.Date;
+                    _uiTime = DateTime.Today.Add(_editTask.DueDate.TimeOfDay);
+                }
+
+                var userId = UserAccess.CurrentUser?.UserID;
+                if (!string.IsNullOrEmpty(userId) && !_availableCourses.Any())
+                {
+                    _availableCourses = await CourseService.GetUserCoursesAsync(userId);
+                    _availableTypes = await TaskService.GetTaskTypesAsync();
+                }
             }
         }
     }
@@ -151,23 +154,12 @@
         }
     }
 
-    private async Task Close() => await OnClose.InvokeAsync();
-
-    // Helper method to safely duplicate the object
-    private BaseTask CloneTask(BaseTask original)
+    private async Task Close() 
     {
-        if (original is AcademicTask ac)
-        {
-            return new AcademicTask {
-                TaskID = ac.TaskID, UserID = ac.UserID, Name = ac.Name, Description = ac.Description,
-                StartDate = ac.StartDate, DueDate = ac.DueDate, TaskStatus = ac.TaskStatus,
-                CourseID = ac.CourseID, TypeID = ac.TypeID, RiskLevel = ac.RiskLevel
-            };
-        }
-        return new BaseTask {
-            TaskID = original.TaskID, UserID = original.UserID, Name = original.Name, Description = original.Description,
-            StartDate = original.StartDate, DueDate = original.DueDate, TaskStatus = original.TaskStatus, RiskLevel = original.RiskLevel
-        };
+        // THE SECOND FIX: Set this to null when closing so the popup 
+        // knows to grab fresh data the next time you open it!
+        _editTask = null; 
+        await OnClose.InvokeAsync();
     }
 }
 

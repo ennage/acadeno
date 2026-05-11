@@ -130,6 +130,25 @@ namespace Acadeno.Backend.Services
                 .ToListAsync();
         }
 
+        public BaseTask? CloneTask(BaseTask? original)
+        {
+            if (original == null) return null;
+
+            if (original is AcademicTask ac)
+            {
+                return new AcademicTask {
+                    TaskID = ac.TaskID, UserID = ac.UserID, Name = ac.Name, Description = ac.Description,
+                    StartDate = ac.StartDate, DueDate = ac.DueDate, TaskStatus = ac.TaskStatus,
+                    CourseID = ac.CourseID, TypeID = ac.TypeID, RiskLevel = ac.RiskLevel
+                };
+            }
+            
+            return new BaseTask {
+                TaskID = original.TaskID, UserID = original.UserID, Name = original.Name, Description = original.Description,
+                StartDate = original.StartDate, DueDate = original.DueDate, TaskStatus = original.TaskStatus, RiskLevel = original.RiskLevel
+            };
+        }
+
         public async Task<bool> UpdateTaskAsync(BaseTask updatedTask)
         {
             if (updatedTask == null) return false;
