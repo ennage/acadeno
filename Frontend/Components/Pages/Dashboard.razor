@@ -72,13 +72,13 @@
         <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
                 <div class="card-header">
-                    <button class="btn-view-all" @onclick="NavigateToAllTasks">
+                    <button class="btn-nav" @onclick="NavigateToAllTasks">
                         <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M7,6H23a1,1,0,0,0,0-2H7A1,1,0,0,0,7,6Z"/><path d="M23,11H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><path d="M23,18H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><circle cx="2" cy="5" r="2"/><circle cx="2" cy="12" r="2"/><circle cx="2" cy="19" r="2"/>
                         </svg>
                     </button>
                     <h3 class="reminder-title">REMINDERS</h3>
-                    <button class="btn-add-reminder" @onclick="ShowAddTaskModal" aria-label="Add Task">+</button>
+                    <button class="btn-nav" @onclick="ShowAddTaskModal" aria-label="Add Reminder">+</button>
                 </div>
 
                 <div class="card-content-area">
@@ -113,10 +113,10 @@
                                     </div>
 
                                     <div class="action-buttons">
-                                        <button class="btn-action btn-complete" @onclick="() => MarkAsComplete(task)">
+                                        <button class="btn-action btn-complete" title="Complete" @onclick="() => MarkAsComplete(task)">
                                             ✔
                                         </button>
-                                        <button class="btn-action btn-edit">
+                                        <button class="btn-action btn-edit" title="Edit" @onclick="() => OpenEditModal(task)">
                                             ✎
                                         </button>
                                     </div>
