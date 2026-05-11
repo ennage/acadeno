@@ -35,6 +35,25 @@ namespace Acadeno.Backend.Services
             return course;
         }
 
+        public async Task AllNewCourseAsync(string userId, string termId, string courseCode, string name, ScheduleEntry scheduleEntry)
+        {
+            var course = new Course
+            {
+                CourseID = Guid.NewGuid().ToString(),
+                UserID = userId,
+                TermID = termId,
+
+                CourseCode = courseCode,
+                Name = name,
+
+                ScheduleEntries = new List<ScheduleEntry> { scheduleEntry }
+            };
+            scheduleEntry.CourseID = course.CourseID;
+            
+            _db.Courses.Add(course);
+            _db.SaveChanges();
+        }
+
         public async Task<List<Course>>GetStudentCoursesAsync(string userId)
         {
             return await _db.Courses

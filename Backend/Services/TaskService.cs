@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Models;
+using Acadeno.Backend.Enums;
 using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
@@ -13,6 +14,54 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
+        public async Task AddNewACtivitiesAsync(string userId, string courseId, string typeId, string name, DateTime dueDate)
+        {
+            var activity = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
+                CourseID = courseId,
+                
+                Name = name,
+                DueDate = dueDate,
+                TypeID = typeId
+            };
+            _db.AcademicTasks.Add(activity);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task AllExams(string userId, string courseId, string typeId, string name, DateTime date, Status status)
+        {
+            var exam = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
+                CourseID = courseId,
+                TypeID = typeId,
+
+                Name = name,
+                DueDate = date,
+                TaskStatus = status
+            };
+            
+            _db.Tasks.Add(exam);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task AllHomeworksAsync(string userId, string courseId, string name, DateTime dueDate)
+        {
+            var homework = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId,
+                CourseID = courseId,
+                Name = name,
+                DueDate = dueDate,
+                TypeID = "Homework"
+            };
+            _db.AcademicTasks.Add(homework);
+            await _db.SaveChangesAsync();
+        }
         public async System.Threading.Tasks.Task<bool> CreateTask(AcademicTask task)
         {
             if (task == null) return false;

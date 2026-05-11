@@ -14,7 +14,7 @@ namespace Acadeno.Backend.Services
         public DashboardService(AppDbContext db)
         {
             _db = db;
-            _engine = new();
+            _engine = new GradingEngine();
         }
          
         public class SimulatedTaskInput
