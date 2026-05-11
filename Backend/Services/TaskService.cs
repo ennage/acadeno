@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Acadeno.Backend.Models;
+using Acadeno.Backend.Enums;
 using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Services
@@ -13,6 +14,54 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
+        public async Task AddNewACtivitiesAsync(string userId, string courseId, string typeId, string name, DateTime dueDate)
+        {
+            var activity = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
+                CourseID = courseId,
+                
+                Name = name,
+                DueDate = dueDate,
+                TypeID = typeId
+            };
+            _db.AcademicTasks.Add(activity);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task AllExams(string userId, string courseId, string typeId, string name, DateTime date, Status status)
+        {
+            var exam = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId.ToString(),
+                CourseID = courseId,
+                TypeID = typeId,
+
+                Name = name,
+                DueDate = date,
+                TaskStatus = status
+            };
+            
+            _db.Tasks.Add(exam);
+            await _db.SaveChangesAsync();
+        }
+
+        public async Task AllHomeworksAsync(string userId, string courseId, string name, DateTime dueDate)
+        {
+            var homework = new AcademicTask
+            {
+                TaskID = Guid.NewGuid().ToString(),
+                UserID = userId,
+                CourseID = courseId,
+                Name = name,
+                DueDate = dueDate,
+                TypeID = "Homework"
+            };
+            _db.AcademicTasks.Add(homework);
+            await _db.SaveChangesAsync();
+        }
         public async System.Threading.Tasks.Task<bool> CreateTask(AcademicTask task)
         {
             if (task == null) return false;
@@ -56,10 +105,32 @@ namespace Acadeno.Backend.Services
                 .AsNoTracking()
                 .ToListAsync();
         }
+         
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllActivities(string typeId)
+        {
+            return await _db.AcademicTasks
+                .Where(t => t.TypeID == typeId)
+                .ToListAsync();
+        }
 
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllExam(string typeId)
+        {
+            return _db.AcademicTasks
+                .Include(t => t.Type)
+                .Where(t => t.TypeID == typeId)
+                .ToList();
+        }
+
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllHomeworks(string typeId)
+        {
+            return await _db.AcademicTasks
+                .Where(t => t.TypeID == typeId)
+                .Include(t => t.Type)
+                .OrderBy(t => t.DueDate)
+                .ToListAsync();
+        }
         
-
-        public int CalculateRiskLevel(string taskid)
+       public int CalculateRiskLevel(string taskid)
         {
             var task = _db.AcademicTasks.Find(taskid);
             if (task == null) return 1;
