@@ -14,7 +14,7 @@ namespace Acadeno.Backend.Services
             _db = db;
         }
 
-        public async Task AddNewACtivitiesAsync(string userId, string courseId, string typeId, string name, DateTime dueDate)
+        public async Task AddNewActivitiesAsync(string userId, string courseId, string typeId, string name, DateTime dueDate)
         {
             var activity = new AcademicTask
             {
@@ -129,8 +129,49 @@ namespace Acadeno.Backend.Services
                 .OrderBy(t => t.DueDate)
                 .ToListAsync();
         }
+
+        public BaseTask? CloneTask(BaseTask? original)
+        {
+            if (original == null) return null;
+
+            if (original is AcademicTask ac)
+            {
+                return new AcademicTask {
+                    TaskID = ac.TaskID, UserID = ac.UserID, Name = ac.Name, Description = ac.Description,
+                    StartDate = ac.StartDate, DueDate = ac.DueDate, TaskStatus = ac.TaskStatus,
+                    CourseID = ac.CourseID, TypeID = ac.TypeID, RiskLevel = ac.RiskLevel
+                };
+            }
+            
+            return new BaseTask {
+                TaskID = original.TaskID, UserID = original.UserID, Name = original.Name, Description = original.Description,
+                StartDate = original.StartDate, DueDate = original.DueDate, TaskStatus = original.TaskStatus, RiskLevel = original.RiskLevel
+            };
+        }
+
+        public async Task<bool> UpdateTaskAsync(BaseTask updatedTask)
+        {
+            if (updatedTask == null) return false;
+            
+            // Clear tracker to prevent Entity Framework confusion
+            _db.ChangeTracker.Clear();
+            
+            _db.Tasks.Update(updatedTask);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteTaskAsync(string taskId)
+        {
+            var task = await _db.Tasks.FindAsync(taskId);
+            if (task == null) return false;
+
+            _db.Tasks.Remove(task);
+            await _db.SaveChangesAsync();
+            return true;
+        }
         
-       public int CalculateRiskLevel(string taskid)
+        public int CalculateRiskLevel(string taskid)
         {
             var task = _db.AcademicTasks.Find(taskid);
             if (task == null) return 1;

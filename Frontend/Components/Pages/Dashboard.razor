@@ -72,9 +72,13 @@
         <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
                 <div class="card-header">
-                    <button class="btn-view-all" @onclick="NavigateToAllTasks">View All</button>
+                    <button class="btn-nav" @onclick="NavigateToAllTasks">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,6H23a1,1,0,0,0,0-2H7A1,1,0,0,0,7,6Z"/><path d="M23,11H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><path d="M23,18H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><circle cx="2" cy="5" r="2"/><circle cx="2" cy="12" r="2"/><circle cx="2" cy="19" r="2"/>
+                        </svg>
+                    </button>
                     <h3 class="reminder-title">REMINDERS</h3>
-                    <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
+                    <button class="btn-nav" @onclick="ShowAddTaskModal" aria-label="Add Reminder">+</button>
                 </div>
 
                 <div class="card-content-area">
@@ -109,10 +113,10 @@
                                     </div>
 
                                     <div class="action-buttons">
-                                        <button class="btn-action btn-complete" @onclick="() => MarkAsComplete(task)">
+                                        <button class="btn-action btn-complete" title="Complete" @onclick="() => MarkAsComplete(task)">
                                             ✔
                                         </button>
-                                        <button class="btn-action btn-edit">
+                                        <button class="btn-action btn-edit" title="Edit" @onclick="() => OpenEditModal(task)">
                                             ✎
                                         </button>
                                     </div>
@@ -213,27 +217,53 @@
     </main>
 </div>
 
-<AddTask IsVisible="_showModal" 
-        OnClose="HideModal" 
+<AddReminder IsVisible="_showAddTaskModal" 
+        OnClose="HideAddTaskModal" 
         OnTaskAdded="RefreshDashboard" />
 
+<EditReminder
+    IsVisible="_showEditTaskModal" 
+    TaskToEdit="_taskBeingEdited"
+    OnClose="() => _showEditTaskModal = false" 
+    OnTaskUpdated="RefreshDashboard" />
+
+<ViewAllReminders
+    IsVisible="_showViewAllTasksModal" 
+    Tasks="_allTasks" 
+    Title="All Reminders"
+    Subtitle="Your complete list of pending academic tasks."
+    OnClose="CloseViewAllTasks" />
+
 @code {
+    
+    private bool _showAddTaskModal = false;
+    private void ShowAddTaskModal() => _showAddTaskModal = true;
+    private void HideAddTaskModal() => _showAddTaskModal = false;
+    private bool _showViewAllTasksModal = false;
+    private void NavigateToAllTasks() => _showViewAllTasksModal = true;
+    private void CloseViewAllTasks() => _showViewAllTasksModal = false;
+    private BaseTask? _taskBeingEdited = null;
+    private bool _showEditTaskModal = false;
+    private void OpenEditModal(BaseTask task)
+    {
+        _taskBeingEdited = task;
+        _showEditTaskModal = true;
+    }
+
+
+    private DateTime _startOfWeek;
+    private int _rawScheduleCount = 0;
+    private int _rawTaskCount = 0;
     private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
-    private bool _showModal = false;
-    private void ShowModal() => _showModal = true;
-    private void HideModal() => _showModal = false;
     private string _dbStatus = "Checking...";
-    private string _userStatus = "Checking...";
     private string _idMismatchCheck = "";
-    private int _rawTaskCount = 0;
-    private int _rawScheduleCount = 0;
-    private DateTime _startOfWeek;
+    private string _userStatus = "Checking...";
     private System.Timers.Timer? _timer;
 
+    private Dictionary<Guid, string> _courseNames = new();
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
-    private Dictionary<Guid, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
@@ -311,11 +341,6 @@
     }
 
     // ----- REMINDERS -----
-    
-    private void NavigateToAllTasks()
-    {
-        // Adjust the path to wherever your full task list lives
-    }
     private async Task MarkAsComplete(BaseTask task)
     {
         task.TaskStatus = Status.Completed;
