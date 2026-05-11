@@ -1,289 +1,288 @@
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f1f5f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* MODAL OVERLAY */
-        .modal-overlay {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* MAIN WINDOW */
-        .courses-window {
-            width: 1000px;
-            max-height: 85vh;
-            background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        /* HEADER */
-        .window-header {
-            padding: 30px;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fff;
-        }
-
-        .header-left h1 {
-            font-size: 1.6rem;
-            color: #0f172a;
-            letter-spacing: -0.5px;
-        }
-
-        .header-left p {
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        /* BODY / GRID - SCROLLABLE AREA */
-        .window-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 30px;
-            background: #f8fafc;
-        }
-
-        /* Custom Scrollbar */
-        .window-body::-webkit-scrollbar {
-            width: 8px;
-        }
-        .window-body::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        /* CARD DESIGN */
-        .course-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .course-card:hover {
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        }
-
-        /* STATUS LINE (Left Side) */
-        .side-line {
-            width: 5px;
-            border-radius: 10px;
-            height: 160px;
-            align-self: center;
-        }
-
-        .urgent { background: #ef4444; } /* Red */
-        .pending { background: #f59e0b; } /* Orange */
-        .stable { background: #10b981; }  /* Green */
-
-        .course-content {
-            flex: 1;
-        }
-
-        .course-top {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .course-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .course-meta {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }
-
-        .meta-urgent { color: #ef4444; }
-        .meta-pending { color: #f59e0b; }
-
-        .course-info {
-            font-size: 0.85rem;
-            color: #64748b;
-            line-height: 1.6;
-        }
-
-        /* FOOTER TAGS */
-        .course-footer {
-            margin-top: 15px;
-            padding-top: 12px;
-            border-top: 1px dashed #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .subject-tag {
-            font-size: 0.75rem;
-            color: #94a3b8;
-            font-weight: 500;
-        }
-
-        .due-tag {
-            background: #f1f5f9;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #475569;
-        }
-
-        /* WINDOW FOOTER */
-        .window-footer {
-            padding: 20px 30px;
-            background: #fff;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .btn-close {
-            background: #4338ca;
-            color: #f1f5f9;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-close:hover {
-            background: #e2e8f0;
-        }
-
-        /* Mobile Responsive */
-        /* media (max-width: 768px) {
-            .course-grid { grid-template-columns: 1fr; }
-            .courses-window { width: 100%; height: 95vh; }
-        }*/
-    </style>
-<body>
-
-<div class="modal-overlay">
-    <div class="courses-window">
-        <header class="window-header">
-            <div class="header-left">
-                <h1>Important Reminders</h1>
-                <p>Stay on top of your academic workload. Monitor pending quizzes, activities, and project deadlines across all subjects.</p>
-            </div>
-        </header>
-
-        <main class="window-body">
-            <div class="course-grid">
-                
-                <div class="course-card">
-                    <div class="side-line urgent"></div>
-                    <div class="course-content">
-                        <div class="course-meta meta-urgent">WARNING</div>
-                        <div class="course-top">
-                            <h3 class="course-title">Quiz 2: Normalization</h3>
-                            <span class="due-tag">TODAY</span>
-                        </div>
-                        <p class="course-info">Complete the 3rd Normal Form exercises before the 11:59 PM cutoff.</p>
-                        <div class="course-footer">
-                            <span class="subject-tag">Database Management Systems</span>
-                            <span class="due-tag">Apr 26</span>
-                        </div>
-                    </div>
+@if (IsVisible)
+{
+    <div class="modal-overlay">
+        <div class="courses-window">
+            <header class="window-header">
+                <div class="header-left">
+                    <h1>@Title</h1>
+                    <p>@Subtitle</p>
                 </div>
+                <button class="close-x" @onclick="Close">&times;</button>
+            </header>
 
-                <div class="course-card">
-                    <div class="side-line urgent"></div>
-                    <div class="course-content">
-                        <div class="course-meta meta-urgent">WARNING</div>
-                        <div class="course-top">
-                            <h3 class="course-title">Activity 1: ERD Drawing</h3>
-                            <span class="due-tag">2 DAYS LEFT</span>
+            <main class="window-body">
+                <div class="course-grid">
+                    @if (Tasks != null && Tasks.Any())
+                    {
+                        @foreach (var task in Tasks)
+                        {
+                            // --- DYNAMIC URGENCY MATH ---
+                            var daysLeft = Math.Ceiling((task.DueDate.Date - DateTime.Today).TotalDays);
+                            
+                            // Determine Colors
+                            string lineClass = daysLeft <= 2 ? "urgent" : (daysLeft <= 7 ? "pending" : "stable");
+                            string metaClass = daysLeft <= 2 ? "meta-urgent" : (daysLeft <= 7 ? "meta-pending" : "meta-stable");
+                            string metaText = daysLeft < 0 ? "OVERDUE" : (daysLeft <= 2 ? "WARNING" : "STABLE");
+                            
+                            // Format the "Due" pill
+                            string dueText = daysLeft == 0 ? "TODAY" : 
+                                            (daysLeft == 1 ? "TOMORROW" : 
+                                            (daysLeft < 0 ? "LATE" : $"{daysLeft} DAYS LEFT"));
+
+                            <div class="course-card">
+                                <div class="side-line @lineClass"></div>
+                                <div class="course-content">
+                                    <div class="course-meta @metaClass">@metaText</div>
+                                    <div class="course-top">
+                                        <h3 class="course-title">@task.Name</h3>
+                                        <span class="due-tag">@dueText</span>
+                                    </div>
+                                    
+                                    <p class="course-info">
+                                        @(string.IsNullOrWhiteSpace(task.Description) ? "No additional details provided." : task.Description)
+                                    </p>
+                                    
+                                    <div class="course-footer">
+                                        <span class="subject-tag">@(task is AcademicTask act ? (act.Course?.Name ?? "General") : "General Task")</span>
+                                        <span class="due-tag">@task.DueDate.ToString("MMM dd, yyyy")</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div style="grid-column: span 2; text-align: center; padding: 40px; color: #64748b;">
+                            <h3>🎉 You're all caught up!</h3>
+                            <p>There are no pending tasks in this category.</p>
                         </div>
-                        <p class="course-info">Finalize the Crow's Foot notation for the Library System project.</p>
-                        <div class="course-footer">
-                            <span class="subject-tag">Database Management Systems</span>
-                            <span class="due-tag">Apr 28</span>
-                        </div>
-                    </div>
+                    }
                 </div>
+            </main>
 
-                <div class="course-card">
-                    <div class="side-line urgent"></div>
-                    <div class="course-content">
-                        <div class="course-meta meta-urgent">WARNING</div>
-                        <div class="course-top">
-                            <h3 class="course-title">Project: FloodWatchPH</h3>
-                            <span class="due-tag">NEXT WEEK</span>
-                        </div>
-                        <p class="course-info">Initial schema design for flood-prone area tracking module.</p>
-                        <div class="course-footer">
-                            <span class="subject-tag">Software Engineering</span>
-                            <span class="due-tag">May 05</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="course-card">
-                    <div class="side-line urgent"></div>
-                    <div class="course-content">
-                        <div class="course-meta">STABLE</div>
-                        <div class="course-top">
-                            <h3 class="course-title">C++ Logic Implementation</h3>
-                            <span class="due-tag">PENDING</span>
-                        </div>
-                        <p class="course-info">Implement the greedy algorithm for medical restocking decisions.</p>
-                        <div class="course-footer">
-                            <span class="subject-tag">Algorithms</span>
-                            <span class="due-tag">May 10</span>
-                        </div>
-                    </div>
-                </div>
-
-                </div>
-        </main>
-
-        <footer class="window-footer">
-            <button class="btn-close">Close </button>
-        </footer>
+            <footer class="window-footer">
+                <button class="btn-close" @onclick="Close">Close</button>
+            </footer>
+        </div>
     </div>
-</div>
+}
 
-</body>
+@code {
+    [Parameter] public bool IsVisible {get; set;}
+    [Parameter] public EventCallback OnClose {get; set;}
+    [Parameter] public List<BaseTask> Tasks {get; set;} = new();
+    [Parameter] public string Title {get; set;} = "Important Reminders";
+    [Parameter] public string Subtitle {get; set;} = "Stay on top of your academic workload.";
+
+    private async Task Close() => await OnClose.InvokeAsync();
+}
+
+<style>
+    /* OVERLAY */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(5px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+    /* MAIN WINDOW */
+    .courses-window {
+        width: 1000px;
+        max-height: 85vh;
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        font-family: 'Poppins', sans-serif;
+        animation: modalSlideUp 0.3s ease-out;
+    }
+
+    @@keyframes modalSlideUp {
+        from { opacity: 0; transform: scale(0.98) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* HEADER */
+    .window-header {
+        padding: 30px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+    }
+
+    .header-left h1 {
+        font-size: 1.6rem;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+        margin: 0 0 5px 0;
+    }
+
+    .header-left p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .close-x {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        color: #94a3b8;
+        cursor: pointer;
+        transition: 0.2s;
+        line-height: 1;
+    }
+    .close-x:hover { color: #0f172a; }
+
+    /* BODY / GRID */
+    .window-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 30px;
+        background: #f8fafc;
+    }
+
+    .window-body::-webkit-scrollbar { width: 8px; }
+    .window-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    /* CARD DESIGN */
+    .course-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        gap: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .course-card:hover {
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    /* STATUS LINE */
+    .side-line {
+        width: 5px;
+        border-radius: 10px;
+        align-self: stretch; /* Stretches to fit card height */
+    }
+
+    .urgent { background: #ef4444; }
+    .pending { background: #f59e0b; }
+    .stable { background: #10b981; }
+
+    .course-content { flex: 1; }
+
+    .course-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        align-items: flex-start;
+    }
+
+    .course-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .course-meta {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .meta-urgent { color: #ef4444; }
+    .meta-pending { color: #f59e0b; }
+    .meta-stable { color: #10b981; }
+
+    .course-info {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.5;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* Truncates super long descriptions */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* FOOTER TAGS */
+    .course-footer {
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px dashed #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .subject-tag {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .due-tag {
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    /* WINDOW FOOTER */
+    .window-footer {
+        padding: 20px 30px;
+        background: #fff;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-close {
+        background: #4f46e5;
+        color: #ffffff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-close:hover { background: #4338ca; }
+</style>

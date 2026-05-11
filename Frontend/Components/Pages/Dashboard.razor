@@ -74,7 +74,7 @@
                 <div class="card-header">
                     <button class="btn-view-all" @onclick="NavigateToAllTasks">View All</button>
                     <h3 class="reminder-title">REMINDERS</h3>
-                    <button class="btn-add-reminder" @onclick="ShowModal" aria-label="Add Task">+</button>
+                    <button class="btn-add-reminder" @onclick="ShowAddTaskModal" aria-label="Add Task">+</button>
                 </div>
 
                 <div class="card-content-area">
@@ -213,27 +213,40 @@
     </main>
 </div>
 
-<AddTask IsVisible="_showModal" 
-        OnClose="HideModal" 
+<ViewAllReminders
+    IsVisible="_showViewAllTasksModal" 
+    Tasks="_allTasks" 
+    Title="All Reminders"
+    Subtitle="Your complete list of pending academic tasks."
+    OnClose="CloseViewAllTasks" />
+
+<AddTask IsVisible="_showAddTaskModal" 
+        OnClose="HideAddTaskModal" 
         OnTaskAdded="RefreshDashboard" />
 
 @code {
+    
+    private bool _showAddTaskModal = false;
+    private void ShowAddTaskModal() => _showAddTaskModal = true;
+    private void HideAddTaskModal() => _showAddTaskModal = false;
+    private bool _showViewAllTasksModal = false;
+    private void NavigateToAllTasks() => _showViewAllTasksModal = true;
+    private void CloseViewAllTasks() => _showViewAllTasksModal = false;
+
+
+    private DateTime _startOfWeek;
+    private int _rawScheduleCount = 0;
+    private int _rawTaskCount = 0;
     private string _currentDate = DateTime.Now.ToString("MMMM dd, yyyy");
     private string _currentTime = DateTime.Now.ToString("dddd, hh:mm:ss tt");
-    private bool _showModal = false;
-    private void ShowModal() => _showModal = true;
-    private void HideModal() => _showModal = false;
     private string _dbStatus = "Checking...";
-    private string _userStatus = "Checking...";
     private string _idMismatchCheck = "";
-    private int _rawTaskCount = 0;
-    private int _rawScheduleCount = 0;
-    private DateTime _startOfWeek;
+    private string _userStatus = "Checking...";
     private System.Timers.Timer? _timer;
 
+    private Dictionary<Guid, string> _courseNames = new();
     private List<BaseTask> _allTasks = new();
     private List<BaseTask> _priorityTasks = new();
-    private Dictionary<Guid, string> _courseNames = new();
     private List<ScheduleEntry> _schedule = new();
 
     protected override async Task OnInitializedAsync()
@@ -311,11 +324,6 @@
     }
 
     // ----- REMINDERS -----
-    
-    private void NavigateToAllTasks()
-    {
-        // Adjust the path to wherever your full task list lives
-    }
     private async Task MarkAsComplete(BaseTask task)
     {
         task.TaskStatus = Status.Completed;
