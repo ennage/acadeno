@@ -92,13 +92,14 @@ Backend/Models/
  Term.cs
  User.cs
 Backend/Services/
- AcademicService.cs
  AuthService.cs
  CalendarService.cs
  CourseService.cs
+ DashboardService.cs
  IdService.cs
  ScheduleService.cs
  TaskService.cs
+ TermService.cs
  UserService.cs
 Backend/Simulation/
  GenAveSimulator.cs
@@ -408,9 +409,9 @@ App.xaml
 Frontend/Components/
  CalendarPopups/CalendarPopUp.razor
  CoursesPopups/
-  AddHomework.razor
   AddNewCourse.razor
-  AddTest.razor
+  AddNewHomework.razor
+  AddNewTest.razor
   ViewAllCoursesPopup.razor
   ViewAllHomeworkPopup.razor
   ViewAllTestsPopup.razor
@@ -436,9 +437,9 @@ MainPage.xaml
 Frontend/Components/
  CalendarPopups/CalendarPopUp.razor
  CoursesPopups/
-  AddHomework.razor
   AddNewCourse.razor
-  AddTest.razor
+  AddNewHomework.razor
+  AddNewTest.razor
   ViewAllCoursesPopup.razor
   ViewAllHomeworkPopup.razor
   ViewAllTestsPopup.razor

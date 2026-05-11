@@ -56,10 +56,32 @@ namespace Acadeno.Backend.Services
                 .AsNoTracking()
                 .ToListAsync();
         }
+         
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllActivities(string typeId)
+        {
+            return await _db.AcademicTasks
+                .Where(t => t.TypeID == typeId)
+                .ToListAsync();
+        }
 
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllExam(string typeId)
+        {
+            return _db.AcademicTasks
+                .Include(t => t.Type)
+                .Where(t => t.TypeID == typeId)
+                .ToList();
+        }
+
+        public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllHomeworks(string typeId)
+        {
+            return await _db.AcademicTasks
+                .Where(t => t.TypeID == typeId)
+                .Include(t => t.Type)
+                .OrderBy(t => t.DueDate)
+                .ToListAsync();
+        }
         
-
-        public int CalculateRiskLevel(string taskid)
+       public int CalculateRiskLevel(string taskid)
         {
             var task = _db.AcademicTasks.Find(taskid);
             if (task == null) return 1;
