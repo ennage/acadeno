@@ -1,10 +1,11 @@
 @page "/courses"
 
-@using Microsoft.EntityFrameworkCore
-@using Acadeno.Backend.Models
-@using Acadeno.Backend.Enums
-@inject Acadeno.Backend.Tools.AppDbContext _db
 @inject Acadeno.Backend.Services.UserService UserAccess
+@inject Acadeno.Backend.Tools.AppDbContext _db
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
+@using Acadeno.Frontend.Components.CoursesPopups
+@using Microsoft.EntityFrameworkCore
 
 <div class="dashboard-root">
     <NavMenu /> 
@@ -13,6 +14,14 @@
         <div class="dashboard-inner">
             
             <header class="dashboard-header">
+                @if (!string.IsNullOrEmpty(_debugError))
+                {
+                    <div style="background: #fee2e2; color: #b91c1c; padding: 20px; margin: 20px; border-radius: 8px; font-weight: bold;">
+                        <h3>🚨 FATAL CRASH DETECTED:</h3>
+                        <p style="white-space: pre-wrap;">@_debugError</p>
+                    </div>
+                }
+
                 <h1 class="page-title">Enrolled Courses</h1>
                 <p class="welcome-subtitle">Welcome back! Here is your academic overview for <strong>@_currentTermDisplay</strong>.</p>
             </header>
@@ -24,7 +33,7 @@
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">My Courses</h2>
-                                <button class="btn-add" title="Add New Course" @onclick="OpenAddCourseModal">+</button>
+                                <button class="btn-add" title="Add New Course" @onclick="OpenAddNewCourseModal">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
                                 View All Courses &rsaquo;
@@ -78,7 +87,7 @@
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Upcoming Tests</h2>
-                                <button class="btn-add" title="Add New Test">+</button>
+                                <button class="btn-add" title="Add New Test" @onclick="OpenAddNewTestModal">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View All Tests &rsaquo;</a>
                         </div>
@@ -161,7 +170,7 @@
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Homeworks</h2>
-                                <button class="btn-add" title="Add New Homework">+</button>
+                                <button class="btn-add" title="Add New Homework" @onclick="OpenAddNewHomeworkModal">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all &rsaquo;</a>
                         </div>
@@ -201,98 +210,158 @@
     </div>
 </div>
 
+<AddNewCourse 
+    IsVisible="_showAddNewCourseModal"
+    OnClose="CloseAddNewCourseModal"
+    OnCourseAdded="RefreshDashboard" />
+
+<AddNewTest
+    IsVisible="_showAddNewTestModal"
+    OnClose="CloseAddNewTestModal"
+    OnTaskAdded="RefreshDashboard" />
+
+<AddNewHomework 
+    IsVisible="_showAddNewHomeworkModal"
+    OnClose="CloseAddNewHomeworkModal"
+    OnTaskAdded="RefreshDashboard" />
+
 <ViewAllCoursesPopup 
-    IsVisible="_showViewAllCoursesPopup" 
-    Courses="_courses" 
-    OnClose="() => _showViewAllCoursesPopup = false" />
+    IsVisible="_showViewAllCoursesPopup"
+    Courses="_courses"
+    OnClose="CloseViewAllCoursesModal" />
 
 <ViewAllTestsPopup 
-    IsVisible="_showViewAllTestsModal" 
-    Tasks="_upcomingTests" 
-    OnClose="() => _showViewAllTestsModal = false" />
+    IsVisible="_showViewAllTestsPopup"
+    Tasks="_upcomingTests"
+    OnClose="CloseViewAllTestsModal" />
 
-<ViewAllHomeworkPopup 
-    IsVisible="_showViewAllHomeworkModal" 
-    Tasks="_homeworks" 
-    OnClose="() => _showViewAllHomeworkModal = false" />
+<ViewAllHomeworkPopup
+    IsVisible="_showViewAllHomeworkPopup" 
+    Tasks="_homeworks"
+    OnClose="CloseViewAllHomeworkModal" />
 
 @code {
-    private bool _showAddCourseModal = false;
-    private bool _showAddHomeworkModal = false;
-    private bool _showAddTestModal = false;
+    // --- MODAL STATES ---
+    private bool _showAddNewCourseModal = false;
+    private bool _showAddNewHomeworkModal = false;
+    private bool _showAddNewTestModal = false;
+
     private bool _showViewAllCoursesPopup = false;
-    private bool _showViewAllHomeworkModal = false;
-    private bool _showViewAllTestsModal = false;
+    private bool _showViewAllHomeworkPopup = false;
+    private bool _showViewAllTestsPopup = false;
+
+    // --- COURSE MODAL METHODS ---
+    private void OpenAddNewCourseModal() => _showAddNewCourseModal = true;
+    private void CloseAddNewCourseModal() => _showAddNewCourseModal = false;
+
+    private void OpenViewAllCoursesModal() => _showViewAllCoursesPopup = true;
+    private void CloseViewAllCoursesModal() => _showViewAllCoursesPopup = false;
+
+    // --- TEST MODAL METHODS ---
+    private void OpenAddNewTestModal() => _showAddNewTestModal = true;
+    private void CloseAddNewTestModal() => _showAddNewTestModal = false;
+
+    private void OpenViewAllTestsModal() => _showViewAllTestsPopup = true;
+    private void CloseViewAllTestsModal() => _showViewAllTestsPopup = false;
+
+    // --- HOMEWORK MODAL METHODS ---
+    private void OpenAddNewHomeworkModal() => _showAddNewHomeworkModal = true;
+    private void CloseAddNewHomeworkModal() => _showAddNewHomeworkModal = false;
+
+    private void OpenViewAllHomeworkModal() => _showViewAllHomeworkPopup = true;
+    private void CloseViewAllHomeworkModal() => _showViewAllHomeworkPopup = false;
+
+    // --- GLOBAL REFRESH ---
+    private async Task RefreshDashboard()
+    {
+        // Close all "Add" modals simultaneously
+        _showAddNewCourseModal = false;
+        _showAddNewHomeworkModal = false;
+        _showAddNewTestModal = false;
+
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private string _debugError = string.Empty;
     private string _userId = string.Empty;
     private string _currentTermDisplay = "your current term";
     
-
     private List<Course> _courses = new();
     private List<Course> _priorityCourses = new();
     private List<AcademicTask> _upcomingTests = new();
     private List<AcademicTask> _homeworks = new();
 
+    
     protected override async Task OnInitializedAsync()
     {
-        var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
-
-        // Fetch data
-        var activeTerm = await _db.Terms
-            .Include(t => t.AcademicYear)
-            .FirstOrDefaultAsync(t => t.IsCurrent && t.AcademicYear.UserID == userId);
-
-        if (activeTerm != null)
+        try
         {
-            _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
-        }
+            var userId = UserAccess.CurrentUser?.UserID;
+            if (string.IsNullOrEmpty(userId)) return;
 
-        var allTasks = await _db.AcademicTasks
-            .Include(t => t.Course)
-            .Include(t => t.Type)
+            // Fetch data
+            var activeTerm = await _db.Terms
+                .Include(t => t.AcademicYear)
+                .FirstOrDefaultAsync(t => t.IsCurrent && t.AcademicYear.UserID == userId);
+
+            if (activeTerm != null)
+            {
+                _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
+            }
+
+            var allTasks = await _db.AcademicTasks
+                .Include(t => t.Course)
+                .Include(t => t.Type)
+                
+                .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
+                .OrderBy(t => t.DueDate)
+                .ToListAsync();
+
+            _courses = await _db.Courses
+                .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
+                .Include(c => c.Term)        // <--- EF Core joins the Terms table here
+                .Include(c => c.ScheduleEntries)
+                .Where(c => c.UserID == userId)
+                .ToListAsync();
             
-            .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
-            .OrderBy(t => t.DueDate)
-            .ToListAsync();
+            // Determine Top 4 Priority Courses
+            var urgentCourseIds = allTasks
+                .Where(t => !string.IsNullOrEmpty(t.CourseID))
+                .Select(t => t.CourseID)
+                .Distinct()
+                .ToList();
 
-        _courses = await _db.Courses
-            .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
-            .Include(c => c.Term)        // <--- EF Core joins the Terms table here
-            .Include(c => c.ScheduleEntries)
-            .Where(c => c.UserID == userId)
-            .ToListAsync();
-        
-        // Determine Top 4 Priority Courses
-        var urgentCourseIds = allTasks
-            .Where(t => !string.IsNullOrEmpty(t.CourseID))
-            .Select(t => t.CourseID)
-            .Distinct()
-            .ToList();
-
-        // Sort courses by urgency, then take 4. Courses with no tasks are pushed to the back.
-        _priorityCourses = _courses
-            .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
-            .Take(4)
-            .ToList();
-        
-        // Categorize Tasks using DefID
-        // DefID '111...' = Quizzes, DefID '333...' = Exams
-        _upcomingTests = allTasks
-            .Where(t => t.Type != null && 
-                    (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
-                        t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
-            .Take(5)
-            .ToList();
-        
-        // Adjust this logic depending on what you consider "Homework"
-        // DefID '222...' = Activities
-        _homeworks = allTasks
-            .Where(t => t.Type != null && 
-                    (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
-            .Take(5)
-            .ToList();
+            // Sort courses by urgency, then take 4. Courses with no tasks are pushed to the back.
+            _priorityCourses = _courses
+                .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
+                .Take(4)
+                .ToList();
+            
+            // Categorize Tasks using DefID
+            // DefID '111...' = Quizzes, DefID '333...' = Exams
+            _upcomingTests = allTasks
+                .Where(t => t.Type != null && 
+                        (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
+                            t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
+                .Take(5)
+                .ToList();
+            
+            // Adjust this logic depending on what you consider "Homework"
+            // DefID '222...' = Activities
+            _homeworks = allTasks
+                .Where(t => t.Type != null && 
+                        (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
+                .Take(5)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            _debugError = $"MESSAGE: {ex.Message}\n\nINNER EXCEPTION: {ex.InnerException?.Message}";
+        }
     }
 
+    // ----- DETAILS -----
     private string GetColorByIndex(int index)
     {
         string[] colors = { "purple-line", "blue-line", "orange-line", "green-line" };
@@ -305,37 +374,4 @@
         Status.Ongoing => "badge-inprogress",
         _ => "badge-notstarted"
     };
-
-    // ----- COURSES -----
-    private void OpenAddCourseModal() 
-    { 
-        _showAddCourseModal = true;
-    }
-
-    private void OpenViewAllCoursesModal()
-    {
-        _showViewAllCoursesPopup = true;
-    }
-
-    // ----- TESTS -----
-    private void OpenAddTestModal() 
-    {
-        _showAddTestModal = true;
-    }
-
-    private void OpenViewAllTestsModal()
-    {
-        _showViewAllTestsModal = true;
-    }
-
-    // ----- HOMEWORK -----
-    private void OpenAddHomeworkModal() 
-    {
-        _showAddHomeworkModal = true;
-    }
-
-    private void OpenViewAllHomeworkModal()
-    {
-        _showViewAllHomeworkModal = true;
-    }
 }
