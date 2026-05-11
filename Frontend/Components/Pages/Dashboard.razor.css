@@ -293,14 +293,14 @@
     border-radius: 18px;
     border: 1px solid #eef2f6;
     margin-bottom: 16px;
-    padding: 16px; /* Matches the inner spacing of your course cards */
+    padding: 16px; 
     transition: all 0.2s ease-in-out;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 /* THE PILL-STYLE ACCENT LINE */
 .accent-line {
-    width: 4px;          
+    width: 2px;          
     height: 75px;        
     border-radius: 10px; 
     margin-right: 18px;
