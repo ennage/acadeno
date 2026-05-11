@@ -72,7 +72,11 @@
         <div class="dashboard-grid-container"> <!-- BOTTOM ROW -->
             <div class="card-stretch">
                 <div class="card-header">
-                    <button class="btn-view-all" @onclick="NavigateToAllTasks">View All</button>
+                    <button class="btn-view-all" @onclick="NavigateToAllTasks">
+                        <svg class="nav-svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7,6H23a1,1,0,0,0,0-2H7A1,1,0,0,0,7,6Z"/><path d="M23,11H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><path d="M23,18H7a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/><circle cx="2" cy="5" r="2"/><circle cx="2" cy="12" r="2"/><circle cx="2" cy="19" r="2"/>
+                        </svg>
+                    </button>
                     <h3 class="reminder-title">REMINDERS</h3>
                     <button class="btn-add-reminder" @onclick="ShowAddTaskModal" aria-label="Add Task">+</button>
                 </div>
@@ -213,16 +217,22 @@
     </main>
 </div>
 
+<AddReminder IsVisible="_showAddTaskModal" 
+        OnClose="HideAddTaskModal" 
+        OnTaskAdded="RefreshDashboard" />
+
+<EditReminder
+    IsVisible="_showEditTaskModal" 
+    TaskToEdit="_taskBeingEdited"
+    OnClose="() => _showEditTaskModal = false" 
+    OnTaskUpdated="RefreshDashboard" />
+
 <ViewAllReminders
     IsVisible="_showViewAllTasksModal" 
     Tasks="_allTasks" 
     Title="All Reminders"
     Subtitle="Your complete list of pending academic tasks."
     OnClose="CloseViewAllTasks" />
-
-<AddTask IsVisible="_showAddTaskModal" 
-        OnClose="HideAddTaskModal" 
-        OnTaskAdded="RefreshDashboard" />
 
 @code {
     
@@ -232,6 +242,13 @@
     private bool _showViewAllTasksModal = false;
     private void NavigateToAllTasks() => _showViewAllTasksModal = true;
     private void CloseViewAllTasks() => _showViewAllTasksModal = false;
+    private BaseTask? _taskBeingEdited = null;
+    private bool _showEditTaskModal = false;
+    private void OpenEditModal(BaseTask task)
+    {
+        _taskBeingEdited = task;
+        _showEditTaskModal = true;
+    }
 
 
     private DateTime _startOfWeek;

@@ -1,350 +1,351 @@
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Services
+@inject TaskService TaskService
+@inject CourseService CourseService
+@inject UserService UserAccess
+
+@if (IsVisible && _editTask != null)
+{
+    <div class="edit-modal-overlay">
+        <div class="edit-modal">
+
+            <div class="edit-modal-header">
+                <div>
+                    <h2>Edit Task</h2>
+                </div>
+                <button type="button" class="close-btn" @onclick="Close">✕</button>
+            </div>
+
+            <EditForm Model="_editTask" OnValidSubmit="HandleSubmit">
+                <div class="edit-modal-body">
+
+                    <div class="input-group">
+                        <label>Task Name</label>
+                        <InputText @bind-Value="_editTask.Name" required />
+                    </div>
+
+                    <div class="input-group">
+                        <label>Category</label>
+                        @if (_editTask is AcademicTask)
+                        {
+                            <InputSelect @bind-Value="((AcademicTask)_editTask).TypeID">
+                                <option value="" disabled>Select Type</option>
+                                @foreach (var type in _availableTypes)
+                                {
+                                    <option value="@type.TypeID">@type.Name</option>
+                                }
+                            </InputSelect>
+                        }
+                        else
+                        {
+                            <input type="text" value="General Task (No Category)" disabled style="background: #e2e8f0; color: #94a3b8;" />
+                        }
+                    </div>
+
+                    <div class="input-group">
+                        <label>Course</label>
+                        @if (_editTask is AcademicTask)
+                        {
+                            <InputSelect @bind-Value="((AcademicTask)_editTask).CourseID">
+                                <option value="" disabled>Select Course</option>
+                                @foreach (var course in _availableCourses)
+                                {
+                                    <option value="@course.CourseID">@course.Name</option>
+                                }
+                            </InputSelect>
+                        }
+                        else
+                        {
+                            <input type="text" value="General Task (No Course)" disabled style="background: #e2e8f0; color: #94a3b8;" />
+                        }
+                    </div>
+
+                    <div class="row-fields">
+                        <div class="input-group">
+                            <label>Due Date</label>
+                            <input type="date" @bind="_uiDate" @bind:format="yyyy-MM-dd" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Time</label>
+                            <input type="time" @bind="_uiTime" @bind:format="HH:mm" required />
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Description</label>
+                        <InputTextArea rows="4" @bind-Value="_editTask.Description" placeholder="Add notes here..."></InputTextArea>
+                    </div>
+
+                </div>
+
+                <div class="edit-modal-footer">
+                    <button type="button" class="btn-delete" @onclick="HandleDelete">Delete</button>
+
+                    <div class="footer-actions">
+                        <button type="button" class="btn-cancel" @onclick="Close">Cancel</button>
+                        <button type="submit" class="btn-save">Save Changes</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public BaseTask? TaskToEdit { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskUpdated { get; set; }
+
+    private BaseTask? _editTask;
+    private DateTime _uiDate;
+    private DateTime _uiTime;
+
+    private List<Course> _availableCourses = new();
+    private List<AcademicTaskType> _availableTypes = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // When the modal opens and a task is passed in, load its details!
+        if (IsVisible && TaskToEdit != null)
+        {
+            // We clone the task so if the user clicks "Cancel", it doesn't accidentally save halfway-typed text to the dashboard UI
+            _editTask = CloneTask(TaskToEdit);
+            
+            // Break apart the DueDate into our safe UI variables
+            _uiDate = _editTask.DueDate.Date;
+            _uiTime = DateTime.Today.Add(_editTask.DueDate.TimeOfDay);
+
+            // Load dropdown data
+            var userId = UserAccess.CurrentUser?.UserID;
+            if (!string.IsNullOrEmpty(userId) && !_availableCourses.Any())
+            {
+                _availableCourses = await CourseService.GetUserCoursesAsync(userId);
+                _availableTypes = await TaskService.GetTaskTypesAsync();
+            }
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (_editTask == null) return;
+
+        // Re-merge the Date and Time safely
+        _editTask.DueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
+
+        // Update the database
+        await TaskService.UpdateTaskAsync(_editTask);
+        
+        await OnTaskUpdated.InvokeAsync();
+        await Close();
+    }
+
+    private async Task HandleDelete()
+    {
+        if (_editTask != null && !string.IsNullOrEmpty(_editTask.TaskID))
+        {
+            await TaskService.DeleteTaskAsync(_editTask.TaskID);
+            await OnTaskUpdated.InvokeAsync();
+            await Close();
+        }
+    }
+
+    private async Task Close() => await OnClose.InvokeAsync();
+
+    // Helper method to safely duplicate the object
+    private BaseTask CloneTask(BaseTask original)
+    {
+        if (original is AcademicTask ac)
+        {
+            return new AcademicTask {
+                TaskID = ac.TaskID, UserID = ac.UserID, Name = ac.Name, Description = ac.Description,
+                StartDate = ac.StartDate, DueDate = ac.DueDate, TaskStatus = ac.TaskStatus,
+                CourseID = ac.CourseID, TypeID = ac.TypeID, RiskLevel = ac.RiskLevel
+            };
+        }
+        return new BaseTask {
+            TaskID = original.TaskID, UserID = original.UserID, Name = original.Name, Description = original.Description,
+            StartDate = original.StartDate, DueDate = original.DueDate, TaskStatus = original.TaskStatus, RiskLevel = original.RiskLevel
+        };
+    }
+}
 
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    font-family:'Inter', sans-serif;
-    background:#f1f5f9;
-    height:100vh;
-}
-
-
-.edit-modal-overlay{
-    position:fixed;
-    inset:0;
-
-    background:rgba(15, 23, 42, 0.45);
-    backdrop-filter:blur(5px);
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:20px;
-}
-
-.edit-modal{
-    width:100%;
-    max-width:540px;
-    background:#ffffff;
-    border-radius:24px;
-    border:1px solid #e2e8f0;
-    overflow:hidden;
-    box-shadow:
-        0 25px 50px -12px rgba(0,0,0,0.18);
-    animation:popup .18s ease;
-}
-
-/*keyframes popup{
-
-    from{
-        opacity:0;
-        transform:translateY(12px) scale(.96);
+    .edit-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 10000; /* Ensure it stays above everything */
     }
-    to{
-        opacity:1;
-        transform:translateY(0) scale(1);
+
+    .edit-modal {
+        width: 100%;
+        max-width: 540px;
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.18);
+        animation: popup .18s ease;
+        font-family: 'Inter', sans-serif;
     }
-}*/
 
-.edit-modal-header{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    padding:28px;
-    border-bottom:1px solid #f1f5f9;
-}
-
-.edit-label{
-    font-size:.72rem;
-    font-weight:700;
-    letter-spacing:1.3px;
-    color:#6366f1;
-    margin-bottom:6px;
-}
-
-.edit-modal-header h2{
-    font-size:1.5rem;
-    font-weight:700;
-    color:#0f172a;
-}
-
-.close-btn{
-    width:38px;
-    height:38px;
-    border:none;
-    border-radius:12px;
-    background:#f8fafc;
-    color:#64748b;
-    cursor:pointer;
-    transition:.2s ease;
-    font-size:1rem;
-}
-
-.close-btn:hover{
-    background:#eef2ff;
-    color:#4f46e5;
-    transform:scale(1.05);
-}
-
-.edit-modal-body{
-    padding:28px;
-}
-.input-group{
-    margin-bottom:18px;
-
-    display:flex;
-    flex-direction:column;
-}
-
-.input-group label{
-    font-size:.82rem;
-    font-weight:600;
-    color:#475569;
-    margin-bottom:8px;
-}
-
-.input-group input,
-.input-group select,
-.input-group textarea{
-    width:100%;
-    border:1px solid #dbe3ee;
-    border-radius:14px;
-    background:#f8fafc;
-    padding:14px 16px;
-    font-size:.92rem;
-    font-family:inherit;
-    color:#0f172a;
-    outline:none;
-    transition:.2s ease;
-}
-
-.input-group textarea{
-    resize:none;
-}
-
-.input-group input:focus,
-.input-group select:focus,
-.input-group textarea:focus{
-
-    border-color:#6366f1;
-    background:#ffffff;
-    box-shadow:
-        0 0 0 4px rgba(99,102,241,.12);
-}
-
-.row-fields{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:16px;
-}
-.edit-modal-footer{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:24px 28px;
-    border-top:1px solid #f1f5f9;
-    background:#fcfcfd;
-}
-
-.footer-actions{
-    display:flex;
-    gap:12px;
-}
-
-.btn-delete{
-    border:none;
-    background:#fef2f2;
-    color:#dc2626;
-    padding:12px 18px;
-    border-radius:12px;
-    font-size:.85rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s ease;
-}
-
-.btn-delete:hover{
-    background:#fee2e2;
-}
-
-.btn-cancel{
-    border:none;
-    background:#f1f5f9;
-    color:#475569;
-    padding:12px 18px;
-    border-radius:12px;
-    font-size:.85rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s ease;
-}
-
-.btn-cancel:hover{
-    background:#e2e8f0;
-}
-
-.btn-save{
-
-    border:none;
-    background:#4f46e5;
-    color:white;
-    padding:12px 20px;
-    border-radius:12px;
-    font-size:.85rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s ease;
-    box-shadow:
-        0 10px 20px rgba(79,70,229,.18);
-}
-
-.btn-save:hover{
-    background:#4338ca;
-    transform:translateY(-1px);
-}
-
-
-/* media(max-width:640px){
-    .row-fields{
-        grid-template-columns:1fr;
+    @@keyframes popup {
+        from { opacity: 0; transform: translateY(12px) scale(.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .edit-modal-footer{
-        flex-direction:column;
-        align-items:stretch;
-        gap:16px;
-    }
-    .footer-actions{
-        width:100%;
-    }
-    .footer-actions button{
-        flex:1;
-    }
-}*/
 
+    .edit-modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 28px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .edit-modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .close-btn {
+        width: 38px;
+        height: 38px;
+        border: none;
+        border-radius: 12px;
+        background: #f8fafc;
+        color: #64748b;
+        cursor: pointer;
+        transition: .2s ease;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-btn:hover {
+        background: #eef2ff;
+        color: #4f46e5;
+        transform: scale(1.05);
+    }
+
+    .edit-modal-body {
+        padding: 28px;
+    }
+
+    .input-group {
+        margin-bottom: 18px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group label {
+        font-size: .82rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        width: 100%;
+        border: 1px solid #dbe3ee;
+        border-radius: 14px;
+        background: #f8fafc;
+        padding: 14px 16px;
+        font-size: .92rem;
+        font-family: inherit;
+        color: #0f172a;
+        outline: none;
+        transition: .2s ease;
+        box-sizing: border-box;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+        border-color: #6366f1;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(99,102,241,.12);
+    }
+
+    .row-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .edit-modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 28px;
+        border-top: 1px solid #f1f5f9;
+        background: #fcfcfd;
+    }
+
+    .footer-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-delete {
+        border: none;
+        background: #fef2f2;
+        color: #dc2626;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: .85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-delete:hover { background: #fee2e2; }
+
+    .btn-cancel {
+        border: none;
+        background: #f1f5f9;
+        color: #475569;
+        padding: 12px 18px;
+        border-radius: 12px;
+        font-size: .85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-cancel:hover { background: #e2e8f0; }
+
+    .btn-save {
+        border: none;
+        background: #4f46e5;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: .85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .2s ease;
+        box-shadow: 0 10px 20px rgba(79,70,229,.18);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .btn-save:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
 </style>
-
-<body>
-
-<div class="edit-modal-overlay">
-
-    <div class="edit-modal">
-
-        <!-- HEADER -->
-        <div class="edit-modal-header">
-
-            <div>
-                <h2>Edit Reminder</h2>
-            </div>
-
-            <button class="close-btn">
-                ✕
-            </button>
-
-        </div>
-
-        <!-- BODY -->
-        <div class="edit-modal-body">
-
-            <!-- TASK NAME -->
-            <div class="input-group">
-
-                <label>Task Name</label>
-
-                <input type="text" value="Quiz 2: Normalization">
-
-            </div>
-
-            <!-- CATEGORY -->
-            <div class="input-group">
-
-                <label>Category</label>
-
-                <select>
-                    <option>Quiz</option>
-                    <option>Assignment</option>
-                    <option>Project</option>
-                    <option>Exam</option>
-                    <option>Activity</option>
-                    <option>Presentation</option>
-                </select>
-
-            </div>
-
-            <!-- COURSE -->
-            <div class="input-group">
-
-                <label>Course</label>
-
-                <select>
-                    <option>Database Management Systems</option>
-                    <option>Advanced Web Design</option>
-                    <option>Graphic Fundamentals</option>
-                    <option>3D Animation</option>
-                </select>
-
-            </div>
-
-            <!-- DATE + TIME -->
-            <div class="row-fields">
-
-                <div class="input-group">
-
-                    <label>Due Date</label>
-
-                    <input type="date">
-
-                </div>
-
-                <div class="input-group">
-
-                    <label>Time</label>
-
-                    <input type="time">
-
-                </div>
-
-            </div>
-
-            <!-- DESCRIPTION -->
-            <div class="input-group">
-
-                <label>Description</label>
-
-                <textarea rows="4" placeholder="Add notes here..."></textarea>
-
-            </div>
-
-        </div>
-
-        <!-- FOOTER -->
-        <div class="edit-modal-footer">
-
-            <button class="btn-delete">
-                Delete
-            </button>
-
-            <div class="footer-actions">
-
-                <button class="btn-cancel">
-                    Cancel
-                </button>
-
-                <button class="btn-save">
-                    Save Changes
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</body>
