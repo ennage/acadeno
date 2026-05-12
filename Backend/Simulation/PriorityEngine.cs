@@ -1,10 +1,21 @@
-using BaseTask = Acadeno.Backend.Models.BaseTask;
-using AcademicTask = Acadeno.Backend.Models.AcademicTask;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Acadeno.Backend.Models;
+using Acadeno.Backend.Enums;
+using Acadeno.Backend.Tools; // Required for AppDbContext
 
 namespace Acadeno.Backend.Simulation
 {
     public class PriorityEngine
     {
+        private readonly AppDbContext _db;
+
+        public PriorityEngine(AppDbContext db)
+        {
+            _db = db;
+        }
+
         public List<BaseTask> GetTopPriorities(int count, List<BaseTask> allTasks)
         {
             if (allTasks == null || !allTasks.Any()) return new List<BaseTask>();
@@ -41,6 +52,25 @@ namespace Acadeno.Backend.Simulation
         public List<BaseTask> RankTasks(List<BaseTask> tasks)
         {
             return tasks.OrderByDescending(t => CalculatePriorityScore(t)).ToList();
+        }
+
+        public int CalculateRiskLevel(string taskid)
+        {
+            var task = _db.Tasks.Find(taskid);
+            if (task == null) return 1;
+
+            int score = 1;
+            var timeRemaining = task.DueDate - DateTime.Now;
+
+            if (timeRemaining.TotalDays <= 1) score += 3;
+            else if (timeRemaining.TotalDays <= 3) score += 2;
+            else if (timeRemaining.TotalDays <= 7) score += 1;
+
+            if (task.RiskLevel == RiskLevel.Critical) score += 5;
+            else if (task.RiskLevel == RiskLevel.Warning) score += 3;
+            else if (task.RiskLevel == RiskLevel.Stable) score += 1;
+
+            return Math.Clamp(score, 1, 5);
         }
     }
 }
