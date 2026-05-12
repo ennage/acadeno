@@ -105,7 +105,7 @@ namespace Acadeno.Backend.Services
                 .AsNoTracking()
                 .ToListAsync();
         }
-         
+        
         public async System.Threading.Tasks.Task<List<AcademicTask>>GetAllActivities(string typeId)
         {
             return await _db.AcademicTasks
@@ -171,23 +171,6 @@ namespace Acadeno.Backend.Services
             return true;
         }
         
-        public int CalculateRiskLevel(string taskid)
-        {
-            var task = _db.AcademicTasks.Find(taskid);
-            if (task == null) return 1;
-
-            int score = 1;
-            var timeReamaining = (DateTime)task.DueDate - DateTime.Now;
-
-            if (timeReamaining.TotalDays <= 1) score += 3;
-            else if (timeReamaining.TotalDays <= 3) score += 2;
-            else if (timeReamaining.TotalDays <= 7) score += 1;
-
-            if (task.RiskLevel == Enums.RiskLevel.Critical) score += 5;
-            else if (task.RiskLevel == Enums.RiskLevel.Warning) score += 3;
-                else if (task.RiskLevel == Enums.RiskLevel.Stable) score += 1;
-
-            return Math.Clamp(score, 1, 5);
-        }
+        
     }
 }

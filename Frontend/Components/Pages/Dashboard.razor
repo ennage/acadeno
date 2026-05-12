@@ -1,9 +1,10 @@
 @page "/dashboard"
 
-@using Acadeno.Backend.Simulation
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
+@using Acadeno.Backend.Simulation
+@using Acadeno.Backend.Tools
 @using Acadeno.Frontend.Components.DashboardPopups
 @using Microsoft.EntityFrameworkCore
 
@@ -11,11 +12,11 @@
 @using AcademicTask = Acadeno.Backend.Models.AcademicTask
 
 @implements IDisposable
-
-@inject Acadeno.Backend.Services.TaskService TaskService
-@inject Acadeno.Backend.Tools.AppDbContext _db
+@inject AppDbContext _db
+@inject DashboardService DashboardService
 @inject NavigationManager NavManager
 @inject PriorityEngine PriorityService
+@inject TaskService TaskService
 @inject UserService UserService
 
 
@@ -45,11 +46,11 @@
                     <div class="kpi-group">
                         <div class="kpi-item">
                             <span class="kpi-label">CURRENT GWA</span>
-                            <span class="kpi-value highlight">1.25</span>
+                            <span class="kpi-value highlight">@_stats.CurrentGWA</span>
                         </div>
                         <div class="kpi-item">
                             <span class="kpi-label">TERM GPA</span>
-                            <span class="kpi-value">1.40</span>
+                            <span class="kpi-value">@_stats.TermGPA</span>
                         </div>
                     </div>
 
@@ -58,12 +59,12 @@
                     <div class="kpi-group">
                         <div class="kpi-item">
                             <span class="kpi-label">UNITS LOADED</span>
-                            <span class="kpi-value">21</span>
+                            <span class="kpi-value">@_stats.UnitsLoaded</span>
                         </div>
                     </div>
                     
                     <div class="kpi-badge">
-                        <i class="fas fa-award"></i> EXCELLENT
+                        <i class="fas fa-award"></i> @_stats.AcademicStanding
                     </div>
                 </div>
             </div>
@@ -250,7 +251,7 @@
         _showEditTaskModal = true;
     }
 
-
+    private Acadeno.Backend.Services.DashboardStatsDto _stats = new();
     private DateTime _startOfWeek;
     private int _rawScheduleCount = 0;
     private int _rawTaskCount = 0;
@@ -269,6 +270,13 @@
     protected override async Task OnInitializedAsync()
     {
         GetClock();
+
+        var userId = UserService.CurrentUser?.UserID;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            // Fetch the live stats
+            _stats = await DashboardService.GetDashboardStatsAsync(userId);
+        }
 
         // Calculate the most recent Monday, (int)DayOfWeek.Monday is 1. 
         int diff = (7 + (DateTime.Today.DayOfWeek - DayOfWeek.Monday)) % 7;
