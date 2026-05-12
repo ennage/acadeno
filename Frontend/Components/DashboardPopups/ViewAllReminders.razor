@@ -10,7 +10,6 @@
                     <h1>@Title</h1>
                     <p>@Subtitle</p>
                 </div>
-                <button class="close-x" @onclick="Close">&times;</button>
             </header>
 
             <main class="window-body">
@@ -138,17 +137,6 @@
         font-family: 'Inter', sans-serif;
     }
 
-    .close-x {
-        background: none;
-        border: none;
-        font-size: 2rem;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: 0.2s;
-        line-height: 1;
-    }
-    .close-x:hover { color: #0f172a; }
-
     /* BODY */
     .window-body {
         flex: 1;
@@ -273,15 +261,31 @@
     }
 
     .btn-close {
-        background: #4f46e5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #5046e5; 
         color: #ffffff;
+        min-width: 110px;
+        height: 44px;
+        padding: 0 24px;
         border: none;
-        padding: 10px 24px;
-        border-radius: 10px;
-        font-weight: 600;
+        border-radius: 12px; 
+        font-weight: 700;
+        font-size: 0.9rem;
+        font-family: 'Poppins', sans-serif;
         cursor: pointer;
-        transition: 0.2s;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 4px 6px -1px rgba(80, 70, 229, 0.2);
     }
 
-    .btn-close:hover { background: #4338ca; }
+    .btn-close:hover {
+        background: #4338ca; 
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px -2px rgba(80, 70, 229, 0.3);
+    }
+
+    .btn-close:active {
+        transform: translateY(0px);
+    }
 </style>

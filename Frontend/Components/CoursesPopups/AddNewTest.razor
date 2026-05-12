@@ -12,8 +12,7 @@
         <div class="modal-card">
 
             <div class="modal-header">
-                <h2 class="modal-title">📝 Add New Test</h2>
-                <button type="button" class="close-x" @onclick="Close">&times;</button>
+                <h2 class="modal-title">Add New Test</h2>
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
@@ -195,20 +194,6 @@
         align-items: center;
         gap: 10px;
         margin: 0;
-    }
-
-    .close-x {
-        background: none;
-        border: none;
-        font-size: 1.8rem;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: 0.2s;
-        line-height: 1;
-    }
-
-    .close-x:hover {
-        color: #64748b;
     }
 
     /* FORM */
