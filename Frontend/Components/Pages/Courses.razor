@@ -177,7 +177,7 @@
                         
                         @if (_homeworks != null && _homeworks.Any())
                         {
-                            @foreach (var hw in _homeworks)
+                            @foreach (var hw in _homeworks.Take(2))
                             {
                                 // Reusing your existing color method so the cards look dynamic!
                                 var colorClass = GetColorByIndex(_homeworks.IndexOf(hw));

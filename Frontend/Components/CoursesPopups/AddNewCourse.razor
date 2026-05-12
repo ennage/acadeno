@@ -13,7 +13,6 @@
         <div class="modal-card">
             <div class="modal-header">
                 <h2 class="modal-title">Add New Course</h2>
-                <button class="close-x" @onclick="Close">&times;</button>
             </div>
 
             <EditForm Model="_newCourse" OnValidSubmit="HandleSubmit">
@@ -181,20 +180,6 @@
         font-weight: 700;
         color: #1e293b;
         margin: 0;
-    }
-
-    .close-x {
-        background: none;
-        border: none;
-        font-size: 1.8rem;
-        color: #94a3b8;
-        cursor: pointer;
-        line-height: 1;
-        transition: color 0.2s;
-    }
-
-    .close-x:hover {
-        color: #64748b;
     }
 
     /* Form Fields */
