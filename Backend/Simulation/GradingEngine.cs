@@ -1,6 +1,6 @@
+using Acadeno.Backend.DTOs;
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Enums;
-using System.Linq;
 
 namespace Acadeno.Backend.Simulation
 {

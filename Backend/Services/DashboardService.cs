@@ -1,3 +1,4 @@
+using Acadeno.Backend.DTOs;
 using Acadeno.Backend.Enums;
 using Acadeno.Backend.Simulation;
 using Acadeno.Backend.Tools;
@@ -29,7 +30,7 @@ namespace Acadeno.Backend.Services
             return "Failing";
         }
 
-        public async Task<DashboardStatsDto> GetDashboardStatsAsync(string userId)
+        public async Task<DashboardStats> GetDashboardStatsAsync(string userId)
         {
             // 1. Get the User's Preferred Scale and info
             var user = await _db.Users.FindAsync(userId);
@@ -80,7 +81,7 @@ namespace Acadeno.Backend.Services
             double cumulativeGradePoints = totalCumulativeUnits > 0 ? (totalQualityPoints / totalCumulativeUnits) : 0;
 
             // 4. Return the beautifully formatted data to the UI
-            return new DashboardStatsDto
+            return new DashboardStats
             {
                 CurrentGWA = cumulativeGradePoints > 0 ? cumulativeGradePoints.ToString("0.00") : "N/A",
                 TermGPA = termGradePoints > 0 ? termGradePoints.ToString("0.00") : "N/A",
@@ -91,12 +92,5 @@ namespace Acadeno.Backend.Services
     }
 
     // A clean data container just for your UI
-    public class DashboardStatsDto
-    {
-        public string CurrentGWA { get; set; } = "0.00";
-        public string TermGPA { get; set; } = "0.00";
-        public double UnitsLoaded { get; set; } = 0;
-        public string AcademicStanding { get; set; } = "No Data";
-        public string University { get; set; } = "UNIVERSITY NOT SET";
-    }
+    
 }

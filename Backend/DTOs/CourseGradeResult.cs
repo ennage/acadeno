@@ -1,6 +1,5 @@
-namespace Acadeno.Backend.Models
+namespace Acadeno.Backend.DTOs
 {
-    // The UI Helper Model
     public class CourseGradeResult
     {
         public double DefinedWeight { get; set; }
