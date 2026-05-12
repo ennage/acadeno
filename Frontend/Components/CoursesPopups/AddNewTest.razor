@@ -16,10 +16,12 @@
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label>Exam Name</label>
+                        <label>Test Name</label>
                         <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Examination" required />
                     </div>
 
@@ -37,11 +39,12 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Schedule</label>
+                            @* Using datetime-local is great for Tests as it handles the specific hour! *@
                             <input type="datetime-local" @bind="_uiDueDate" @bind:format="yyyy-MM-ddTHH:mm" required />
                         </div>
 
                         <div class="form-group">
-                            <label>Room</label>
+                            <label>Room / Location</label>
                             <input type="text" @bind="_tempRoom" placeholder="e.g. Lab 3" />
                         </div>
                     </div>
@@ -58,9 +61,15 @@
 
                         <div class="form-group">
                             <label>Type</label>
-                            <InputSelect @bind-Value="_newTask.TypeID" required>
-                                <option value="" disabled selected>Select Type</option>
-                                @foreach (var type in _availableTypes)
+                            <InputSelect @bind-Value="_newTask.TypeID" 
+                                        required 
+                                        disabled="@(string.IsNullOrEmpty(_newTask.CourseID))">
+                                
+                                <option value="" disabled selected>
+                                    @(string.IsNullOrEmpty(_newTask.CourseID) ? "Select a course first" : "Select Type")
+                                </option>
+
+                                @foreach (var type in FilteredTypes)
                                 {
                                     <option value="@type.TypeID">@type.Name</option>
                                 }
@@ -86,12 +95,11 @@
 
     private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
     
-    // UI-specific variables to prevent binding crashes
     private DateTime _uiDueDate = DateTime.Today.AddDays(7).AddHours(10); 
     private string _tempRoom = string.Empty;
     
     private List<Course> _availableCourses = new();
-    private List<AcademicTaskType> _availableTypes = new();
+    private List<AcademicTaskType> _allTaskTypes = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -100,42 +108,60 @@
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Fetch courses via CourseService
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
                 
-                // Fetch task types via TaskService
-                var allTypes = await TaskService.GetTaskTypesAsync();
-                _availableTypes = allTypes
-                    .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || 
-                                t.DefID == "33333333-3333-3333-3333-333333333333")
-                    .ToList();
+                // Fetch ALL available buckets for the user's courses
+                _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
         }
     }
 
+    // This property now ONLY returns Quizzes/Exams linked to the specific selected course
+    private IEnumerable<AcademicTaskType> FilteredTypes => _allTaskTypes
+        .Where(t => {
+            // Find the course the user picked in the first dropdown
+            var selectedCourse = _availableCourses.FirstOrDefault(c => c.CourseID == _newTask.CourseID);
+            
+            // Only match if the Category's GradeID matches the Course's GradeID
+            return t.GradeID == selectedCourse?.ActualGrade?.GradeID;
+        })
+        .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || // Quizzes
+                    t.DefID == "33333333-3333-3333-3333-333333333333");   // Exams
+
     private async Task HandleSubmit()
     {
         var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
+        // Ensure we have a user, a course, and a specific category bucket selected
+        if (string.IsNullOrEmpty(userId) || 
+            string.IsNullOrEmpty(_newTask.CourseID) || 
+            string.IsNullOrEmpty(_newTask.TypeID)) return;
 
-        // Map the safe UI date over to the actual object
-        _newTask.DueDate = _uiDueDate;
-        
-        _newTask.TaskID = Guid.NewGuid().ToString();
-        _newTask.UserID = userId;
-        _newTask.StartDate = DateTime.Now;
-
+        // Combine date and room info
         if (!string.IsNullOrWhiteSpace(_tempRoom))
         {
             _newTask.Description = $"Location/Room: {_tempRoom}";
         }
 
-        await TaskService.SaveNewTaskAsync(_newTask);
+        // Use the refactored Service call for consistency and default score handling
+        var success = await TaskService.SaveNewAcademicTaskAsync(
+            userId,
+            _newTask.CourseID,
+            _newTask.TypeID, // This is the specific Quiz or Exam bucket for THIS course
+            _newTask.Name,
+            _uiDueDate,
+            _newTask.TaskStatus
+        );
 
-        await OnTaskAdded.InvokeAsync();
-        await Close();
+        if (success)
+        {
+            await OnTaskAdded.InvokeAsync();
+            await Close();
+            ResetForm();
+        }
+    }
 
-        // Reset the form safely
+    private void ResetForm()
+    {
         _newTask = new() { TaskStatus = Status.Pending };
         _uiDueDate = DateTime.Today.AddDays(7).AddHours(10);
         _tempRoom = string.Empty;

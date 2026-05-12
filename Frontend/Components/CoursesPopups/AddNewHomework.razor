@@ -16,6 +16,8 @@
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
                 <div class="modal-body">
 
                     <div class="form-group">
@@ -62,35 +64,27 @@
 }
 
 @code {
-    [Parameter] public bool IsVisible {get; set;}
-    [Parameter] public EventCallback OnClose {get; set;}
-    [Parameter] public EventCallback OnTaskAdded {get; set;}
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskAdded { get; set; }
 
     private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
-    private DateTime _uiDate = DateTime.Today.AddDays(1); // Default: Tomorrow
+    private DateTime _uiDate = DateTime.Today.AddDays(1);
     private DateTime _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);
-    
+
     private List<Course> _availableCourses = new();
-    private string _homeworkTypeId = string.Empty;
+    private List<AcademicTaskType> _allTaskTypes = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        // Safe loading: Waits for the modal to open before querying EF Core
         if (IsVisible && !_availableCourses.Any())
         {
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Fetch Courses
+                // Load courses and ALL available task type buckets
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
-                
-                // Fetch Task Types and secretly grab the "Activity/Homework" ID
-                var allTypes = await TaskService.GetTaskTypesAsync();
-                var hwType = allTypes.FirstOrDefault(t => t.DefID == "22222222-2222-2222-2222-222222222222");
-                if (hwType != null) 
-                {
-                    _homeworkTypeId = hwType.TypeID;
-                }
+                _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
         }
     }
@@ -98,25 +92,42 @@
     private async Task HandleSubmit()
     {
         var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(_newTask.CourseID)) return;
 
-        // Merge Date and Time right before saving!
-        _newTask.DueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
-        
-        // Auto-assign properties
-        _newTask.TaskID = Guid.NewGuid().ToString();
-        _newTask.UserID = userId;
-        _newTask.StartDate = DateTime.Now;
-        _newTask.TypeID = _homeworkTypeId; // Assigns it as Homework
+        // DYNAMIC TYPE LOOKUP
+        // We find the 'Activities/Homework' bucket (DefID 2222...) that belongs to the SELECTED course.
+        var correctType = _allTaskTypes.FirstOrDefault(t => 
+            t.DefID == "22222222-2222-2222-2222-222222222222" && 
+            _availableCourses.Any(c => c.CourseID == _newTask.CourseID)
+        );
 
-        // Save
-        await TaskService.SaveNewTaskAsync(_newTask);
+        // Fallback: If for some reason the course is broken, we find ANY bucket for that course
+        var typeId = correctType?.TypeID ?? _allTaskTypes.FirstOrDefault(t => _availableCourses.Any(c => c.CourseID == _newTask.CourseID))?.TypeID;
 
-        // Refresh Dashboard and Close
-        await OnTaskAdded.InvokeAsync();
-        await Close();
+        if (string.IsNullOrEmpty(typeId)) return;
 
-        // Reset the form
+        // MERGE DATE/TIME
+        var finalDueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
+
+        var success = await TaskService.SaveNewAcademicTaskAsync(
+            userId,
+            _newTask.CourseID,
+            typeId,
+            _newTask.Name,
+            finalDueDate,
+            _newTask.TaskStatus
+        );
+
+        if (success)
+        {
+            await OnTaskAdded.InvokeAsync();
+            await Close();
+            ResetForm();
+        }
+    }
+
+    private void ResetForm()
+    {
         _newTask = new() { TaskStatus = Status.Pending };
         _uiDate = DateTime.Today.AddDays(1);
         _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);

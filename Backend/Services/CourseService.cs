@@ -63,6 +63,7 @@ namespace Acadeno.Backend.Services
         {
             return await _db.Courses
                 .AsNoTracking()
+                .Include(c => c.ActualGrade)
                 .Where(c => c.UserID == userId)
                 .ToListAsync();
         }
