@@ -13,7 +13,6 @@
 
             <div class="modal-header">
                 <h2 class="modal-title">Add Homework</h2>
-                <button type="button" class="close-x" @onclick="Close">&times;</button>
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
@@ -174,26 +173,6 @@
         font-weight: 700;
         color: #111827;
         margin: 0;
-    }
-
-    .close-x {
-        width: 42px;
-        height: 42px;
-        border: none;
-        border-radius: 12px;
-        background: #f9fafb;
-        color: #6b7280;
-        font-size: 1.4rem;
-        cursor: pointer;
-        transition: 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .close-x:hover {
-        background: #f3f4f6;
-        color: #111827;
     }
 
     /* BODY */
