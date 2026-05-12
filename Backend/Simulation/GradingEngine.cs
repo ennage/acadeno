@@ -1,105 +1,104 @@
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Enums;
+using System.Linq;
 
 namespace Acadeno.Backend.Simulation
 {
     public class GradingEngine
     {
+        private readonly GradeConverter _converter;
+
+        public GradingEngine(GradeConverter converter)
+        {
+            _converter = converter;
+        }
+        
+        // 1. TASK LEVEL
         public double CalculateTaskPercentage(AcademicTask task)
         {
             if (task.MaxScore == 0) return 0;
             return (double)task.Score / task.MaxScore * 100;
         }
 
+        // 2. CATEGORY LEVEL
         public double CalculateCategoryGrade(AcademicTaskType type)
         {
-            var gradedTasks = type.AcademicTasks
-                .Where(t => t.Score >= 0)
-                .ToList();      
+            var gradedTasks = type.AcademicTasks?.Where(t => t.Score >= 0).ToList();      
+            if (gradedTasks == null || !gradedTasks.Any()) return 0;
 
-            if(!gradedTasks.Any()) return 0;
+            double totalScore = gradedTasks.Sum(t => (double)t.Score);
+            double totalMaxScore = gradedTasks.Sum(t => (double)t.MaxScore);
 
-            double TotalScore = gradedTasks.Sum(t => (double)t.Score);
-            double TotalMaxScore = gradedTasks.Sum(t => (double)t.MaxScore);
+            if (totalMaxScore == 0) return 0;
 
-            if (TotalMaxScore == 0) return 0;
-
-            double performancePercentage = TotalScore / TotalMaxScore;
-            return performancePercentage * type.Weight;
+            return (totalScore / totalMaxScore) * 100;
         }
 
-        public double CalculateCourseGrade(Grade grade)
+        // 3. COURSE LEVEL
+        public CourseGradeResult CalculateCourseGrade(Grade grade, GradeScaleType userScale)
         {
+            if (grade.AcademicTaskTypes == null || !grade.AcademicTaskTypes.Any()) 
+                return new CourseGradeResult();
+
             double totalWeightedGrade = 0;
-            double totalWeight = 0;
+            double definedWeight = 0;
 
             foreach (var type in grade.AcademicTaskTypes)
             {
-                if (type.AcademicTasks == null || !type.AcademicTasks.Any()) continue;
-
-                totalWeightedGrade += CalculateCategoryGrade(type);
-                totalWeight += type.Weight;
+                if (type.AcademicTasks != null && type.AcademicTasks.Any(t => t.Score >= 0))
+                {
+                    double categoryPercentage = CalculateCategoryGrade(type);
+                    totalWeightedGrade += categoryPercentage * (type.Weight / 100);
+                    definedWeight += type.Weight;
+                }
             }
 
-            if (totalWeight == 0) return 0;
-            return totalWeightedGrade / totalWeight * 100;
+            definedWeight = Math.Min(definedWeight, 100);
+            double unallocatedWeight = 100 - definedWeight;
+
+            // Calculate the Raw Percentages
+            double runningPercentage = definedWeight > 0 ? (totalWeightedGrade / (definedWeight / 100)) : 0;
+            double floorPercentage = totalWeightedGrade; 
+
+            // Return the bundled result with pre-formatted strings for UI
+            return new CourseGradeResult
+            {
+                DefinedWeight = definedWeight,
+                UnallocatedWeight = unallocatedWeight,
+                RunningPercentage = Math.Round(runningPercentage, 2),
+                FloorPercentage = Math.Round(floorPercentage, 2),
+                
+                // Formats the grade dynamically based on user settings
+                DisplayRunningGrade = _converter.FormatGrade(runningPercentage, userScale),
+                DisplayFloorGrade = _converter.FormatGrade(floorPercentage, userScale)
+            };
         }
 
-        public double CalculateTermGrade(Term term)
+        // 4. TERM LEVEL 
+        public double CalculateTermGradePoints(Term term, GradeScaleType userScale)
         {
-            var coursesWithGrades = term.Courses
-                .Where(c => c.ActualGrade != null && (c.Units ?? 0) > 0)
-                .ToList(); 
+            var activeCourses = term.Courses?.Where(c => c.ActualGrade != null && (c.Units ?? 0) > 0).ToList(); 
+            if (activeCourses == null || !activeCourses.Any()) return 0;
 
-            if (!coursesWithGrades.Any()) return 0;
+            double totalQualityPoints = 0;
+            double totalUnits = 0;
 
-            double totalWeightedGrade = coursesWithGrades
-            .Sum(c => ConvertToGWA(c.ActualGrade.CourseGrade ?? 0, GradeScaleType.Default) * (c.Units ?? 0));
+            foreach (var course in activeCourses)
+            {
+                var courseResult = CalculateCourseGrade(course.ActualGrade, userScale);
+                
+                // The raw numerical grade point (e.g. 1.25 or 3.8) to do the Term math
+                double gradePoint = _converter.GetNumericalGradePoint(courseResult.RunningPercentage, userScale);
+                
+                totalQualityPoints += (gradePoint * (course.Units ?? 0));
+                totalUnits += (course.Units ?? 0);
+            }
 
-            double totalUnits = coursesWithGrades.Sum(c => c.Units ?? 0);
-            double termGWA = totalUnits == 0 ? 0 : totalWeightedGrade / totalUnits;
-            
-            return Math.Round(termGWA, 2);
-        }
-
-        public double ConvertToGPA(double rawGrade, GradeScaleType scale)
-        {
-            if (rawGrade >= 97) return 5.00;
-            if (rawGrade >= 94) return 3.00;
-            if (rawGrade >= 91) return 2.75;
-            if (rawGrade >= 88) return 2.50;
-            if (rawGrade >= 85) return 1.75;
-            if (rawGrade >= 82) return 1.50;
-            if (rawGrade >= 79) return 1.25;
-            return 0.00;
-
-        }
-        public double ConvertToGWA(double rawGrade, GradeScaleType scale)
-        {
-            if (rawGrade >= 98) return 1.00;
-            if (rawGrade >= 94) return 1.25;
-            if (rawGrade >= 91) return 1.5;
-            if (rawGrade >= 88) return 1.75;
-            if (rawGrade >= 85) return 2.0;
-            if (rawGrade >= 82) return 2.25;
-            if (rawGrade >= 79) return 2.5;
-            if (rawGrade >= 76) return 2.75;
-            if (rawGrade >= 75) return 3.0;
-            return 5.0;
-        }
-
-        public string ConvertToLetter(double rawGrade, GradeScaleType scale) 
-        {
-            if (rawGrade >= 97) return "A+";
-            if (rawGrade >= 94) return "A";
-            if (rawGrade >= 91) return "A-";
-            if (rawGrade >= 88) return "B+";
-            if (rawGrade >= 85) return "B";
-            if (rawGrade >= 82) return "B-";
-            if (rawGrade >= 79) return "C+";
-            if (rawGrade >= 76) return "C";
-            if (rawGrade >= 75) return "C-";
-            return "F";
+            return totalUnits == 0 ? 0 : Math.Round(totalQualityPoints / totalUnits, 2);
         }
     }
+
+    
+
+    
 }

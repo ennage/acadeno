@@ -31,6 +31,7 @@ namespace Acadeno
 			builder.Services.AddScoped<AuthService>();
 			builder.Services.AddScoped<CalendarService>();
 			builder.Services.AddScoped<CourseService>();
+			builder.Services.AddScoped<DashboardService>();
 			builder.Services.AddScoped<IdService>();
 			builder.Services.AddScoped<ScheduleService>();
 			builder.Services.AddScoped<TaskService>();
@@ -38,9 +39,10 @@ namespace Acadeno
 			builder.Services.AddScoped<UserService>();
 
 			//	SIMULATION
-			builder.Services.AddScoped<GenAveSimulator>();
+			builder.Services.AddScoped<GradeConverter>();
 			builder.Services.AddScoped<GradingEngine>();
 			builder.Services.AddScoped<PriorityEngine>();
+			builder.Services.AddScoped<TargetSimulator>();
 
 		#if DEBUG
 				builder.Services.AddBlazorWebViewDeveloperTools();
