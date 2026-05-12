@@ -1,0 +1,221 @@
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { 
+            background-color: #f1f5f9; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 23, 57, 0.4);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-window {
+            width: 100%;
+            max-width: 900px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 15px 25px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 { font-size: 1.4rem; font-weight: 800; color: #0b1739; }
+        .header-content p { font-size: 0.8rem; color: #64748b; }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 20px;
+            padding: 20px 25px;
+            background: #fcfdfe;
+        }
+
+        /* Identity Sidebar */
+        .identity-card {
+            background: #0b1739;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            height: fit-content;
+        }
+
+        .identity-card h2 { font-size: 1.1rem; font-weight: 700; }
+        .role-badge { color: #38bdf8; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+
+        .info-stack {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-row { display: flex; justify-content: space-between; font-size: 0.7rem; }
+        .info-row span { opacity: 0.6; }
+
+        /* Form Content */
+        .section-box h3 {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #0b1739;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .field label { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        
+        .field input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 0.8rem;
+            color: #0b1739;
+            transition: all 0.2s;
+        }
+
+        /* Active Edit State */
+        .field input:not(:disabled) {
+            background: #fff;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .field input:disabled { background: #f1f5f9; color: #64748b; border-color: transparent; }
+
+        .modal-footer {
+            padding: 12px 25px;
+            background: #fff;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Button Styling */
+        .btn { 
+            padding: 8px 18px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            font-size: 0.8rem; 
+            cursor: pointer; 
+            border: none; 
+            transition: 0.2s;
+        }
+        
+        .btn-edit { background: #0b1739; color: #fff; }
+        .btn-save { background: #10b981; color: #fff; } /* Green for Save */
+        
+        .btn-cancel { background: #f1f5f9; color: #64748b; }
+
+        /*media (max-width: 700px) {
+            .modal-body { grid-template-columns: 1fr; }
+        }*/
+    </style>
+<body>
+
+<div class="modal-overlay">
+    <div class="modal-window">
+        <header class="modal-header">
+            <div class="header-content">
+                <h1>Account Settings</h1>
+                <p>Manage your profile and academic preferences</p>
+            </div>
+        </header>
+
+        <div class="modal-body">
+            <aside class="identity-pane">
+                <div class="identity-card">
+                    <h2>Lance Buenviaje</h2>
+                    <span class="role-badge">Computer Science Student</span>
+                    
+                    <div class="info-stack">
+                        <div class="info-row"><span>Status</span><strong>Enrolled</strong></div>
+                        <div class="info-row"><span>Member Since</span><strong>Aug 2023</strong></div>
+                        <div class="info-row"><span>University</span><strong>Batangas State</strong></div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="data-pane">
+                <section class="section-box">
+                    <h3>PERSONAL INFORMATION</h3>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Full Name</label>
+                            <input type="text" value="Lance Buenviaje" class="profile-input" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Student ID</label>
+                            <input type="text" value="2026-10293-BS" class="profile-input" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Email Address</label>
+                            <input type="email" value="lance.buenviaje@example.com" class="profile-input" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Password</label>
+                            <input type="password" value="********" class="profile-input" disabled>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <footer class="modal-footer">
+            <button class="btn btn-cancel">Close</button>
+            <button class="btn btn-edit" id="toggleBtn" onclick="handleEditToggle()">Edit Profile</button>
+        </footer>
+    </div>
+</div>
+
+<script>
+    let isEditing = false;
+
+    function handleEditToggle() {
+        const btn = document.getElementById('toggleBtn');
+        const inputs = document.querySelectorAll('.profile-input');
+        
+        isEditing = !isEditing;
+
+        if (isEditing) {
+            // Switch to Editing Mode
+            inputs.forEach(input => input.disabled = false);
+            btn.textContent = "Save Changes";
+            btn.className = "btn btn-save";
+        } else {
+            // Switch back to View Mode
+            inputs.forEach(input => input.disabled = true);
+            btn.textContent = "Edit Profile";
+            btn.className = "btn btn-edit";
+            alert("Changes saved successfully!");
+        }
+    }
+</script>
+
+</body>
