@@ -116,11 +116,12 @@
         if (string.IsNullOrEmpty(userId)) return;
 
         // Aligning perfectly with your CourseService signature
-        await CourseService.AddNewCourseAsync(
+        await CourseService.AddCourseWithScheduleAsync(
             userId: userId, 
             termId: _newCourse.TermID, 
             courseCode: _newCourse.CourseCode, 
-            name: _newCourse.Name, 
+            name: _newCourse.Name,
+            units: _newCourse.Units ?? 3,
             scheduleEntry: _schedule
         );
         

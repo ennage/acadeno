@@ -1,5 +1,6 @@
 @page "/dashboard"
 
+@using Acadeno.Backend.DTOs
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
@@ -251,7 +252,7 @@
         _showEditTaskModal = true;
     }
 
-    private Acadeno.Backend.Services.DashboardStatsDto _stats = new();
+    private DashboardStats _stats = new();
     private DateTime _startOfWeek;
     private int _rawScheduleCount = 0;
     private int _rawTaskCount = 0;

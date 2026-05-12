@@ -1,146 +1,152 @@
 @page "/calculator"
 
-<div class="dashboard-layout" style="display: flex;">
+@using Acadeno.Backend.Models
+@using Acadeno.Backend.Enums
+@using Acadeno.Backend.Simulation
+
+@inject GradingEngine GradeEngine
+@inject TargetSimulator TargetSim
+@inject Acadeno.Backend.Services.CourseService CourseService
+@inject Acadeno.Backend.Services.UserService UserService
+
+<div class="dashboard-layout">
     <NavMenu />
 
-    <div class="container" style="flex: 1; overflow-y: auto; height: 100vh;">
+    <div class="container">
         <div class="header">
             <div class="branding">
                 <h1>Acadeno Grade Calculator</h1>
-                <p>Dynamic grading dashboard with quizzes, activities, projects, and exams.</p>
+                <p>Select a course, simulate your scores, and predict your final grade.</p>
             </div>
-            <div class="badge">AY 2025–2026</div>
+            <div class="badge">SIMULATION MODE</div>
         </div>
 
         <div class="main-grid">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Courses Window</div>
-                    <button class="primary-btn">+</button>
+                    <div class="card-title">Course Simulator</div>
+                    
+                    <select class="category-dropdown course-selector" @onchange="LoadExistingCourse">
+                        <option value="" selected>Load Existing Course...</option>
+                        @if (_existingCourses != null)
+                        {
+                            @foreach(var c in _existingCourses)
+                            {
+                                <option value="@c.CourseID">@c.Name (@c.CourseCode)</option>
+                            }
+                        }
+                    </select>
                 </div>
 
-                <div class="course-card">
-                    <div class="course-header">
-                        <div class="course-header-left">
-                            <button class="collapse-btn">▼</button>
+                @if (_activeView == null)
+                {
+                    <div class="empty-state">
+                        <i class="fas fa-laptop-code empty-icon"></i>
+                        <h3>Select a Course</h3>
+                        <p>Choose a course from the dropdown above to view and simulate its specific grades.</p>
+                    </div>
+                }
+                else
+                {
+                    var courseResult = GradeEngine.CalculateCourseGrade(_activeView.Course.ActualGrade, _selectedScale);
+
+                    <div class="course-card" @key="_activeView.Course.CourseID">
+                        <div class="course-header">
+                            <div class="course-header-left">
+                                <div>
+                                    <h2 class="course-title">@_activeView.Course.Name</h2>
+                                    <p class="course-subtitle">@_activeView.Course.Units Units • @_activeView.Course.CourseCode</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        @foreach (var category in _activeView.Course.ActualGrade.AcademicTaskTypes)
+                        {
+                            <div class="category-box" @key="category.TypeID">
+                                <div class="category-header">
+                                    <div class="category-left">
+                                        <h3 class="category-title">
+                                            <i class="fas fa-folder-open category-icon"></i>
+                                            @(category.Definition?.Name ?? category.Name)
+                                        </h3>
+                                    </div>
+                                    <div class="category-weight-badge">
+                                        @category.Weight% of Final Grade
+                                    </div>
+                                </div>
+
+                                @foreach (var task in category.AcademicTasks)
+                                {
+                                    <div class="test-item" @key="task.TaskID">
+                                        <input type="text" value="@task.Name" readonly class="readonly-input" />
+
+                                        <div class="score-group">
+                                            <input type="number" placeholder="Score" 
+                                                   @bind="task.Score" @bind:after="RecalculateAll" />
+                                            <span>/</span>
+                                            <input type="number" placeholder="Total" 
+                                                   @bind="task.MaxScore" @bind:after="RecalculateAll" />
+                                        </div>
+                                        
+                                        <input class="computed-score" type="text" 
+                                               value="@(GradeEngine.CalculateTaskPercentage(task).ToString("0.0"))%" readonly />
+
+                                        <button class="delete-btn small-delete" 
+                                                @onclick="() => RemoveTask(category, task)" title="Remove Task">×</button>
+                                    </div>
+                                }
+
+                                <button class="add-test-btn" @onclick="() => AddTask(category)">+ Add Simulated Task</button>
+                            </div>
+                        }
+
+                        <div class="injector-box">
+                            <span class="injector-label">Missing a Category?</span>
+                            <select class="category-dropdown injector-select" @bind="_newCategoryDefId">
+                                <option value="" selected disabled>Select from Official Definitions...</option>
+                                @if (_availableDefinitions != null)
+                                {
+                                    @foreach(var def in _availableDefinitions)
+                                    {
+                                        <option value="@def.DefID">@def.Name</option>
+                                    }
+                                }
+                            </select>
+                            <button class="add-test-btn injector-btn" @onclick="AddCategoryToSimulation">
+                                + Add Category
+                            </button>
+                        </div>
+
+                        <div class="final-grade">
                             <div>
-                                <h2 class="course-title">Web Development</h2>
-                                <p class="course-subtitle">BSCS • 3 Units</p>
+                                <small>Running Grade (@courseResult.DefinedWeight% of Course Defined)</small>
+                                <h2>@courseResult.RunningPercentage.ToString("0.00")%</h2>
+                            </div>
+                            <div class="grade-letter">
+                                @courseResult.DisplayRunningGrade
                             </div>
                         </div>
-                        <button class="delete-btn">×</button>
-                    </div>
 
-                    <div class="course-top">
-                        <input type="text" placeholder="Code">
-                        <input type="text" placeholder="Course Name">
-                        <select>
-                            <option>3 Units</option>
-                            <option>2 Units</option>
-                            <option>5 Units</option>
-                        </select>
-                    </div>
-
-                    <div class="category-box">
-                        <div class="category-header">
-                            <div class="category-left">
-                                <select class="category-dropdown">
-                                    <option selected disabled>
-                                        Select Category
-                                    </option>
-                                    <option>
-                                        Quizzes
-                                    </option>
-                                    <option>
-                                        Activities
-                                    </option>
-                                    <option>
-                                        Assignments
-                                    </option>
-                                    <option>
-                                        Projects
-                                    </option>
-                                    <option>
-                                        Laboratory
-                                    </option>
-                                    <option>
-                                        Seatwork
-                                    </option>
-                                    <option>
-                                        Recitation
-                                    </option>
-                                    <option>
-                                        Attendance
-                                    </option>
-                                    <option>
-                                        Performance Task
-                                    </option>
-                                    <option>
-                                        Midterm Exam
-                                    </option>
-                                    <option>
-                                        Final Exam
-                                    </option>
-                                    <option>
-                                        Research
-                                    </option>
-                                    <option>
-                                        Portfolio
-                                    </option>
-                                </select>
+                        <div class="prediction-box">
+                            <div class="prediction-header">
+                                <strong>🎯 Target Predictor</strong>
+                                <span>@courseResult.UnallocatedWeight% Weight Remaining</span>
                             </div>
-
-                            <input
-                                class="weight-input"
-                                type="number"
-                                placeholder="%"
-                                value="30"
-                            >
-
-                        </div>
-                        <div class="test-item">
-                            <input
-                                type="text"
-                                placeholder="Activity Name">
-
-                            <div class="score-group">
-                                <input
-                                    type="number"
-                                    placeholder="Score"
-                                >
-                                <span>/</span>
-                                <input
-                                    type="number"
-                                    placeholder="Total"
-                                >
+                            <div class="prediction-inputs">
+                                <input type="text" placeholder="Enter target (e.g., 1.50 or A)" 
+                                       @bind="_activeView.TargetInput" @bind:event="oninput" @bind:after="() => RunPrediction(_activeView)" />
                             </div>
-                            <input
-                                class="computed-score"
-                                type="text"
-                                value="0%"
-                                readonly
-                            >
-
-                            <button class="delete-btn">
-                                ×
-                            </button>
-
+                            
+                            @if (!string.IsNullOrWhiteSpace(_activeView.TargetInput))
+                            {
+                                <div class="prediction-message @(_activeView.IsPossible ? "possible" : "impossible")">
+                                    <i class="fas @(_activeView.IsPossible ? "fa-check-circle" : "fa-exclamation-circle")"></i>
+                                    @_activeView.PredictionMessage
+                                </div>
+                            }
                         </div>
-
-                            <button class="add-test-btn">
-                                + Add Test
-                            </button>
-
                     </div>
-
-                    <div class="final-grade">
-                        <div>
-                            <small>Computed Final Grade</small>
-                            <h2>91.40%</h2>
-                        </div>
-                        <div class="grade-letter" style="font-size: 1.5rem; font-weight: bold;">1.75</div>
-                    </div>
-                </div>
+                }
             </div>
 
             <div class="card">
@@ -148,30 +154,34 @@
                     <div class="gwa-circle">
                         <svg viewBox="0 0 200 200">
                             <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-                            <circle class="circle-progress" cx="100" cy="100" r="90"></circle>
+                            <circle class="circle-progress" cx="100" cy="100" r="90" 
+                                    style="stroke-dashoffset: @(565 - (565 * (_overallPercentage / 100))); transition: stroke-dashoffset 0.5s ease;"></circle>
                         </svg>
                         <div class="circle-center">
-                            <h1>1.25</h1>
-                            <p>Cumulative Grade</p>
+                            <h1>@_overallGWA.ToString("0.00")</h1>
+                            <p>Term Simulated Grade</p>
                         </div>
                     </div>
 
                     <div class="summary-grid">
                         <div class="summary-card">
-                            <div class="summary-label">Total Courses</div>
-                            <div class="summary-value">6</div>
+                            <div class="summary-label">Courses in Simulation</div>
+                            <div class="summary-value">@_loadedSimulations.Count</div>
                         </div>
                         <div class="summary-card">
-                            <div class="summary-label">Average Grade</div>
-                            <div class="summary-value">91.40%</div>
+                            <div class="summary-label">Average Raw Score</div>
+                            <div class="summary-value">@_overallPercentage.ToString("0.00")%</div>
                         </div>
                         <div class="summary-card">
-                            <div class="summary-label">Highest Grade</div>
-                            <div class="summary-value">98.20%</div>
-                        </div>
-                        <div class="summary-card">
-                            <div class="summary-label">Academic Standing</div>
-                            <div class="summary-value">Dean's Lister</div>
+                            <div class="summary-label">Simulation Scale</div>
+                            <div class="summary-value">
+                                <select class="sidebar-scale-select" @bind="_selectedScale" @bind:after="RecalculateAll">
+                                    <option value="@GradeScaleType.GWA">PH GWA (1.0-5.0)</option>
+                                    <option value="@GradeScaleType.GPA">US GPA (4.0)</option>
+                                    <option value="@GradeScaleType.Letter">Letter Grades</option>
+                                    <option value="@GradeScaleType.Percentage">Percentage</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,3 +189,145 @@
         </div>
     </div>
 </div>
+
+@code {
+    private class SimulatedCourseView 
+    {
+        public Course Course { get; set; } = new();
+        public string TargetInput { get; set; } = "";
+        public string PredictionMessage { get; set; } = "";
+        public bool IsPossible { get; set; } = true;
+    }
+
+
+    private List<TaskTypeDefinition> _availableDefinitions = new();
+    private string _newCategoryDefId = "";
+    private List<Course> _existingCourses = new();
+    private Term _simulatedTerm = new() { Courses = new List<Course>() };
+    private Dictionary<string, SimulatedCourseView> _loadedSimulations = new();
+    
+    // THIS is the only course shown on screen
+    private SimulatedCourseView? _activeView = null; 
+    
+    private GradeScaleType _selectedScale = GradeScaleType.GWA;
+    private double _overallPercentage = 0;
+    private double _overallGWA = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch definitions for our Add Category dropdown
+        _availableDefinitions = await CourseService.GetAllTaskTypeDefinitionsAsync();
+
+        var userId = UserService.CurrentUser?.UserID;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            _existingCourses = await CourseService.GetUserCoursesAsync(userId);
+        }
+    }
+
+    private void AddCategoryToSimulation()
+    {
+        if (string.IsNullOrEmpty(_newCategoryDefId) || _activeView == null) return;
+        
+        var def = _availableDefinitions.FirstOrDefault(d => d.DefID == _newCategoryDefId);
+        if (def == null) return;
+
+        var newCategory = new AcademicTaskType
+        {
+            TypeID = Guid.NewGuid().ToString(),
+            DefID = def.DefID,
+            Definition = def, // Binds the name automatically!
+            Name = def.Name,
+            Weight = 0, // Starts at 0% weight so user can define it
+            AcademicTasks = new List<AcademicTask>()
+        };
+
+        // Safety check in case the course doesn't even have a Grade object yet
+        if (_activeView.Course.ActualGrade == null) 
+            _activeView.Course.ActualGrade = new Grade { AcademicTaskTypes = new List<AcademicTaskType>() };
+            
+        if (_activeView.Course.ActualGrade.AcademicTaskTypes == null) 
+            _activeView.Course.ActualGrade.AcademicTaskTypes = new List<AcademicTaskType>();
+
+        _activeView.Course.ActualGrade.AcademicTaskTypes.Add(newCategory);
+        
+        // Reset the dropdown
+        _newCategoryDefId = ""; 
+        RecalculateAll();
+    }
+
+    private async Task LoadExistingCourse(ChangeEventArgs e)
+    {
+        var courseId = e.Value?.ToString();
+        
+        if (string.IsNullOrEmpty(courseId)) 
+        {
+            _activeView = null;
+            return;
+        }
+
+        if (!_loadedSimulations.ContainsKey(courseId))
+        {
+            var realCourse = await CourseService.GetCourseWithFullDetailsAsync(courseId);
+            if (realCourse != null)
+            {
+                var clonedCourse = CourseService.DeepCloneCourse(realCourse);
+                _loadedSimulations[courseId] = new SimulatedCourseView { Course = clonedCourse };
+                _simulatedTerm.Courses.Add(clonedCourse);
+            }
+        }
+
+        // Instantly switch the UI to the newly selected course!
+        if (_loadedSimulations.ContainsKey(courseId))
+        {
+            _activeView = _loadedSimulations[courseId];
+            RecalculateAll();
+        }
+    }
+
+    private void AddTask(AcademicTaskType category)
+    {
+        category.AcademicTasks.Add(new AcademicTask 
+        { 
+            TaskID = Guid.NewGuid().ToString(), 
+            Name = "Simulated Task", 
+            Score = 0, 
+            MaxScore = 100 
+        });
+        RecalculateAll();
+    }
+
+    private void RemoveTask(AcademicTaskType category, AcademicTask task)
+    {
+        category.AcademicTasks.Remove(task);
+        RecalculateAll();
+    }
+
+    private void RunPrediction(SimulatedCourseView view)
+    {
+        if (string.IsNullOrWhiteSpace(view.TargetInput)) return;
+
+        var result = TargetSim.PredictCourseTarget(view.Course.ActualGrade, view.TargetInput, _selectedScale);
+        view.IsPossible = result.IsPossible;
+        view.PredictionMessage = result.Message;
+    }
+
+    private void RecalculateAll()
+    {
+        _overallGWA = GradeEngine.CalculateTermGradePoints(_simulatedTerm, _selectedScale);
+
+        double totalQualityPoints = 0;
+        double totalUnits = 0;
+
+        foreach (var view in _loadedSimulations.Values)
+        {
+            var result = GradeEngine.CalculateCourseGrade(view.Course.ActualGrade, _selectedScale);
+            totalQualityPoints += result.RunningPercentage * (view.Course.Units ?? 0);
+            totalUnits += (view.Course.Units ?? 0);
+            
+            RunPrediction(view); 
+        }
+
+        _overallPercentage = totalUnits > 0 ? (totalQualityPoints / totalUnits) : 0;
+    }
+}
