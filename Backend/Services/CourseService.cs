@@ -51,7 +51,7 @@ namespace Acadeno.Backend.Services
         // Standardized Schedule-based Creation
         public async Task AddCourseWithSchedulesAsync(string userId, string termId, string courseCode, string name, int units, List<ScheduleEntry> schedules)
         {
-            // Use your existing logic to create the course and category buckets
+            // Use existing logic to create the course and category buckets
             var course = await AddNewCourseAsync(userId, termId, courseCode, name, units);
 
             foreach (var entry in schedules)
@@ -104,6 +104,43 @@ namespace Acadeno.Backend.Services
                     .ThenInclude(g => g.AcademicTaskTypes)
                         .ThenInclude(type => type.AcademicTasks)
                 .FirstOrDefaultAsync(c => c.CourseID == courseId);
+        }
+
+        public async Task<bool> SaveOfficialSyllabusWeightsAsync(string gradeId, List<AcademicTaskType> simulatedCategories)
+        {
+            var actualGrade = await _db.Grades
+                .Include(g => g.AcademicTaskTypes)
+                .FirstOrDefaultAsync(g => g.GradeID == gradeId);
+
+            if (actualGrade == null) return false;
+
+            foreach (var simCat in simulatedCategories)
+            {
+                // Find the matching category in the actual database using the Definition ID
+                var existingCat = actualGrade.AcademicTaskTypes.FirstOrDefault(c => c.DefID == simCat.DefID);
+                
+                if (existingCat != null)
+                {
+                    // Update the existing weight
+                    existingCat.Weight = simCat.Weight;
+                    _db.AcademicTaskTypes.Update(existingCat);
+                }
+                else
+                {
+                    // If the user injected a BRAND NEW category in the simulator, add it to the DB!
+                    var newCat = new AcademicTaskType
+                    {
+                        TypeID = Guid.NewGuid().ToString(),
+                        GradeID = actualGrade.GradeID,
+                        DefID = simCat.DefID,
+                        Name = simCat.Name,
+                        Weight = simCat.Weight
+                    };
+                    await _db.AcademicTaskTypes.AddAsync(newCat);
+                }
+            }
+
+            return await _db.SaveChangesAsync() > 0;
         }
 
         public Course DeepCloneCourse(Course original)

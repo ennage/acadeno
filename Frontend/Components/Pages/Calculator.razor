@@ -163,13 +163,26 @@
                         </div>
                     </div>
 
-                    @* NEW LOCATION: Course-Specific Results *@
+                    @* Course-Specific Results & Official Save Button *@
                     @if (_activeView != null)
                     {
                         var courseResult = GradeEngine.CalculateCourseGrade(_activeView.Course.ActualGrade, _selectedScale);
 
-                        <div class="active-course-results" style="margin-top: 30px; padding-top: 25px; border-top: 1px dashed #cbd5e1;">
-                            <h4 style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Active Course Analysis</h4>
+                        <div class="active-course-results">
+                            <div class="results-header-row">
+                                <h4 class="results-title">Active Course Analysis</h4>
+                                
+                                <button class="btn-save-official" @onclick="SaveOfficialWeights">
+                                    💾 Save Official Weights
+                                </button>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(_saveMessage))
+                            {
+                                <div class="success-message">
+                                    @_saveMessage
+                                </div>
+                            }
                             
                             <div class="final-grade">
                                 <div>
@@ -218,29 +231,46 @@
         public bool IsPossible { get; set; } = true;
     }
 
-
     private List<TaskTypeDefinition> _availableDefinitions = new();
     private string _newCategoryDefId = "";
     private List<Course> _existingCourses = new();
     private Term _simulatedTerm = new() { Courses = new List<Course>() };
     private Dictionary<string, SimulatedCourseView> _loadedSimulations = new();
-    
-    // THIS is the only course shown on screen
     private SimulatedCourseView? _activeView = null; 
     
     private GradeScaleType _selectedScale = GradeScaleType.GWA;
     private double _overallPercentage = 0;
     private double _overallGWA = 0;
+    private string _saveMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch definitions for our Add Category dropdown
         _availableDefinitions = await CourseService.GetAllTaskTypeDefinitionsAsync();
 
         var userId = UserService.CurrentUser?.UserID;
         if (!string.IsNullOrEmpty(userId))
         {
             _existingCourses = await CourseService.GetUserCoursesAsync(userId);
+        }
+    }
+
+    private async Task SaveOfficialWeights()
+    {
+        if (_activeView?.Course.ActualGrade == null) return;
+
+        var success = await CourseService.SaveOfficialSyllabusWeightsAsync(
+            _activeView.Course.ActualGrade.GradeID,
+            _activeView.Course.ActualGrade.AcademicTaskTypes
+        );
+
+        if (success)
+        {
+            _saveMessage = "Official syllabus weights updated in the database!";
+            StateHasChanged();
+
+            await Task.Delay(3000);
+            _saveMessage = "";
+            StateHasChanged();
         }
     }
 
@@ -255,13 +285,12 @@
         {
             TypeID = Guid.NewGuid().ToString(),
             DefID = def.DefID,
-            Definition = def, // Binds the name automatically!
+            Definition = def, 
             Name = def.Name,
-            Weight = 0, // Starts at 0% weight so user can define it
+            Weight = 0, 
             AcademicTasks = new List<AcademicTask>()
         };
 
-        // Safety check in case the course doesn't even have a Grade object yet
         if (_activeView.Course.ActualGrade == null) 
             _activeView.Course.ActualGrade = new Grade { AcademicTaskTypes = new List<AcademicTaskType>() };
             
@@ -269,8 +298,6 @@
             _activeView.Course.ActualGrade.AcademicTaskTypes = new List<AcademicTaskType>();
 
         _activeView.Course.ActualGrade.AcademicTaskTypes.Add(newCategory);
-        
-        // Reset the dropdown
         _newCategoryDefId = ""; 
         RecalculateAll();
     }
@@ -296,7 +323,6 @@
             }
         }
 
-        // Instantly switch the UI to the newly selected course!
         if (_loadedSimulations.ContainsKey(courseId))
         {
             _activeView = _loadedSimulations[courseId];
