@@ -3,17 +3,14 @@
 @using Acadeno.Backend.DTOs
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
-@using Acadeno.Backend.Services
-@using Acadeno.Backend.Simulation
-@using Acadeno.Backend.Tools
 @using Acadeno.Frontend.Components.CoursesPopups
 @using Microsoft.EntityFrameworkCore
 
-@inject Acadeno.Backend.Services.TermService TermService
 @inject Acadeno.Backend.Services.UserService UserAccess
-@inject Acadeno.Backend.Simulation.GradeConverter GradeConverter
-@inject Acadeno.Backend.Simulation.GradingEngine GradingEngine
 @inject Acadeno.Backend.Tools.AppDbContext _db
+@inject Acadeno.Backend.Simulation.GradingEngine GradeEngine
+@inject Acadeno.Backend.Services.YearService YearService
+@inject Acadeno.Backend.Services.TermService TermService
 
 <div class="dashboard-root">
     <NavMenu /> 
@@ -21,27 +18,80 @@
     <div class="main-content-wrapper">
         <div class="dashboard-inner">
             
+            @* --- 1. HEADER & CONTEXT SWITCHER --- *@
             <header class="dashboard-header">
                 @if (!string.IsNullOrEmpty(_debugError))
                 {
-                    <div style="background: #fee2e2; color: #b91c1c; padding: 20px; margin: 20px; border-radius: 8px; font-weight: bold;">
-                        <h3>🚨 FATAL CRASH DETECTED:</h3>
+                    <div style="background: #fee2e2; color: #b91c1c; padding: 20px; margin-bottom: 20px; border-radius: 8px; font-weight: bold;">
+                        <h3>🚨 ERROR DETECTED:</h3>
                         <p style="white-space: pre-wrap;">@_debugError</p>
                     </div>
                 }
 
-                <h1 class="page-title">Enrolled Courses</h1>
-                <p class="welcome-subtitle">Welcome back! Here is your academic overview for <strong>@_currentTermDisplay</strong>.</p>
+                <div class="header-main-row">
+                    <div>
+                        <h1 class="page-title">Enrolled Courses</h1>
+                        <p class="welcome-subtitle">Manage your schedule and tasks for the selected term.</p>
+                    </div>
+
+                    <div class="academic-context-controls">
+                        @* ACADEMIC YEAR DROPDOWN *@
+                        <div class="control-group">
+                            <label>Academic Year</label>
+                            <div class="input-with-btn">
+                                <select class="context-select" @bind="_selectedYearId" @bind:after="OnYearChanged">
+                                    @if (_academicYears.Any())
+                                    {
+                                        @foreach (var ay in _academicYears)
+                                        {
+                                            <option value="@ay.YearID">AY @ay.YearSpan</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="">No Years Found</option>
+                                    }
+                                </select>
+                                <button class="btn-icon-add" title="Add New Academic Year" @onclick="OpenAddYearModal">+</button>
+                            </div>
+                        </div>
+
+                        @* TERM DROPDOWN *@
+                        <div class="control-group">
+                            <label>Term / Semester</label>
+                            <div class="input-with-btn">
+                                <select class="context-select" @bind="_selectedTermId" @bind:after="OnTermChanged" disabled="@(!_availableTerms.Any())">
+                                    @if (_availableTerms.Any())
+                                    {
+                                        @foreach (var term in _availableTerms)
+                                        {
+                                            <option value="@term.TermID">@term.Name</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option value="">No Terms Found</option>
+                                    }
+                                </select>
+                                <button class="btn-icon-add" title="Add New Term" @onclick="OpenAddTermModal" disabled="@(string.IsNullOrEmpty(_selectedYearId))">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </header>
 
+            @* --- 2. MAIN GRID LAYOUT --- *@
             <div class="dashboard-grid-layout">
+                
+                @* LEFT COLUMN (Courses & Tests) *@
                 <div class="primary-column">
                     
+                    @* MY COURSES *@
                     <section class="content-section">
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">My Courses</h2>
-                                <button class="btn-add" title="Add New Course" @onclick="OpenAddNewCourseModal">+</button>
+                                <button class="btn-add" title="Add New Course" @onclick="OpenAddNewCourseModal" disabled="@(string.IsNullOrEmpty(_selectedTermId))">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllCoursesModal">
                                 View All Courses &rsaquo;
@@ -61,7 +111,15 @@
                                             <div class="card-header-flex">
                                                 <h3 class="course-name">@course.Name</h3>
                                                 <span class="course-grade">
-                                                    @(course.ActualGrade?.CourseGrade > 0 ? $"{course.ActualGrade.CourseGrade}" : "--")
+                                                    @if (course.ActualGrade != null)
+                                                    {
+                                                        var realGrade = GradeEngine.CalculateCourseGrade(course.ActualGrade, GradeScaleType.Percentage);
+                                                        @(realGrade.DefinedWeight > 0 ? $"{realGrade.RunningPercentage:0.00}%" : "--")
+                                                    }
+                                                    else
+                                                    {
+                                                        @("--")
+                                                    }
                                                 </span>
                                             </div>
                                             <p class="course-id">@course.CourseCode</p>
@@ -86,16 +144,17 @@
                             }
                             else
                             {
-                                <p class="welcome-subtitle">No courses found. Click the + to get started.</p>
+                                <p class="welcome-subtitle" style="padding: 20px 0;">No courses found for this term. Click the + to get started.</p>
                             }
                         </div>
                     </section>
 
+                    @* UPCOMING TESTS *@
                     <section class="content-section">
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Upcoming Tests</h2>
-                                <button class="btn-add" title="Add New Test" @onclick="OpenAddNewTestModal">+</button>
+                                <button class="btn-add" title="Add New Test" @onclick="OpenAddNewTestModal" disabled="@(string.IsNullOrEmpty(_selectedTermId))">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllTestsModal">View All Tests &rsaquo;</a>
                         </div>
@@ -112,7 +171,7 @@
                                 <tbody>
                                     @if (_upcomingTests != null && _upcomingTests.Any())
                                     {
-                                        @foreach (var test in _upcomingTests.Take(3))
+                                        @foreach (var test in _upcomingTests.Take(5))
                                         {
                                             <tr>
                                                 <td>@test.Name</td>
@@ -140,23 +199,24 @@
                     </section>
                 </div>
 
+                @* RIGHT COLUMN (GWA & Homework) *@
                 <aside class="secondary-column">
+                    
+                    @* ACADEMIC STANDING CARD *@
                     <div class="gwa-card">
                         <h2 class="section-title">Academic Standing</h2>
-                        <a href="calculator" class="accent-link"> Calculate GWA &rsaquo;</a>
+                        <a href="/calculator" class="accent-link"> Calculate GWA &rsaquo;</a>
                         
                         <div class="gwa-display">
                             <div class="gwa-circle">
                                 <svg viewBox="0 0 36 36" class="circular-chart">
                                     <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-
                                     <path class="circle" 
-                                        stroke-dasharray="@($"{_standing.CirclePercentage}, 100")" 
-                                        style="stroke: @_standing.StandingColor;"
-                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                            stroke-dasharray="@($"{_standing.CirclePercentage}, 100")" 
+                                            style="stroke: @_standing.StandingColor;"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 </svg>
                                 <div class="gwa-text">
-                                    @* DYNAMIC CUMULATIVE GWA *@
                                     <span class="gwa-number">@_standing.CumulativeGwa.ToString("0.00")</span>
                                     <span class="gwa-label">Cumulative GWA</span>
                                 </div>
@@ -166,31 +226,29 @@
                         <div class="gwa-stats">
                             <div class="stat-item">
                                 <span>Current Term</span>
-                                @* DYNAMIC CURRENT TERM GWA *@
                                 <strong>@_standing.CurrentTermGwa.ToString("0.00")</strong>
                             </div>
                             <div class="stat-item">
                                 <span>Standing</span>
-                                @* DYNAMIC TEXT & COLOR *@
                                 <strong style="color: @_standing.StandingColor;">@_standing.Standing</strong>
                             </div>
                         </div>
                     </div>
 
+                    @* HOMEWORKS *@
                     <div class="content-section">
                         <div class="section-top-bar">
                             <div class="title-group">
                                 <h2 class="section-title">Homeworks</h2>
-                                <button class="btn-add" title="Add New Homework" @onclick="OpenAddNewHomeworkModal">+</button>
+                                <button class="btn-add" title="Add New Homework" @onclick="OpenAddNewHomeworkModal" disabled="@(string.IsNullOrEmpty(_selectedTermId))">+</button>
                             </div>
                             <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all &rsaquo;</a>
                         </div>
                         
                         @if (_homeworks != null && _homeworks.Any())
                         {
-                            @foreach (var hw in _homeworks.Take(2))
+                            @foreach (var hw in _homeworks.Take(3))
                             {
-                                // Reusing your existing color method so the cards look dynamic!
                                 var colorClass = GetColorByIndex(_homeworks.IndexOf(hw));
 
                                 <div class="mini-card">
@@ -220,6 +278,18 @@
         </div>
     </div>
 </div>
+
+@* --- MODALS --- *@
+<AddNewYear 
+    IsVisible="_showAddYearModal" 
+    OnClose="() => _showAddYearModal = false" 
+    OnYearAdded="HandleYearAdded" />
+
+<AddNewTerm 
+    IsVisible="_showAddTermModal" 
+    SelectedYearId="_selectedYearId"
+    OnClose="() => _showAddTermModal = false" 
+    OnTermAdded="HandleTermAdded" />
 
 <AddNewCourse 
     IsVisible="_showAddNewCourseModal"
@@ -252,59 +322,50 @@
     OnClose="CloseViewAllHomeworkModal" />
 
 @code {
-    // --- MODAL STATES ---
-    private bool _showAddNewCourseModal = false;
-    private bool _showAddNewHomeworkModal = false;
-    private bool _showAddNewTestModal = false;
-
-    private bool _showViewAllCoursesPopup = false;
-    private bool _showViewAllHomeworkPopup = false;
-    private bool _showViewAllTestsPopup = false;
-
-    // --- COURSE MODAL METHODS ---
-    private void OpenAddNewCourseModal() => _showAddNewCourseModal = true;
-    private void CloseAddNewCourseModal() => _showAddNewCourseModal = false;
-
-    private void OpenViewAllCoursesModal() => _showViewAllCoursesPopup = true;
-    private void CloseViewAllCoursesModal() => _showViewAllCoursesPopup = false;
-
-    // --- TEST MODAL METHODS ---
-    private void OpenAddNewTestModal() => _showAddNewTestModal = true;
-    private void CloseAddNewTestModal() => _showAddNewTestModal = false;
-
-    private void OpenViewAllTestsModal() => _showViewAllTestsPopup = true;
-    private void CloseViewAllTestsModal() => _showViewAllTestsPopup = false;
-
-    // --- HOMEWORK MODAL METHODS ---
-    private void OpenAddNewHomeworkModal() => _showAddNewHomeworkModal = true;
-    private void CloseAddNewHomeworkModal() => _showAddNewHomeworkModal = false;
-
-    private void OpenViewAllHomeworkModal() => _showViewAllHomeworkPopup = true;
-    private void CloseViewAllHomeworkModal() => _showViewAllHomeworkPopup = false;
-
-    // --- GLOBAL REFRESH ---
-    private async Task RefreshDashboard()
-    {
-        // Close all "Add" modals simultaneously
-        _showAddNewCourseModal = false;
-        _showAddNewHomeworkModal = false;
-        _showAddNewTestModal = false;
-
-        await OnInitializedAsync();
-        StateHasChanged();
-    }
-
+    // --- CONTEXT VARIABLES ---
     private string _debugError = string.Empty;
-    private string _userId = string.Empty;
-    private string _currentTermDisplay = "your current term";
-    private AcademicStandingResult _standing = new();
-    
+    private List<AcademicYear> _academicYears = new();
+    private List<Term> _availableTerms = new();
+    private string _selectedYearId = string.Empty;
+    private string _selectedTermId = string.Empty;
+
+    // --- DATA LISTS ---
     private List<Course> _courses = new();
     private List<Course> _priorityCourses = new();
     private List<AcademicTask> _upcomingTests = new();
     private List<AcademicTask> _homeworks = new();
+    private AcademicStandingResult _standing = new();
 
+    // --- MODAL STATES ---
+    private bool _showAddNewCourseModal = false;
+    private bool _showAddNewHomeworkModal = false;
+    private bool _showAddNewTestModal = false;
+    private bool _showViewAllCoursesPopup = false;
+    private bool _showViewAllHomeworkPopup = false;
+    private bool _showViewAllTestsPopup = false;
+    private bool _showAddYearModal = false;
+    private bool _showAddTermModal = false;
+
+    // --- MODAL METHODS ---
+    private void OpenAddNewCourseModal() => _showAddNewCourseModal = true;
+    private void CloseAddNewCourseModal() => _showAddNewCourseModal = false;
+    private void OpenViewAllCoursesModal() => _showViewAllCoursesPopup = true;
+    private void CloseViewAllCoursesModal() => _showViewAllCoursesPopup = false;
     
+    private void OpenAddNewTestModal() => _showAddNewTestModal = true;
+    private void CloseAddNewTestModal() => _showAddNewTestModal = false;
+    private void OpenViewAllTestsModal() => _showViewAllTestsPopup = true;
+    private void CloseViewAllTestsModal() => _showViewAllTestsPopup = false;
+    
+    private void OpenAddNewHomeworkModal() => _showAddNewHomeworkModal = true;
+    private void CloseAddNewHomeworkModal() => _showAddNewHomeworkModal = false;
+    private void OpenViewAllHomeworkModal() => _showViewAllHomeworkPopup = true;
+    private void CloseViewAllHomeworkModal() => _showViewAllHomeworkPopup = false;
+
+    private void OpenAddYearModal() => _showAddYearModal = true;
+    private void OpenAddTermModal() => _showAddTermModal = true;
+
+    // --- INITIALIZATION ---
     protected override async Task OnInitializedAsync()
     {
         try
@@ -312,78 +373,159 @@
             var userId = UserAccess.CurrentUser?.UserID;
             if (string.IsNullOrEmpty(userId)) return;
 
-            // Fetch data
-            var activeTerm = await _db.Terms
-                .Include(t => t.AcademicYear)
-                .FirstOrDefaultAsync(t => t.IsCurrent && t.AcademicYear.UserID == userId);
+            // Load all years
+            _academicYears = await YearService.GetYearsByUserAsync(userId);
 
-            if (activeTerm != null)
+            if (_academicYears.Any())
             {
-                _currentTermDisplay = $"{activeTerm.Name}, AY {activeTerm.AcademicYear?.YearSpan}";
+                var currentYear = _academicYears.FirstOrDefault(ay => ay.IsCurrent) ?? _academicYears.First();
+                _selectedYearId = currentYear.YearID;
+                await OnYearChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            _debugError = $"INIT ERROR: {ex.Message}";
+        }
+    }
+
+    // --- CASCADING DROPDOWNS ---
+    private async Task OnYearChanged()
+    {
+        if (string.IsNullOrEmpty(_selectedYearId)) return;
+
+        _availableTerms = await TermService.GetTermsByYearAsync(_selectedYearId);
+
+        if (_availableTerms.Any())
+        {
+            var currentTerm = _availableTerms.FirstOrDefault(t => t.IsCurrent) ?? _availableTerms.First();
+            _selectedTermId = currentTerm.TermID;
+        }
+        else
+        {
+            _selectedTermId = string.Empty;
+        }
+
+        await OnTermChanged();
+    }
+
+    private async Task OnTermChanged()
+    {
+        try 
+        {
+            var userId = UserAccess.CurrentUser?.UserID;
+            if (string.IsNullOrEmpty(userId)) return;
+
+            if (string.IsNullOrEmpty(_selectedTermId)) 
+            {
+                _courses.Clear();
+                _priorityCourses.Clear();
+                _upcomingTests.Clear();
+                _homeworks.Clear();
+                return;
             }
 
-            var allTasks = await _db.AcademicTasks
+            // 1. Fetch Courses for this specific term
+            _courses = await _db.Courses
+                .Include(c => c.ActualGrade)
+                .Include(c => c.Term)
+                .Include(c => c.ScheduleEntries)
+                .Where(c => c.UserID == userId && c.TermID == _selectedTermId)
+                .ToListAsync();
+                
+            var courseIdsInTerm = _courses.Select(c => c.CourseID).ToList();
+
+            // 2. Fetch Tasks only for courses in this term
+            var allTasksForTerm = await _db.AcademicTasks
                 .Include(t => t.Course)
                 .Include(t => t.Type)
-                
-                .Where(t => t.UserID == userId && t.TaskStatus != Status.Completed)
+                .Where(t => t.UserID == userId && 
+                            courseIdsInTerm.Contains(t.CourseID) && 
+                            t.TaskStatus != Status.Completed)
                 .OrderBy(t => t.DueDate)
                 .ToListAsync();
 
-            _courses = await _db.Courses
-                .Include(c => c.ActualGrade) // <--- EF Core joins the Grades table on CourseID here
-                .Include(c => c.Term)        // <--- EF Core joins the Terms table here
-                .Include(c => c.ScheduleEntries)
-                .Where(c => c.UserID == userId)
-                .ToListAsync();
-            
-            // Determine Top 4 Priority Courses
-            var urgentCourseIds = allTasks
-                .Where(t => !string.IsNullOrEmpty(t.CourseID))
-                .Select(t => t.CourseID)
-                .Distinct()
-                .ToList();
-
-            // Sort courses by urgency, then take 4. Courses with no tasks are pushed to the back.
+            // Priority Courses (Top 4 with urgent tasks)
+            var urgentCourseIds = allTasksForTerm.Select(t => t.CourseID).Distinct().ToList();
             _priorityCourses = _courses
                 .OrderBy(c => urgentCourseIds.Contains(c.CourseID) ? urgentCourseIds.IndexOf(c.CourseID) : int.MaxValue)
                 .Take(4)
                 .ToList();
-            
-            // Categorize Tasks using DefID
-            // DefID '111...' = Quizzes, DefID '333...' = Exams
-            _upcomingTests = allTasks
+
+            // Upcoming Tests
+            _upcomingTests = allTasksForTerm
                 .Where(t => t.Type != null && 
                         (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
-                            t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
+                        t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
                 .ToList();
-            
-            // Adjust this logic depending on what you consider "Homework"
-            // DefID '222...' = Activities
-            _homeworks = allTasks
+
+            // Homeworks
+            _homeworks = allTasksForTerm
                 .Where(t => t.Type != null && 
-                        (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
+                        t.Type.DefID == "22222222-2222-2222-2222-222222222222")
                 .ToList();
-            
-            // Fetch ALL terms with every task and grade included
+
+            // Calculate Overall GWA across ALL history
             var termsForGwa = await _db.Terms
-                .Include(t => t.Courses)
-                    .ThenInclude(c => c.ActualGrade)
-                        .ThenInclude(g => g.AcademicTaskTypes)
-                            .ThenInclude(tt => tt.AcademicTasks)
+                .Include(t => t.Courses).ThenInclude(c => c.ActualGrade).ThenInclude(g => g.AcademicTaskTypes).ThenInclude(tt => tt.AcademicTasks)
                 .Where(t => t.AcademicYear.UserID == userId)
                 .ToListAsync();
-
-            // Pass those terms to the Engine
-            _standing = GradingEngine.GetOverallStanding(termsForGwa, GradeScaleType.GWA);
+                
+            _standing = GradeEngine.GetOverallStanding(termsForGwa, GradeScaleType.GWA);
         }
         catch (Exception ex)
         {
-            _debugError = $"MESSAGE: {ex.Message}\n\nINNER EXCEPTION: {ex.InnerException?.Message}";
+            _debugError = $"DATA LOAD ERROR: {ex.Message}";
         }
     }
 
-    // ----- DETAILS -----
+    // --- GLOBAL REFRESH ---
+    private async Task RefreshDashboard()
+    {
+        _showAddNewCourseModal = false;
+        _showAddNewHomeworkModal = false;
+        _showAddNewTestModal = false;
+
+        // Force a re-fetch of data using the current selections
+        await OnTermChanged();
+        StateHasChanged();
+    }
+
+    // --- CONTEXT REFRESH HANDLERS ---
+    private async Task HandleYearAdded()
+    {
+        _showAddYearModal = false;
+        var userId = UserAccess.CurrentUser?.UserID;
+        if (string.IsNullOrEmpty(userId)) return;
+
+        // 1. Re-fetch the updated list of years from the database
+        _academicYears = await YearService.GetYearsByUserAsync(userId);
+
+        // 2. Smart Switch: Find the year marked "IsCurrent" and select it in the dropdown
+        var currentYear = _academicYears.FirstOrDefault(ay => ay.IsCurrent) ?? _academicYears.First();
+        _selectedYearId = currentYear.YearID;
+
+        // 3. Trigger the cascade to load its terms and update the screen
+        await OnYearChanged();
+    }
+
+    private async Task HandleTermAdded()
+    {
+        _showAddTermModal = false;
+        if (string.IsNullOrEmpty(_selectedYearId)) return;
+
+        // 1. Re-fetch the updated list of terms for the current year
+        _availableTerms = await TermService.GetTermsByYearAsync(_selectedYearId);
+
+        // 2. Smart Switch: Find the term marked "IsCurrent" and select it
+        var currentTerm = _availableTerms.FirstOrDefault(t => t.IsCurrent) ?? _availableTerms.First();
+        _selectedTermId = currentTerm.TermID;
+
+        // 3. Trigger the cascade to load the new courses/tasks
+        await OnTermChanged();
+    }
+
+    // --- UI HELPERS ---
     private string GetColorByIndex(int index)
     {
         string[] colors = { "purple-line", "blue-line", "orange-line", "green-line" };
