@@ -1,8 +1,6 @@
+@using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
-@using Acadeno.Backend.Simulation
-@using Microsoft.EntityFrameworkCore
-@inject Acadeno.Backend.Tools.AppDbContext _db
 @inject CourseService CourseService
 @inject TermService TermService
 @inject UserService UserAccess
@@ -16,266 +14,293 @@
             </div>
 
             <EditForm Model="_newCourse" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+                
+                @* This div now handles the scrolling *@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Course Name</label>
-                        <InputText @bind-Value="_newCourse.Name" placeholder="e.g. Graphic Fundamentals" required />
+                        <InputText @bind-Value="_newCourse.Name" placeholder="e.g. Object-Oriented Programming" required />
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label>Course Code</label>
-                            <InputText @bind-Value="_newCourse.CourseCode" placeholder="ART101" required />
+                            <InputText @bind-Value="_newCourse.CourseCode" placeholder="IT211" required />
                         </div>
                         <div class="form-group">
-                            <label>Term</label>
-                            <InputSelect @bind-Value="_newCourse.TermID" class="form-control">
-                                <option value="" disabled selected>Select Term</option>
-                                @foreach (var term in _availableTerms)
-                                {
-                                    <option value="@term.TermID">@term.Name</option>
-                                }
-                            </InputSelect>
+                            <label>Units</label>
+                            <InputNumber @bind-Value="_newCourse.Units" placeholder="3" />
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Day of the Week</label>
-                            <select @bind="_schedule.Day">
-                                <option value="" disabled selected>Select Day</option>
-                                <option value="1">Monday</option>
-                                <option value="2">Tuesday</option>
-                                <option value="3">Wednesday</option>
-                                <option value="4">Thursday</option>
-                                <option value="5">Friday</option>
-                                <option value="6">Saturday</option>
-                                <option value="0">Sunday</option>
-                            </select>
+                    <div class="form-group">
+                        <label>Academic Term</label>
+                        <InputSelect @bind-Value="_newCourse.TermID" required>
+                            <option value="" disabled selected>Select Term</option>
+                            @foreach (var term in _availableTerms)
+                            {
+                                <option value="@term.TermID">@term.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <hr class="divider" />
+
+                    <div class="schedule-builder-section">
+                        <label class="section-label">Build Schedule Slot</label>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Day</label>
+                                <InputSelect @bind-Value="_activeEntry.Day">
+                                    <option value="1">Monday</option>
+                                    <option value="2">Tuesday</option>
+                                    <option value="3">Wednesday</option>
+                                    <option value="4">Thursday</option>
+                                    <option value="5">Friday</option>
+                                    <option value="6">Saturday</option>
+                                    <option value="0">Sunday</option>
+                                </InputSelect>
+                            </div>
+                            <div class="form-group">
+                                <label>Session Type</label>
+                                <InputText @bind-Value="_activeEntry.Session" placeholder="Lecture, Lab, etc." />
+                            </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Start Time</label>
-                                <input type="time" @bind="_schedule.StartTime" @bind:format="HH:mm" required />
+                                <InputDate Type="InputDateType.Time" @bind-Value="_uiStartTime" required />
                             </div>
                             <div class="form-group">
                                 <label>End Time</label>
-                                <input type="time" @bind="_schedule.EndTime" @bind:format="HH:mm" required />
+                                <InputDate Type="InputDateType.Time" @bind-Value="_uiEndTime" required />
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Room</label>
-                                <InputText @bind-Value="_schedule.Room" placeholder="Studio A" />
+                                <label>Building</label>
+                                <InputText @bind-Value="_activeEntry.Building" placeholder="Science Building" />
                             </div>
                             <div class="form-group">
-                                <label>Building</label>
-                                <InputText @bind-Value="_schedule.Building" placeholder="Main Campus" />
+                                <label>Room</label>
+                                <InputText @bind-Value="_activeEntry.Room" placeholder="Room 302" />
+                            </div>
+                        </div>
+
+                        <div class="form-row align-items-center">
+                            <div class="form-group checkbox-group">
+                                <InputCheckbox @bind-Value="_activeEntry.IsRepeating" id="repeatCheck" />
+                                <label for="repeatCheck" class="label-inline">Is Repeating Weekly</label>
+                            </div>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-add-slot" @onclick="AddScheduleToList">
+                                    + Add Schedule Slot
+                                </button>
                             </div>
                         </div>
                     </div>
+
+                    @if (_tempSchedules.Any())
+                    {
+                        <div class="added-slots-container">
+                            <label>Added Slots:</label>
+                            @foreach (var sch in _tempSchedules)
+                            {
+                                <div class="slot-item">
+                                    <div class="slot-text">
+                                        <strong>@GetDayName(sch.Day)</strong>: @sch.StartTime.ToString("h:mm tt") - @sch.EndTime.ToString("h:mm tt")
+                                        <br/><small>@sch.Session | @sch.Building (@sch.Room)</small>
+                                    </div>
+                                    <button type="button" class="btn-remove-slot" @onclick="() => _tempSchedules.Remove(sch)">×</button>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
-                    <button type="submit" class="btn btn-submit">Add Course</button>
+                    <button type="submit" class="btn btn-submit" disabled="@(!_tempSchedules.Any())">Create Course</button>
                 </div>
             </EditForm>
         </div>
     </div>
 }
 
-
-
 @code {
-    [Parameter] public bool IsVisible {get; set;}
-    [Parameter] public EventCallback OnClose {get; set;}
-    [Parameter] public EventCallback OnCourseAdded {get; set;}
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnCourseAdded { get; set; }
 
-    private Course _newCourse = new();
-    private ScheduleEntry _schedule = new() { 
-        StartTime = DateTime.Today.AddHours(8),                     // 8:00 AM
-        EndTime = DateTime.Today.AddHours(9).AddMinutes(30)   // 9:30 AM
-    };
+    private Course _newCourse = new() { Units = 3 };
     private List<Term> _availableTerms = new();
+    private List<ScheduleEntry> _tempSchedules = new();
+    private ScheduleEntry _activeEntry = new() { Day = 1, IsRepeating = true, Session = "Lecture" };
+    
+    private DateTime _uiStartTime = DateTime.Today.Date.AddHours(8);
+    private DateTime _uiEndTime = DateTime.Today.Date.AddHours(9).AddMinutes(30);
 
     protected override async Task OnParametersSetAsync()
     {
-        // This forces the popup to wait until IsVisible becomes true before it queries the database!
         if (IsVisible && !_availableTerms.Any())
         {
             _availableTerms = await TermService.GetAvailableTermsAsync();
         }
     }
 
+    private void AddScheduleToList()
+    {
+        // Add a copy to the list
+        _tempSchedules.Add(new ScheduleEntry {
+            Day = _activeEntry.Day,
+            StartTime = _uiStartTime,
+            EndTime = _uiEndTime,
+            Room = _activeEntry.Room,
+            Building = _activeEntry.Building,
+            Session = _activeEntry.Session,
+            IsRepeating = _activeEntry.IsRepeating
+        });
+
+        // Smart reset: Advance the day, but keep the Building/Room for convenience
+        if (_activeEntry.Day < 6) _activeEntry.Day++;
+    }
+
     private async Task HandleSubmit()
     {
         var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
+        if (string.IsNullOrEmpty(userId) || !_tempSchedules.Any()) return;
 
-        // Aligning perfectly with your CourseService signature
-        await CourseService.AddCourseWithScheduleAsync(
-            userId: userId, 
-            termId: _newCourse.TermID, 
-            courseCode: _newCourse.CourseCode, 
-            name: _newCourse.Name,
-            units: _newCourse.Units ?? 3,
-            scheduleEntry: _schedule
+        await CourseService.AddCourseWithSchedulesAsync(
+            userId, _newCourse.TermID, _newCourse.CourseCode, _newCourse.Name, _newCourse.Units ?? 3, _tempSchedules
         );
-        
-        // Notify parent to refresh the grid and close
+
         await OnCourseAdded.InvokeAsync();
         await Close();
-        
-        // Reset form for the next time it opens
-        _newCourse = new();
-        _schedule = new()
-        { 
-            StartTime = DateTime.Today.AddHours(8), 
-            EndTime = DateTime.Today.AddHours(9).AddMinutes(30) 
-        };
+        ResetAll();
     }
-    
-    private async Task Close() => await OnClose.InvokeAsync();
+
+    private string GetDayName(int day) => day switch {
+        1 => "Mon", 2 => "Tue", 3 => "Wed", 4 => "Thu", 5 => "Fri", 6 => "Sat", 0 => "Sun", _ => ""
+    };
+
+    private void ResetAll()
+    {
+        _newCourse = new() { Units = 3 };
+        _tempSchedules.Clear();
+        _activeEntry = new() { Day = 1, IsRepeating = true, Session = "Lecture" };
+        _uiStartTime = DateTime.Today.Date.AddHours(8);
+        _uiEndTime = DateTime.Today.Date.AddHours(9).AddMinutes(30);
+    }
+
+    private async Task Close() { ResetAll(); await OnClose.InvokeAsync(); }
 }
 
 <style>
     .modal-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(30, 41, 59, 0.5); 
-        backdrop-filter: blur(5px);       
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.6); 
+        backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        opacity: 1;
-        transition: opacity 0.3s ease;
+        overflow-y: auto;
     }
 
     .modal-card {
         background: #ffffff;
-        width: 90%;
-        max-width: 520px;
+        width: 95%;
+        max-width: 600px;
+        @* max-height: 85vh;  *@
         border-radius: 24px;
-        padding: 35px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         font-family: 'Poppins', sans-serif;
-        animation: modalSlideUp 0.4s ease-out;
+        @* overflow-y: auto;  *@
     }
 
     .modal-header {
+        padding: 24px 32px;
+        border-bottom: 1px solid #f1f5f9;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 28px;
+        overflow-y: auto;
     }
 
-    .modal-title {
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 0;
-    }
-
-    /* Form Fields */
-    .form-group {
-        margin-bottom: 22px;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 18px;
-    }
-
-    label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 8px;
-        padding-left: 2px;
-    }
-
-    input {
-        width: 100%;
-        padding: 13px 16px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.95rem;
-        font-family: 'Inter', sans-serif;
-        color: #1e293b;
-        box-sizing: border-box;
-        transition: all 0.2s ease;
-    }
-
-    input::placeholder {
-        color: #cbd5e1;
-    }
-
-    input:focus {
-        outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    .modal-body {
+        padding: 24px 32px;
+        @* FIX: ENABLE SCROLLING WITHIN THE BODY *@
+        overflow-y: auto; 
+        flex: 1;
     }
 
     .modal-footer {
+        padding: 20px 32px;
+        border-top: 1px solid #f1f5f9;
         display: flex;
         justify-content: flex-end;
-        gap: 14px;
-        margin-top: 12px;
+        gap: 12px;
+        background: #f8fafc;
     }
 
-    .btn {
-        padding: 12px 24px;
+    .divider { border: 0; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+    .section-label { font-size: 0.75rem; color: #4f46e5; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; display: block; }
+    
+    .schedule-builder-section {
+        background: #f1f5f9;
+        padding: 20px;
+        border-radius: 16px;
+    }
+
+    .checkbox-group { display: flex; align-items: center; gap: 8px; }
+    .label-inline { margin: 0 !important; color: #1e293b !important; text-transform: none !important; }
+
+    .btn-add-slot {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 10px 18px;
         border-radius: 10px;
-        font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
-        font-family: 'Poppins', sans-serif;
+        width: 100%;
     }
 
-    .btn-cancel {
+    .added-slots-container { margin-top: 20px; }
+    
+    .slot-item {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        color: #64748b;
-    }
-
-    .btn-cancel:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-    }
-
-    .btn-submit {
-        background: #4f46e5; 
-        border: none;
-        color: #ffffff;
-        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-    }
-
-    .btn-submit:hover {
-        background: #4338ca;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 10px -1px rgba(79, 70, 229, 0.3);
-    }
-
-    .hidden {
-        display: none;
-    }
-    select {
-        width: 100%;
-        padding: 13px 16px;
+        padding: 12px 16px;
         border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.95rem;
-        background: white;
-        font-family: 'Inter', sans-serif;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
     }
+
+    .slot-text small { color: #64748b; font-size: 0.75rem; }
+
+    .btn-remove-slot {
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.9rem; }
 </style>

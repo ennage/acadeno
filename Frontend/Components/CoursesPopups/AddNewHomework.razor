@@ -1,7 +1,8 @@
-@using Acadeno.Backend.Models
 @using Acadeno.Backend.Enums
+@using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
-@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Forms
+
 @inject TaskService TaskService
 @inject CourseService CourseService
 @inject UserService UserAccess
@@ -20,11 +21,13 @@
 
                 <div class="modal-body">
 
+                    @* HOMEWORK NAME *@
                     <div class="form-group">
                         <label>Homework Name</label>
                         <InputText @bind-Value="_newTask.Name" placeholder="e.g. Website Mockup Design" required />
                     </div>
 
+                    @* COURSE SELECTION *@
                     <div class="form-group">
                         <label>Course Name</label>
                         <InputSelect @bind-Value="_newTask.CourseID" required>
@@ -36,20 +39,22 @@
                         </InputSelect>
                     </div>
 
+                    @* DESCRIPTION *@
                     <div class="form-group">
                         <label>Description</label>
                         <InputTextArea @bind-Value="_newTask.Description" placeholder="Enter homework details, instructions, or notes..." />
                     </div>
 
+                    @* DATE AND TIME - FIXED: Uses InputDate to prevent reset on re-render *@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Submission Date</label>
-                            <input type="date" @bind="_uiDate" @bind:format="yyyy-MM-dd" required />
+                            <InputDate @bind-Value="_uiDate" class="form-control" required />
                         </div>
 
                         <div class="form-group">
                             <label>Submission Time</label>
-                            <input type="time" @bind="_uiTime" @bind:format="HH:mm" required />
+                            <InputDate Type="InputDateType.Time" @bind-Value="_uiTime" class="form-control" required />
                         </div>
                     </div>
                 </div>
@@ -69,20 +74,22 @@
     [Parameter] public EventCallback OnTaskAdded { get; set; }
 
     private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    
+    // We use DateTime objects for binding; InputDate handles the synchronization safely
     private DateTime _uiDate = DateTime.Today.AddDays(1);
-    private DateTime _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);
+    private DateTime _uiTime = DateTime.Today.Date.AddHours(23).AddMinutes(59);
 
     private List<Course> _availableCourses = new();
     private List<AcademicTaskType> _allTaskTypes = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (IsVisible && !_availableCourses.Any())
+        if (IsVisible)
         {
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Load courses and ALL available task type buckets
+                // Refresh data whenever the modal opens
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
                 _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
@@ -94,21 +101,22 @@
         var userId = UserAccess.CurrentUser?.UserID;
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(_newTask.CourseID)) return;
 
-        // DYNAMIC TYPE LOOKUP
-        // We find the 'Activities/Homework' bucket (DefID 2222...) that belongs to the SELECTED course.
+        // We find the specific 'Activities' category assigned to the chosen course
+        var selectedCourse = _availableCourses.FirstOrDefault(c => c.CourseID == _newTask.CourseID);
         var correctType = _allTaskTypes.FirstOrDefault(t => 
             t.DefID == "22222222-2222-2222-2222-222222222222" && 
-            _availableCourses.Any(c => c.CourseID == _newTask.CourseID)
+            t.GradeID == selectedCourse?.ActualGrade?.GradeID
         );
 
-        // Fallback: If for some reason the course is broken, we find ANY bucket for that course
-        var typeId = correctType?.TypeID ?? _allTaskTypes.FirstOrDefault(t => _availableCourses.Any(c => c.CourseID == _newTask.CourseID))?.TypeID;
+        // Fallback to the first available category for that course if Activities is missing
+        var typeId = correctType?.TypeID ?? _allTaskTypes.FirstOrDefault(t => t.GradeID == selectedCourse?.ActualGrade?.GradeID)?.TypeID;
 
         if (string.IsNullOrEmpty(typeId)) return;
 
-        // MERGE DATE/TIME
+        // DATE & TIME
         var finalDueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
 
+        // SAVE
         var success = await TaskService.SaveNewAcademicTaskAsync(
             userId,
             _newTask.CourseID,
@@ -130,10 +138,14 @@
     {
         _newTask = new() { TaskStatus = Status.Pending };
         _uiDate = DateTime.Today.AddDays(1);
-        _uiTime = DateTime.Today.AddHours(23).AddMinutes(59);
+        _uiTime = DateTime.Today.Date.AddHours(23).AddMinutes(59);
     }
 
-    private async Task Close() => await OnClose.InvokeAsync();
+    private async Task Close() 
+    {
+        ResetForm();
+        await OnClose.InvokeAsync();
+    }
 }
 
 <style>

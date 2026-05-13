@@ -49,12 +49,16 @@ namespace Acadeno.Backend.Services
         }
 
         // Standardized Schedule-based Creation
-        public async Task AddCourseWithScheduleAsync(string userId, string termId, string courseCode, string name, int units, ScheduleEntry scheduleEntry)
+        public async Task AddCourseWithSchedulesAsync(string userId, string termId, string courseCode, string name, int units, List<ScheduleEntry> schedules)
         {
+            // Use your existing logic to create the course and category buckets
             var course = await AddNewCourseAsync(userId, termId, courseCode, name, units);
 
-            scheduleEntry.CourseID = course.CourseID;
-            _db.ScheduleEntries.Add(scheduleEntry);
+            foreach (var entry in schedules)
+            {
+                entry.CourseID = course.CourseID;
+                _db.ScheduleEntries.Add(entry);
+            }
             
             await _db.SaveChangesAsync();
         }
