@@ -18,26 +18,19 @@ namespace Acadeno.Backend.Services
         #region CREATE & SAVE
 
         // Unified save method for all Academic Tasks (Exams, Quizzes, Activities, etc.)
-        public async Task<bool> SaveNewAcademicTaskAsync(string userId, string courseId, string typeId, string name, DateTime dueDate, Status status = Status.Pending)
+        // Unified save method for all Academic Tasks
+        public async Task<bool> SaveNewAcademicTaskAsync(AcademicTask newTask)
         {
-            var task = new AcademicTask
+            // Generate an ID if the UI didn't provide one
+            if (string.IsNullOrEmpty(newTask.TaskID))
             {
-                // Generates the standard 36-char ID. 
-                // Add "acade-" + if you prefer your custom prefix!
-                TaskID = Guid.NewGuid().ToString(), 
-                UserID = userId,
-                CourseID = courseId,
-                TypeID = typeId, 
-                Name = name,
-                DueDate = dueDate,
-                TaskStatus = status,
-                
-                // Defaults for the Grading Engine
-                Score = 0,
-                MaxScore = 100 
-            };
+                newTask.TaskID = Guid.NewGuid().ToString();
+            }
 
-            await _db.AcademicTasks.AddAsync(task);
+            _db.ChangeTracker.Clear();
+            
+            // Save the ENTIRE object (Description, Scores, Difficulty included!)
+            await _db.AcademicTasks.AddAsync(newTask);
             return await _db.SaveChangesAsync() > 0;
         }
 
@@ -92,12 +85,30 @@ namespace Acadeno.Backend.Services
 
         public async Task<bool> UpdateTaskAsync(BaseTask updatedTask)
         {
-            if (updatedTask == null) return false;
-            
-            // Critical for Blazor: Prevents EF from tracking two copies of the task
-            _db.ChangeTracker.Clear();
-            
-            _db.Tasks.Update(updatedTask);
+            if (updatedTask == null || string.IsNullOrEmpty(updatedTask.TaskID)) return false;
+
+            var existingTask = await _db.Tasks.FindAsync(updatedTask.TaskID);
+            if (existingTask == null) return false;
+
+            existingTask.Name = updatedTask.Name;
+            existingTask.Description = updatedTask.Description;
+            existingTask.StartDate = updatedTask.StartDate;
+            existingTask.DueDate = updatedTask.DueDate;
+            existingTask.Difficulty = updatedTask.Difficulty;
+            existingTask.RiskLevel = updatedTask.RiskLevel;
+            existingTask.TaskStatus = updatedTask.TaskStatus;
+
+            // If it's an Academic Task, safely map the academic fields!
+            if (existingTask is AcademicTask existingAcademic && updatedTask is AcademicTask updatedAcademic)
+            {
+
+                existingAcademic.CourseID = updatedAcademic.CourseID;
+                existingAcademic.TypeID = updatedAcademic.TypeID;
+                existingAcademic.TargetScore = updatedAcademic.TargetScore;
+                existingAcademic.Score = updatedAcademic.Score;
+                existingAcademic.MaxScore = updatedAcademic.MaxScore;
+            }
+
             return await _db.SaveChangesAsync() > 0;
         }
 
@@ -115,37 +126,44 @@ namespace Acadeno.Backend.Services
         #region UTILITIES
 
         // For EditReminders Popup
-        public BaseTask? CloneTask(BaseTask? original)
+        public BaseTask CloneTask(BaseTask original)
         {
-            if (original == null) return null;
-
-            if (original is AcademicTask ac)
+            // Check if it's an Academic Task first
+            if (original is AcademicTask academic)
             {
-                return new AcademicTask {
-                    TaskID = ac.TaskID,
-                    UserID = ac.UserID,
-                    Name = ac.Name,
-                    Description = ac.Description,
-                    StartDate = ac.StartDate,
-                    DueDate = ac.DueDate,
-                    TaskStatus = ac.TaskStatus,
-                    CourseID = ac.CourseID,
-                    TypeID = ac.TypeID,
-                    RiskLevel = ac.RiskLevel,
-                    Score = ac.Score,
-                    MaxScore = ac.MaxScore
+                return new AcademicTask
+                {
+                    TaskID = academic.TaskID,
+                    UserID = academic.UserID,
+                    Name = academic.Name,
+                    Description = academic.Description,
+                    StartDate = academic.StartDate,
+                    DueDate = academic.DueDate,
+                    Difficulty = academic.Difficulty,
+                    RiskLevel = academic.RiskLevel,
+                    TaskStatus = academic.TaskStatus,
+                    
+                    // THE CRITICAL MISSING PIECES:
+                    CourseID = academic.CourseID,
+                    TypeID = academic.TypeID,
+                    TargetScore = academic.TargetScore,
+                    Score = academic.Score,
+                    MaxScore = academic.MaxScore
                 };
             }
             
-            return new BaseTask {
+            // Fallback for standard tasks (Reminders, general to-dos)
+            return new BaseTask
+            {
                 TaskID = original.TaskID,
                 UserID = original.UserID,
                 Name = original.Name,
                 Description = original.Description,
                 StartDate = original.StartDate,
                 DueDate = original.DueDate,
-                TaskStatus = original.TaskStatus,
-                RiskLevel = original.RiskLevel
+                Difficulty = original.Difficulty,
+                RiskLevel = original.RiskLevel,
+                TaskStatus = original.TaskStatus
             };
         }
 

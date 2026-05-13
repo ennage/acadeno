@@ -21,13 +21,11 @@
 
                 <div class="modal-body">
 
-                    @* HOMEWORK NAME *@
                     <div class="form-group">
                         <label>Homework Name</label>
                         <InputText @bind-Value="_newTask.Name" placeholder="e.g. Website Mockup Design" required />
                     </div>
 
-                    @* COURSE SELECTION *@
                     <div class="form-group">
                         <label>Course Name</label>
                         <InputSelect @bind-Value="_newTask.CourseID" required>
@@ -39,13 +37,44 @@
                         </InputSelect>
                     </div>
 
-                    @* DESCRIPTION *@
+                    @* NEW: DIFFICULTY & RISK LEVEL *@
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Difficulty (1-10)</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" min="1" max="10" />
+                        </div>
+                        <div class="form-group">
+                            <label>Risk Level</label>
+                            <InputSelect @bind-Value="_newTask.RiskLevel">
+                                @foreach (var risk in Enum.GetValues<RiskLevel>())
+                                {
+                                    <option value="@risk">@risk.ToString().ToUpper()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    @* NEW: SCORES ROW *@
+                    <div class="score-row">
+                        <div class="form-group">
+                            <label>Target</label>
+                            <InputNumber @bind-Value="_newTask.TargetScore" />
+                        </div>
+                        <div class="form-group">
+                            <label>Score</label>
+                            <InputNumber @bind-Value="_newTask.Score" />
+                        </div>
+                        <div class="form-group">
+                            <label>Max</label>
+                            <InputNumber @bind-Value="_newTask.MaxScore" />
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label>Description</label>
                         <InputTextArea @bind-Value="_newTask.Description" placeholder="Enter homework details, instructions, or notes..." />
                     </div>
 
-                    @* DATE AND TIME - FIXED: Uses InputDate to prevent reset on re-render *@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Submission Date</label>
@@ -73,9 +102,8 @@
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback OnTaskAdded { get; set; }
 
-    private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    private AcademicTask _newTask = new() { TaskStatus = Status.Pending, Difficulty = 1, RiskLevel = RiskLevel.Stable };
     
-    // We use DateTime objects for binding; InputDate handles the synchronization safely
     private DateTime _uiDate = DateTime.Today.AddDays(1);
     private DateTime _uiTime = DateTime.Today.Date.AddHours(23).AddMinutes(59);
 
@@ -89,7 +117,6 @@
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Refresh data whenever the modal opens
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
                 _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
@@ -101,30 +128,25 @@
         var userId = UserAccess.CurrentUser?.UserID;
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(_newTask.CourseID)) return;
 
-        // We find the specific 'Activities' category assigned to the chosen course
         var selectedCourse = _availableCourses.FirstOrDefault(c => c.CourseID == _newTask.CourseID);
         var correctType = _allTaskTypes.FirstOrDefault(t => 
             t.DefID == "22222222-2222-2222-2222-222222222222" && 
             t.GradeID == selectedCourse?.ActualGrade?.GradeID
         );
 
-        // Fallback to the first available category for that course if Activities is missing
         var typeId = correctType?.TypeID ?? _allTaskTypes.FirstOrDefault(t => t.GradeID == selectedCourse?.ActualGrade?.GradeID)?.TypeID;
 
         if (string.IsNullOrEmpty(typeId)) return;
 
-        // DATE & TIME
-        var finalDueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
+        // PACK THE MISSING DATA INTO THE OBJECT BEFORE SAVING
+        _newTask.TaskID = Guid.NewGuid().ToString();
+        _newTask.UserID = userId;
+        _newTask.TypeID = typeId;
+        _newTask.DueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
+        // Note: Name, Description, Difficulty, TargetScore, Score, MaxScore, and RiskLevel are already bound!
 
-        // SAVE
-        var success = await TaskService.SaveNewAcademicTaskAsync(
-            userId,
-            _newTask.CourseID,
-            typeId,
-            _newTask.Name,
-            finalDueDate,
-            _newTask.TaskStatus
-        );
+        // Pass the WHOLE object to the service
+        var success = await TaskService.SaveNewAcademicTaskAsync(_newTask);
 
         if (success)
         {
@@ -136,7 +158,7 @@
 
     private void ResetForm()
     {
-        _newTask = new() { TaskStatus = Status.Pending };
+        _newTask = new() { TaskStatus = Status.Pending, Difficulty = 1, RiskLevel = RiskLevel.Stable };
         _uiDate = DateTime.Today.AddDays(1);
         _uiTime = DateTime.Today.Date.AddHours(23).AddMinutes(59);
     }
@@ -294,5 +316,12 @@
 
     .btn-submit:hover {
         background: #000000;
+    }
+
+    .score-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
     }
 </style>

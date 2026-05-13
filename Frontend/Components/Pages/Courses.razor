@@ -1,11 +1,19 @@
 @page "/courses"
 
-@inject Acadeno.Backend.Services.UserService UserAccess
-@inject Acadeno.Backend.Tools.AppDbContext _db
+@using Acadeno.Backend.DTOs
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
+@using Acadeno.Backend.Services
+@using Acadeno.Backend.Simulation
+@using Acadeno.Backend.Tools
 @using Acadeno.Frontend.Components.CoursesPopups
 @using Microsoft.EntityFrameworkCore
+
+@inject Acadeno.Backend.Services.TermService TermService
+@inject Acadeno.Backend.Services.UserService UserAccess
+@inject Acadeno.Backend.Simulation.GradeConverter GradeConverter
+@inject Acadeno.Backend.Simulation.GradingEngine GradingEngine
+@inject Acadeno.Backend.Tools.AppDbContext _db
 
 <div class="dashboard-root">
     <NavMenu /> 
@@ -104,7 +112,7 @@
                                 <tbody>
                                     @if (_upcomingTests != null && _upcomingTests.Any())
                                     {
-                                        @foreach (var test in _upcomingTests)
+                                        @foreach (var test in _upcomingTests.Take(3))
                                         {
                                             <tr>
                                                 <td>@test.Name</td>
@@ -135,22 +143,37 @@
                 <aside class="secondary-column">
                     <div class="gwa-card">
                         <h2 class="section-title">Academic Standing</h2>
-                        <a href="#" class="accent-link"> Calculate GWA &rsaquo;</a>
+                        <a href="calculator" class="accent-link"> Calculate GWA &rsaquo;</a>
+                        
                         <div class="gwa-display">
                             <div class="gwa-circle">
                                 <svg viewBox="0 0 36 36" class="circular-chart">
                                     <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path class="circle" stroke-dasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+
+                                    <path class="circle" 
+                                        stroke-dasharray="@($"{_standing.CirclePercentage}, 100")" 
+                                        style="stroke: @_standing.StandingColor;"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 </svg>
                                 <div class="gwa-text">
-                                    <span class="gwa-number">1.25</span>
+                                    @* DYNAMIC CUMULATIVE GWA *@
+                                    <span class="gwa-number">@_standing.CumulativeGwa.ToString("0.00")</span>
                                     <span class="gwa-label">Cumulative GWA</span>
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="gwa-stats">
-                            <div class="stat-item"><span>Current Term</span><strong>1.40</strong></div>
-                            <div class="stat-item"><span>Standing</span><strong style="color: #10b981;">Excellent</strong></div>
+                            <div class="stat-item">
+                                <span>Current Term</span>
+                                @* DYNAMIC CURRENT TERM GWA *@
+                                <strong>@_standing.CurrentTermGwa.ToString("0.00")</strong>
+                            </div>
+                            <div class="stat-item">
+                                <span>Standing</span>
+                                @* DYNAMIC TEXT & COLOR *@
+                                <strong style="color: @_standing.StandingColor;">@_standing.Standing</strong>
+                            </div>
                         </div>
                     </div>
 
@@ -274,6 +297,7 @@
     private string _debugError = string.Empty;
     private string _userId = string.Empty;
     private string _currentTermDisplay = "your current term";
+    private AcademicStandingResult _standing = new();
     
     private List<Course> _courses = new();
     private List<Course> _priorityCourses = new();
@@ -332,7 +356,6 @@
                 .Where(t => t.Type != null && 
                         (t.Type.DefID == "11111111-1111-1111-1111-111111111111" || 
                             t.Type.DefID == "33333333-3333-3333-3333-333333333333"))
-                .Take(5)
                 .ToList();
             
             // Adjust this logic depending on what you consider "Homework"
@@ -340,8 +363,19 @@
             _homeworks = allTasks
                 .Where(t => t.Type != null && 
                         (t.Type.DefID == "22222222-2222-2222-2222-222222222222"))
-                .Take(5)
                 .ToList();
+            
+            // Fetch ALL terms with every task and grade included
+            var termsForGwa = await _db.Terms
+                .Include(t => t.Courses)
+                    .ThenInclude(c => c.ActualGrade)
+                        .ThenInclude(g => g.AcademicTaskTypes)
+                            .ThenInclude(tt => tt.AcademicTasks)
+                .Where(t => t.AcademicYear.UserID == userId)
+                .ToListAsync();
+
+            // Pass those terms to the Engine
+            _standing = GradingEngine.GetOverallStanding(termsForGwa, GradeScaleType.GWA);
         }
         catch (Exception ex)
         {

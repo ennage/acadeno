@@ -1,15 +1,17 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
+@using Microsoft.AspNetCore.Components.Forms
 
-@inject CourseService CourseService
 @inject TaskService TaskService
+@inject CourseService CourseService
 @inject UserService UserAccess
 
 @if (IsVisible)
 {
     <div class="modal-overlay">
         <div class="modal-card">
+
             <div class="modal-header">
                 <h2 class="modal-title">Schedule Test Event</h2>
             </div>
@@ -18,7 +20,6 @@
                 <DataAnnotationsValidator />
 
                 <div class="modal-body">
-                    @* 1. COURSE SELECTION (The Anchor) *@
                     <div class="form-group">
                         <label>Course</label>
                         <InputSelect @bind-Value="_newTask.CourseID" @bind-Value:after="OnCourseChanged" required>
@@ -35,7 +36,45 @@
                         <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Exam" required />
                     </div>
 
-                    @* 2. RESTORED: START & END TIMES *@
+                    @* NEW: DIFFICULTY & RISK LEVEL *@
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Difficulty (1-10)</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" min="1" max="10" />
+                        </div>
+                        <div class="form-group">
+                            <label>Risk Level</label>
+                            <InputSelect @bind-Value="_newTask.RiskLevel">
+                                @foreach (var risk in Enum.GetValues<RiskLevel>())
+                                {
+                                    <option value="@risk">@risk.ToString().ToUpper()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    @* NEW: SCORES ROW *@
+                    <div class="score-row">
+                        <div class="form-group">
+                            <label>Target</label>
+                            <InputNumber @bind-Value="_newTask.TargetScore" />
+                        </div>
+                        <div class="form-group">
+                            <label>Score</label>
+                            <InputNumber @bind-Value="_newTask.Score" />
+                        </div>
+                        <div class="form-group">
+                            <label>Max</label>
+                            <InputNumber @bind-Value="_newTask.MaxScore" />
+                        </div>
+                    </div>
+
+                    @* NEW: DESCRIPTION *@
+                    <div class="form-group">
+                        <label>Description / Notes</label>
+                        <InputTextArea @bind-Value="_newTask.Description" placeholder="Topics to cover, instructions..." rows="3" />
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Starts At</label>
@@ -48,7 +87,6 @@
                     </div>
 
                     <div class="form-row">
-                        @* 3. TYPE SELECTION (Filtered by Course) *@
                         <div class="form-group">
                             <label>Test Type</label>
                             <InputSelect @bind-Value="_newTask.TypeID" required disabled="@(string.IsNullOrEmpty(_newTask.CourseID))">
@@ -61,7 +99,7 @@
                         </div>
                         <div class="form-group">
                             <label>Room</label>
-                            <input type="text" @bind="_tempRoom" placeholder="e.g. Room 402" />
+                            <InputText @bind-Value="_tempRoom" placeholder="e.g. Room 402" />
                         </div>
                     </div>
                 </div>
@@ -80,9 +118,9 @@
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback OnTaskAdded { get; set; }
 
-    private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    // Pre-loaded with defaults
+    private AcademicTask _newTask = new() { TaskStatus = Status.Pending, Difficulty = 5, RiskLevel = RiskLevel.Stable, TargetScore = 0, Score = 0, MaxScore = 100 };
     
-    // UI Variables for the session duration
     private DateTime _uiStartTime = DateTime.Today.AddDays(7).AddHours(10); 
     private DateTime _uiEndTime = DateTime.Today.AddDays(7).AddHours(12);
     private string _tempRoom = string.Empty;
@@ -97,7 +135,6 @@
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // FIX: Ensure we reload if the list is empty
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
                 _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
@@ -113,7 +150,6 @@
     private IEnumerable<AcademicTaskType> FilteredTypes => _allTaskTypes
         .Where(t => {
             var selectedCourse = _availableCourses.FirstOrDefault(c => c.CourseID == _newTask.CourseID);
-            // This now works because GetUserCoursesAsync includes the Grade object
             return selectedCourse != null && t.GradeID == selectedCourse.ActualGrade?.GradeID;
         })
         .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || 
@@ -124,35 +160,42 @@
         var userId = UserAccess.CurrentUser?.UserID;
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(_newTask.CourseID)) return;
 
-        // Apply Room to description
-        _newTask.Description = !string.IsNullOrWhiteSpace(_tempRoom) ? $"Room: {_tempRoom}" : "";
+        // Append room info to description if provided
+        if (!string.IsNullOrWhiteSpace(_tempRoom))
+        {
+            _newTask.Description = string.IsNullOrWhiteSpace(_newTask.Description) 
+                ? $"Room: {_tempRoom}" 
+                : $"{_newTask.Description}\nRoom: {_tempRoom}";
+        }
         
-        // Manual mapping for Start/End times
+        // Pack all UI logic into the object
+        _newTask.UserID = userId;
         _newTask.StartDate = _uiStartTime;
-        _newTask.DueDate = _uiEndTime; // The 'DueDate' acts as the End Time for the event
+        _newTask.DueDate = _uiEndTime; 
 
-        // Save using the comprehensive service call
-        var success = await TaskService.SaveNewAcademicTaskAsync(
-            userId, _newTask.CourseID, _newTask.TypeID, _newTask.Name, _uiEndTime
-        );
+        // Send the entire object to the updated service method
+        var success = await TaskService.SaveNewAcademicTaskAsync(_newTask);
 
         if (success)
         {
             await OnTaskAdded.InvokeAsync();
             await Close();
-            ResetForm();
         }
     }
 
     private void ResetForm()
     {
-        _newTask = new() { TaskStatus = Status.Pending };
+        _newTask = new() { TaskStatus = Status.Pending, Difficulty = 5, RiskLevel = RiskLevel.Stable, TargetScore = 0, Score = 0, MaxScore = 100 };
         _uiStartTime = DateTime.Today.AddDays(7).AddHours(10);
         _uiEndTime = DateTime.Today.AddDays(7).AddHours(12);
         _tempRoom = string.Empty;
     }
 
-    private async Task Close() => await OnClose.InvokeAsync();
+    private async Task Close() 
+    {
+        ResetForm();
+        await OnClose.InvokeAsync();
+    }
 }
 
 <style>
@@ -288,5 +331,12 @@
     .btn-submit:hover {
         background: #4338ca;
         transform: translateY(-1px);
+    }
+
+    .score-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
     }
 </style>

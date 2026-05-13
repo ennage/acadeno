@@ -25,6 +25,37 @@
                         <InputText @bind-Value="_editTask.Name" required />
                     </div>
 
+                    @* NEW: STATUS & GRADING SECTION *@
+                    <div class="row-fields">
+                        <div class="input-group">
+                            <label>Status</label>
+                            <InputSelect @bind-Value="_editTask.TaskStatus">
+                                <option value="@Status.Pending">Pending</option>
+                                <option value="@Status.Ongoing">In Progress</option>
+                                <option value="@Status.Completed">Completed</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    @* ONLY SHOW SCORES IF IT'S AN ACADEMIC TASK *@
+                    @if (_editTask is AcademicTask academicScores)
+                    {
+                        <div class="score-row">
+                            <div class="input-group">
+                                <label>Target</label>
+                                <InputNumber @bind-Value="academicScores.TargetScore" />
+                            </div>
+                            <div class="input-group">
+                                <label>Score</label>
+                                <InputNumber @bind-Value="academicScores.Score" />
+                            </div>
+                            <div class="input-group">
+                                <label>Max</label>
+                                <InputNumber @bind-Value="academicScores.MaxScore" />
+                            </div>
+                        </div>
+                    }
+
                     <div class="input-group">
                         <label>Category</label>
                         @if (_editTask is AcademicTask academic)
@@ -192,7 +223,8 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-        z-index: 10000; /* Ensure it stays above everything */
+        z-index: 10000;
+        overflow-y: auto;
     }
 
     .edit-modal {
@@ -359,4 +391,11 @@
         background: #4338ca;
         transform: translateY(-1px);
     }
+
+    .score-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 22px;
+}
 </style>

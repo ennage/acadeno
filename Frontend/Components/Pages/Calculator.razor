@@ -70,8 +70,13 @@
                                             @(category.Definition?.Name ?? category.Name)
                                         </h3>
                                     </div>
-                                    <div class="category-weight-badge">
-                                        @category.Weight% of Final Grade
+                                    <div class="category-weight-badge interactive-weight">
+                                        <input type="number" 
+                                            class="weight-input" 
+                                            @bind="category.Weight" 
+                                            @bind:after="RecalculateAll" 
+                                            min="0" max="100" />
+                                        <span>% Weight</span>
                                     </div>
                                 </div>
 
