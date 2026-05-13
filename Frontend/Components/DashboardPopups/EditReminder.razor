@@ -25,13 +25,44 @@
                         <InputText @bind-Value="_editTask.Name" required />
                     </div>
 
+                    @* NEW: STATUS & GRADING SECTION *@
+                    <div class="row-fields">
+                        <div class="input-group">
+                            <label>Status</label>
+                            <InputSelect @bind-Value="_editTask.TaskStatus">
+                                <option value="@Status.Pending">Pending</option>
+                                <option value="@Status.Ongoing">In Progress</option>
+                                <option value="@Status.Completed">Completed</option>
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    @* ONLY SHOW SCORES IF IT'S AN ACADEMIC TASK *@
+                    @if (_editTask is AcademicTask academicScores)
+                    {
+                        <div class="score-row">
+                            <div class="input-group">
+                                <label>Target</label>
+                                <InputNumber @bind-Value="academicScores.TargetScore" />
+                            </div>
+                            <div class="input-group">
+                                <label>Score</label>
+                                <InputNumber @bind-Value="academicScores.Score" />
+                            </div>
+                            <div class="input-group">
+                                <label>Max</label>
+                                <InputNumber @bind-Value="academicScores.MaxScore" />
+                            </div>
+                        </div>
+                    }
+
                     <div class="input-group">
                         <label>Category</label>
-                        @if (_editTask is AcademicTask)
+                        @if (_editTask is AcademicTask academic)
                         {
-                            <InputSelect @bind-Value="((AcademicTask)_editTask).TypeID">
+                            <InputSelect @bind-Value="academic.TypeID">
                                 <option value="" disabled>Select Type</option>
-                                @foreach (var type in _availableTypes)
+                                @foreach (var type in FilteredTypes)
                                 {
                                     <option value="@type.TypeID">@type.Name</option>
                                 }
@@ -39,7 +70,7 @@
                         }
                         else
                         {
-                            <input type="text" value="General Task (No Category)" disabled style="background: #e2e8f0; color: #94a3b8;" />
+                            <input type="text" value="General Task (No Category)" disabled class="disabled-input" />
                         }
                     </div>
 
@@ -93,27 +124,41 @@
 }
 
 @code {
-    [Parameter] public bool IsVisible {get; set;}
-    [Parameter] public BaseTask? TaskToEdit {get; set;}
-    [Parameter] public EventCallback OnClose {get; set;}
-    [Parameter] public EventCallback OnTaskUpdated {get; set;}
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public BaseTask? TaskToEdit { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnTaskUpdated { get; set; }
 
     private BaseTask? _editTask;
     private DateTime _uiDate;
     private DateTime _uiTime;
 
     private List<Course> _availableCourses = new();
-    private List<AcademicTaskType> _availableTypes = new();
+    private List<AcademicTaskType> _allTaskTypes = new();
+
+    // DYNAMIC FILTER: Only show categories (Quizzes, Exams) for the selected course
+    private IEnumerable<AcademicTaskType> FilteredTypes
+    {
+        get
+        {
+            if (_editTask is AcademicTask academicTask && !string.IsNullOrEmpty(academicTask.CourseID))
+            {
+                return _allTaskTypes.Where(t => t.GradeID == _availableCourses
+                    .FirstOrDefault(c => c.CourseID == academicTask.CourseID)?.ActualGrade?.GradeID);
+            }
+            return Enumerable.Empty<AcademicTaskType>();
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         if (IsVisible && TaskToEdit != null)
         {
-            // THE FIX: Only clone the data if we are opening a NEW task, 
-            // or if the popup was just opened (meaning _editTask is null)!
+            // Only re-clone if the TaskID changed (prevents losing unsaved changes during re-renders)
             if (_editTask == null || _editTask.TaskID != TaskToEdit.TaskID)
             {
                 _editTask = TaskService.CloneTask(TaskToEdit);
+                
                 if (_editTask != null)
                 {
                     _uiDate = _editTask.DueDate.Date;
@@ -121,10 +166,11 @@
                 }
 
                 var userId = UserAccess.CurrentUser?.UserID;
-                if (!string.IsNullOrEmpty(userId) && !_availableCourses.Any())
+                if (!string.IsNullOrEmpty(userId))
                 {
+                    // Load the lists needed for the dropdowns
                     _availableCourses = await CourseService.GetUserCoursesAsync(userId);
-                    _availableTypes = await TaskService.GetTaskTypesAsync();
+                    _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
                 }
             }
         }
@@ -134,31 +180,35 @@
     {
         if (_editTask == null) return;
 
-        // Re-merge the Date and Time safely
+        // Merge the UI Date and Time back into the object
         _editTask.DueDate = _uiDate.Date.Add(_uiTime.TimeOfDay);
 
-        // Update the database
-        await TaskService.UpdateTaskAsync(_editTask);
+        // Update database
+        var success = await TaskService.UpdateTaskAsync(_editTask);
         
-        await OnTaskUpdated.InvokeAsync();
-        await Close();
+        if (success)
+        {
+            await OnTaskUpdated.InvokeAsync();
+            await Close();
+        }
     }
 
     private async Task HandleDelete()
     {
         if (_editTask != null && !string.IsNullOrEmpty(_editTask.TaskID))
         {
-            await TaskService.DeleteTaskAsync(_editTask.TaskID);
-            await OnTaskUpdated.InvokeAsync();
-            await Close();
+            var success = await TaskService.DeleteTaskAsync(_editTask.TaskID);
+            if (success)
+            {
+                await OnTaskUpdated.InvokeAsync();
+                await Close();
+            }
         }
     }
 
     private async Task Close() 
     {
-        // THE SECOND FIX: Set this to null when closing so the popup 
-        // knows to grab fresh data the next time you open it!
-        _editTask = null; 
+        _editTask = null; // Clear memory for the next open
         await OnClose.InvokeAsync();
     }
 }
@@ -173,7 +223,8 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
-        z-index: 10000; /* Ensure it stays above everything */
+        z-index: 10000;
+        overflow-y: auto;
     }
 
     .edit-modal {
@@ -340,4 +391,11 @@
         background: #4338ca;
         transform: translateY(-1px);
     }
+
+    .score-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 22px;
+}
 </style>

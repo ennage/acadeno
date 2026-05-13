@@ -383,3 +383,40 @@ input:focus, select:focus {
     .test-item { grid-template-columns: 1fr; }
     .injector-box { flex-direction: column; }
 }
+
+.interactive-weight {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #eef2ff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid #c7d2fe;
+}
+
+.weight-input {
+    width: 45px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed #4f46e5; /* Subtle underline to show it's editable */
+    color: #4f46e5;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0;
+    outline: none;
+    font-family: inherit;
+}
+
+.weight-input:focus {
+    border-bottom: 1px solid #4f46e5;
+    background: #ffffff;
+    border-radius: 4px;
+}
+
+.interactive-weight span {
+    color: #4f46e5;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}

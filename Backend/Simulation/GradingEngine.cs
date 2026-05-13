@@ -96,9 +96,57 @@ namespace Acadeno.Backend.Simulation
 
             return totalUnits == 0 ? 0 : Math.Round(totalQualityPoints / totalUnits, 2);
         }
+
+        public AcademicStandingResult GetOverallStanding(List<Term> terms, GradeScaleType scale)
+        {
+            var result = new AcademicStandingResult();
+            if (terms == null || !terms.Any()) return result;
+
+            double totalQualityPoints = 0;
+            double totalUnits = 0;
+            
+            // Calculate Cumulative Stats
+            foreach (var term in terms)
+            {
+                var activeCourses = term.Courses?.Where(c => c.ActualGrade != null && (c.Units ?? 0) > 0).ToList();
+                if (activeCourses == null) continue;
+
+                foreach (var course in activeCourses)
+                {
+                    var courseResult = CalculateCourseGrade(course.ActualGrade, scale);
+                    double gradePoint = _converter.GetNumericalGradePoint(courseResult.RunningPercentage, scale);
+                    
+                    totalQualityPoints += (gradePoint * (course.Units ?? 0));
+                    totalUnits += (course.Units ?? 0);
+                }
+            }
+
+            // Set Cumulative Values
+            result.CumulativeGwa = totalUnits > 0 ? Math.Round(totalQualityPoints / totalUnits, 2) : 0;
+            
+            // Get Current Term (Assuming last term is current)
+            var latestTerm = terms.LastOrDefault();
+            if (latestTerm != null)
+            {
+                result.CurrentTermGwa = CalculateTermGradePoints(latestTerm, scale);
+            }
+
+            // Map Standing & UI Helpers
+            (result.Standing, result.StandingColor) = DetermineStanding(result.CumulativeGwa);
+            
+            // Circle Percentage Logic: (Max - Actual) / (Max - Min) * 100
+            // Assuming 1.0 is the best and 3.0 is the passing limit
+            result.CirclePercentage = Math.Clamp(((3.0 - result.CumulativeGwa) / (3.0 - 1.0)) * 100, 0, 100);
+
+            return result;
+        }
+
+        private (string, string) DetermineStanding(double gwa)
+        {
+            if (gwa <= 0 || gwa > 3.0) return ("Incomplete", "#94a3b8");
+            if (gwa <= 1.25) return ("Excellent", "#10b981");
+            if (gwa <= 1.75) return ("Very Good", "#3b82f6");
+            return ("Satisfactory", "#f59e0b");
+        }
     }
-
-    
-
-    
 }

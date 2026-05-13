@@ -11,35 +11,41 @@
                     <h1>All Homeworks</h1>
                     <p>Track all assignments, projects, and pending activities.</p>
                 </div>
-                </div>
+            </div>
 
             <div class="window-body">
-                <div class="homework-grid">
+                <div class="homework-list">
                     @if (Tasks != null && Tasks.Any())
                     {
                         @foreach (var hw in Tasks)
                         {
-                            <div class="homework-card">
-                                <div class="side-line @GetColorClass(Tasks.IndexOf(hw))"></div>
-                                
-                                <div class="card-content">
-                                    <div class="card-header">
-                                        <div>
-                                            <h3 class="homework-title">@hw.Name</h3>
-                                            <p class="subject-name">@(hw.Course?.Name ?? "Unassigned")</p>
-                                        </div>
-                                        <span class="status-badge @GetStatusBadgeClass(hw)">
-                                            @(IsOverdue(hw) ? "Overdue" : hw.TaskStatus.ToString())
-                                        </span>
+                            <div class="homework-list-item">
+                                @* LEFT: Course & Title *@
+                                <div class="list-item-left">
+                                    <div class="side-line @GetColorClass(Tasks.IndexOf(hw))"></div>
+                                    <div class="info-group">
+                                        <h3 class="homework-title">@hw.Name</h3>
+                                        <p class="subject-name">@(hw.Course?.Name ?? "Unassigned")</p>
                                     </div>
+                                </div>
 
+                                @* MIDDLE: Description Snippet *@
+                                <div class="list-item-middle">
                                     <p class="homework-description">
                                         @(string.IsNullOrWhiteSpace(hw.Description) ? "No description provided." : hw.Description)
                                     </p>
+                                </div>
 
-                                    <div class="card-footer">
+                                @* RIGHT: Deadlines & Status *@
+                                <div class="list-item-right">
+                                    <div class="datetime-group">
                                         <span class="due-date">🕒 @GetDueText(hw.DueDate)</span>
                                         <span class="deadline-tag">@hw.DueDate.ToString("h:mm tt")</span>
+                                    </div>
+                                    <div class="status-wrapper">
+                                        <span class="status-badge @GetStatusBadgeClass(hw)">
+                                            @(IsOverdue(hw) ? "Overdue" : hw.TaskStatus.ToString())
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -47,7 +53,7 @@
                     }
                     else
                     {
-                        <div style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 40px;">
+                        <div class="empty-state">
                             <p>You have no pending homework. Great job!</p>
                         </div>
                     }
@@ -73,7 +79,6 @@
     [Parameter] public List<AcademicTask> Tasks { get; set; } = new();
     [Parameter] public EventCallback OnClose { get; set; }
 
-    // Helpers for visual styling
     private string GetColorClass(int index)
     {
         string[] colors = { "red", "orange", "blue", "green", "purple", "pink" };
@@ -93,12 +98,11 @@
         return task.TaskStatus switch
         {
             Status.Completed => "completed",
-            Status.Ongoing => "ongoing", // I added CSS for this below to match the tests popup
+            Status.Ongoing => "ongoing", 
             _ => "pending" 
         };
     }
 
-    // Dynamic Due Date Text (e.g., "Due in 2 days", "Due today")
     private string GetDueText(DateTime dueDate)
     {
         var span = dueDate.Date - DateTime.Now.Date;
@@ -114,7 +118,7 @@
 }
 
 <style>
-    /* OVERLAY */
+    /* OVERLAY & WINDOW */
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -127,7 +131,6 @@
         z-index: 1000;
     }
 
-    /* WINDOW */
     .homework-window {
         width: 1150px;
         height: 720px;
@@ -172,56 +175,44 @@
         background: #f8fafc;
     }
 
-    /* GRID */
-    .homework-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 22px;
-    }
-
-    /* CARD */
-    .homework-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        padding: 20px;
-        display: flex;
-        gap: 18px;
-        transition: 0.25s ease;
-    }
-
-    .homework-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(15,23,42,0.08);
-    }
-
-    /* SIDE INDICATOR */
-    .side-line {
-        width: 5px;
-        border-radius: 20px;
-        flex-shrink: 0; /* Prevents line from squishing */
-    }
-
-    .red { background: #ef4444; }
-    .orange { background: #f97316; }
-    .blue { background: #3b82f6; }
-    .green { background: #10b981; }
-    .purple { background: #8b5cf6; }
-    .pink { background: #ec4899; }
-
-    /* CONTENT */
-    .card-content {
-        flex: 1;
+    /* THE NEW LIST LAYOUT */
+    .homework-list {
         display: flex;
         flex-direction: column;
+        gap: 16px;
     }
 
-    .card-header {
+    .homework-list-item {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px 24px;
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 10px;
-        gap: 10px;
+        align-items: center;
+        gap: 24px;
+        transition: 0.2s ease;
+    }
+
+    .homework-list-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15,23,42,0.06);
+        border-color: #cbd5e1;
+    }
+
+    /* LEFT: Title & Identity */
+    .list-item-left {
+        display: flex;
+        align-items: stretch;
+        gap: 16px;
+        flex: 1;
+        min-width: 250px;
+        max-width: 300px;
+    }
+
+    .info-group {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .homework-title {
@@ -235,25 +226,44 @@
     .subject-name {
         font-size: 0.8rem;
         color: #94a3b8;
-        margin-top: 3px;
+        margin: 4px 0 0 0;
     }
 
-    /* DESCRIPTION */
+    /* MIDDLE: Description */
+    .list-item-middle {
+        flex: 2;
+        padding: 0 20px;
+        border-left: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+    }
+
     .homework-description {
-        font-size: 0.83rem;
+        font-size: 0.85rem;
         color: #64748b;
-        line-height: 1.6;
-        margin-bottom: 18px;
+        margin: 0;
+        line-height: 1.5;
+        /* Line Clamp limits the text to 2 lines so the list stays uniform */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
-    /* CARD FOOTER */
-    .card-footer {
-        margin-top: auto;
+    /* RIGHT: Meta info */
+    .list-item-right {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        border-top: 1px dashed #e2e8f0;
-        padding-top: 14px;
+        gap: 24px;
+        flex-shrink: 0;
+        width: 280px;
+        justify-content: flex-end;
+    }
+
+    .datetime-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
     }
 
     .due-date {
@@ -265,18 +275,37 @@
     .deadline-tag {
         background: #eef2ff;
         color: #4f46e5;
-        padding: 5px 10px;
+        padding: 4px 10px;
         border-radius: 8px;
         font-size: 0.72rem;
         font-weight: 700;
     }
 
-    /* STATUS BADGES */
+    .status-wrapper {
+        width: 100px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* SHARED STYLES */
+    .side-line {
+        width: 4px;
+        border-radius: 20px;
+        flex-shrink: 0;
+    }
+
+    .red { background: #ef4444; }
+    .orange { background: #f97316; }
+    .blue { background: #3b82f6; }
+    .green { background: #10b981; }
+    .purple { background: #8b5cf6; }
+    .pink { background: #ec4899; }
+
     .status-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 5px 12px;
+        padding: 6px 14px;
         border-radius: 999px;
         font-size: 0.72rem;
         font-weight: 700;
@@ -285,11 +314,17 @@
     }
 
     .pending { background: #fef3c7; color: #b45309; }
-    .ongoing { background: #dbeafe; color: #1d4ed8; } /* Added Ongoing for consistency */
+    .ongoing { background: #dbeafe; color: #1d4ed8; }
     .completed { background: #dcfce7; color: #15803d; }
     .overdue { background: #fee2e2; color: #b91c1c; }
 
-    /* WINDOW FOOTER */
+    .empty-state {
+        text-align: center; 
+        color: #64748b; 
+        padding: 60px 20px;
+    }
+
+    /* FOOTER */
     .window-footer {
         padding: 18px 30px;
         border-top: 1px solid #eef2f7;
@@ -299,15 +334,7 @@
         align-items: center;
     }
 
-    .footer-text {
-        font-size: 0.82rem;
-        color: #64748b;
-    }
-
-    .footer-buttons {
-        display: flex;
-        gap: 12px;
-    }
+    .footer-text { font-size: 0.82rem; color: #64748b; }
 
     .btn {
         padding: 11px 18px;
@@ -319,13 +346,6 @@
         transition: 0.2s ease;
     }
 
-    .btn-secondary {
-        background: #4f46e5;
-        color: #fff;
-    }
-
-    .btn-secondary:hover {
-        background: #4338ca;
-        transform: translateY(-1px);
-    }
+    .btn-secondary { background: #4f46e5; color: #fff; }
+    .btn-secondary:hover { background: #4338ca; transform: translateY(-1px); }
 </style>

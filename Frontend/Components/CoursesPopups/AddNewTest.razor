@@ -1,32 +1,29 @@
 @using Acadeno.Backend.Enums
 @using Acadeno.Backend.Models
 @using Acadeno.Backend.Services
+@using Microsoft.AspNetCore.Components.Forms
 
-@inject CourseService CourseService
 @inject TaskService TaskService
+@inject CourseService CourseService
 @inject UserService UserAccess
 
 @if (IsVisible)
 {
-    <div class="modal-overlay" id="testModalOverlay">
+    <div class="modal-overlay">
         <div class="modal-card">
 
             <div class="modal-header">
-                <h2 class="modal-title">Add New Test</h2>
+                <h2 class="modal-title">Schedule Test Event</h2>
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator />
+
                 <div class="modal-body">
-
-                    <div class="form-group">
-                        <label>Exam Name</label>
-                        <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Examination" required />
-                    </div>
-
                     <div class="form-group">
                         <label>Course</label>
-                        <InputSelect @bind-Value="_newTask.CourseID" required>
-                            <option value="" disabled selected>Select a course</option>
+                        <InputSelect @bind-Value="_newTask.CourseID" @bind-Value:after="OnCourseChanged" required>
+                            <option value="" disabled selected>-- Select Course --</option>
                             @foreach (var course in _availableCourses)
                             {
                                 <option value="@course.CourseID">@course.Name (@course.CourseCode)</option>
@@ -34,45 +31,82 @@
                         </InputSelect>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Schedule</label>
-                            <input type="datetime-local" @bind="_uiDueDate" @bind:format="yyyy-MM-ddTHH:mm" required />
-                        </div>
-
-                        <div class="form-group">
-                            <label>Room</label>
-                            <input type="text" @bind="_tempRoom" placeholder="e.g. Lab 3" />
-                        </div>
+                    <div class="form-group">
+                        <label>Test Name</label>
+                        <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Exam" required />
                     </div>
 
+                    @* NEW: DIFFICULTY & RISK LEVEL *@
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Status</label>
-                            <InputSelect @bind-Value="_newTask.TaskStatus" required>
-                                <option value="@Status.Pending">Pending</option>
-                                <option value="@Status.Ongoing">In Progress</option>
-                                <option value="@Status.Completed">Completed</option>
-                            </InputSelect>
+                            <label>Difficulty (1-10)</label>
+                            <InputNumber @bind-Value="_newTask.Difficulty" min="1" max="10" />
                         </div>
-
                         <div class="form-group">
-                            <label>Type</label>
-                            <InputSelect @bind-Value="_newTask.TypeID" required>
-                                <option value="" disabled selected>Select Type</option>
-                                @foreach (var type in _availableTypes)
+                            <label>Risk Level</label>
+                            <InputSelect @bind-Value="_newTask.RiskLevel">
+                                @foreach (var risk in Enum.GetValues<RiskLevel>())
                                 {
-                                    <option value="@type.TypeID">@type.Name</option>
+                                    <option value="@risk">@risk.ToString().ToUpper()</option>
                                 }
                             </InputSelect>
                         </div>
                     </div>
 
+                    @* NEW: SCORES ROW *@
+                    <div class="score-row">
+                        <div class="form-group">
+                            <label>Target</label>
+                            <InputNumber @bind-Value="_newTask.TargetScore" />
+                        </div>
+                        <div class="form-group">
+                            <label>Score</label>
+                            <InputNumber @bind-Value="_newTask.Score" />
+                        </div>
+                        <div class="form-group">
+                            <label>Max</label>
+                            <InputNumber @bind-Value="_newTask.MaxScore" />
+                        </div>
+                    </div>
+
+                    @* NEW: DESCRIPTION *@
+                    <div class="form-group">
+                        <label>Description / Notes</label>
+                        <InputTextArea @bind-Value="_newTask.Description" placeholder="Topics to cover, instructions..." rows="3" />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Starts At</label>
+                            <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_uiStartTime" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Ends At</label>
+                            <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_uiEndTime" required />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Test Type</label>
+                            <InputSelect @bind-Value="_newTask.TypeID" required disabled="@(string.IsNullOrEmpty(_newTask.CourseID))">
+                                <option value="" disabled selected>Select Type</option>
+                                @foreach (var type in FilteredTypes)
+                                {
+                                    <option value="@type.TypeID">@type.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label>Room</label>
+                            <InputText @bind-Value="_tempRoom" placeholder="e.g. Room 402" />
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" @onclick="Close">Cancel</button>
-                    <button type="submit" class="btn btn-submit">Schedule Test</button>
+                    <button type="submit" class="btn btn-submit">Save Test Event</button>
                 </div>
             </EditForm>
         </div>
@@ -84,64 +118,84 @@
     [Parameter] public EventCallback OnClose { get; set; }
     [Parameter] public EventCallback OnTaskAdded { get; set; }
 
-    private AcademicTask _newTask = new() { TaskStatus = Status.Pending };
+    // Pre-loaded with defaults
+    private AcademicTask _newTask = new() { TaskStatus = Status.Pending, Difficulty = 5, RiskLevel = RiskLevel.Stable, TargetScore = 0, Score = 0, MaxScore = 100 };
     
-    // UI-specific variables to prevent binding crashes
-    private DateTime _uiDueDate = DateTime.Today.AddDays(7).AddHours(10); 
+    private DateTime _uiStartTime = DateTime.Today.AddDays(7).AddHours(10); 
+    private DateTime _uiEndTime = DateTime.Today.AddDays(7).AddHours(12);
     private string _tempRoom = string.Empty;
     
     private List<Course> _availableCourses = new();
-    private List<AcademicTaskType> _availableTypes = new();
+    private List<AcademicTaskType> _allTaskTypes = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        if (IsVisible && !_availableCourses.Any())
+        if (IsVisible)
         {
             var userId = UserAccess.CurrentUser?.UserID;
             if (!string.IsNullOrEmpty(userId))
             {
-                // Fetch courses via CourseService
                 _availableCourses = await CourseService.GetUserCoursesAsync(userId);
-                
-                // Fetch task types via TaskService
-                var allTypes = await TaskService.GetTaskTypesAsync();
-                _availableTypes = allTypes
-                    .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || 
-                                t.DefID == "33333333-3333-3333-3333-333333333333")
-                    .ToList();
+                _allTaskTypes = await TaskService.GetAvailableTaskTypesAsync();
             }
         }
     }
 
+    private void OnCourseChanged()
+    {
+        _newTask.TypeID = string.Empty;
+        StateHasChanged();
+    }
+
+    private IEnumerable<AcademicTaskType> FilteredTypes => _allTaskTypes
+        .Where(t => {
+            var selectedCourse = _availableCourses.FirstOrDefault(c => c.CourseID == _newTask.CourseID);
+            return selectedCourse != null && t.GradeID == selectedCourse.ActualGrade?.GradeID;
+        })
+        .Where(t => t.DefID == "11111111-1111-1111-1111-111111111111" || 
+                    t.DefID == "33333333-3333-3333-3333-333333333333");
+
     private async Task HandleSubmit()
     {
         var userId = UserAccess.CurrentUser?.UserID;
-        if (string.IsNullOrEmpty(userId)) return;
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(_newTask.CourseID)) return;
 
-        // Map the safe UI date over to the actual object
-        _newTask.DueDate = _uiDueDate;
-        
-        _newTask.TaskID = Guid.NewGuid().ToString();
-        _newTask.UserID = userId;
-        _newTask.StartDate = DateTime.Now;
-
+        // Append room info to description if provided
         if (!string.IsNullOrWhiteSpace(_tempRoom))
         {
-            _newTask.Description = $"Location/Room: {_tempRoom}";
+            _newTask.Description = string.IsNullOrWhiteSpace(_newTask.Description) 
+                ? $"Room: {_tempRoom}" 
+                : $"{_newTask.Description}\nRoom: {_tempRoom}";
         }
+        
+        // Pack all UI logic into the object
+        _newTask.UserID = userId;
+        _newTask.StartDate = _uiStartTime;
+        _newTask.DueDate = _uiEndTime; 
 
-        await TaskService.SaveNewTaskAsync(_newTask);
+        // Send the entire object to the updated service method
+        var success = await TaskService.SaveNewAcademicTaskAsync(_newTask);
 
-        await OnTaskAdded.InvokeAsync();
-        await Close();
+        if (success)
+        {
+            await OnTaskAdded.InvokeAsync();
+            await Close();
+        }
+    }
 
-        // Reset the form safely
-        _newTask = new() { TaskStatus = Status.Pending };
-        _uiDueDate = DateTime.Today.AddDays(7).AddHours(10);
+    private void ResetForm()
+    {
+        _newTask = new() { TaskStatus = Status.Pending, Difficulty = 5, RiskLevel = RiskLevel.Stable, TargetScore = 0, Score = 0, MaxScore = 100 };
+        _uiStartTime = DateTime.Today.AddDays(7).AddHours(10);
+        _uiEndTime = DateTime.Today.AddDays(7).AddHours(12);
         _tempRoom = string.Empty;
     }
 
-    private async Task Close() => await OnClose.InvokeAsync();
+    private async Task Close() 
+    {
+        ResetForm();
+        await OnClose.InvokeAsync();
+    }
 }
 
 <style>
@@ -277,5 +331,12 @@
     .btn-submit:hover {
         background: #4338ca;
         transform: translateY(-1px);
+    }
+
+    .score-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
     }
 </style>
