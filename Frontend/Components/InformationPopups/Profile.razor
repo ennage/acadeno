@@ -1,221 +1,438 @@
+@page "/profile"
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        
-        body { 
-            background-color: #f1f5f9; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
+@using Acadeno.Backend.Services
+@inject NavigationManager NavManager
+@inject UserService UserService
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .profile-page {
+        min-height: 100vh;
+        background: #eef2f7;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #08142f, #0f1f4b);
+        padding: 28px 34px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .profile-header h1 {
+        font-size: 1.7rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .profile-header p {
+        opacity: 0.75;
+        font-size: 0.9rem;
+    }
+
+    .profile-status {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 10px 16px;
+        border-radius: 14px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #38bdf8;
+    }
+
+    .profile-body {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 24px;
+        padding: 28px;
+        background: #f8fafc;
+    }
+
+    .sidebar-card {
+        background: linear-gradient(180deg, #0b1739, #111c44);
+        border-radius: 24px;
+        padding: 28px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sidebar-card::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 140px;
+        height: 140px;
+        background: rgba(56, 189, 248, 0.08);
+        border-radius: 50%;
+    }
+
+    .sidebar-card h2 {
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+
+    .course-badge {
+        margin-top: 8px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .course-badge span {
+        background: rgba(56, 189, 248, 0.14);
+        color: #38bdf8;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .stats-group {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-row span {
+        font-size: 0.78rem;
+        opacity: 0.65;
+    }
+
+    .stat-row strong {
+        font-size: 0.82rem;
+    }
+
+    .content-panel {
+        background: white;
+        border-radius: 24px;
+        padding: 28px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .section-title {
+        font-size: 0.82rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: 0.08em;
+        margin-bottom: 22px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .field-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .field-group.full-width {
+        grid-column: span 2;
+    }
+
+    .field-group label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .field-group input {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid #dbe3ef;
+        padding: 14px 16px;
+        background: #f8fafc;
+        color: #0f172a;
+        font-size: 0.9rem;
+        transition: 0.2s ease;
+    }
+
+    .field-group input:focus {
+        outline: none;
+    }
+
+    .field-group input:disabled {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .field-group input:not(:disabled) {
+        background: white;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+    }
+
+    .profile-footer {
+        padding: 22px 28px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 14px;
+        border-top: 1px solid #e2e8f0;
+        background: white;
+    }
+
+    .btn {
+        border: none;
+        border-radius: 14px;
+        padding: 13px 22px;
+        font-size: 0.84rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-back {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .btn-back:hover {
+        background: #cbd5e1;
+    }
+
+    .btn-edit {
+        background: #08142f;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #122452;
+    }
+
+    .btn-save {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-save:hover {
+        background: #059669;
+    }
+
+    @@media(max-width: 900px) {
+
+        .profile-body {
+            grid-template-columns: 1fr;
         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(11, 23, 57, 0.4);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
+        .form-grid {
+            grid-template-columns: 1fr;
         }
 
-        .modal-window {
-            width: 100%;
-            max-width: 900px;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            display: flex;
+        .field-group.full-width {
+            grid-column: span 1;
+        }
+
+        .profile-header {
             flex-direction: column;
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 15px 25px;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-content h1 { font-size: 1.4rem; font-weight: 800; color: #0b1739; }
-        .header-content p { font-size: 0.8rem; color: #64748b; }
-
-        .modal-body {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 20px;
-            padding: 20px 25px;
-            background: #fcfdfe;
-        }
-
-        /* Identity Sidebar */
-        .identity-card {
-            background: #0b1739;
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            height: fit-content;
-        }
-
-        .identity-card h2 { font-size: 1.1rem; font-weight: 700; }
-        .role-badge { color: #38bdf8; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-
-        .info-stack {
-            margin-top: 15px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .info-row { display: flex; justify-content: space-between; font-size: 0.7rem; }
-        .info-row span { opacity: 0.6; }
-
-        /* Form Content */
-        .section-box h3 {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #0b1739;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .field label { font-size: 0.65rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        
-        .field input {
-            width: 100%;
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            font-size: 0.8rem;
-            color: #0b1739;
-            transition: all 0.2s;
-        }
-
-        /* Active Edit State */
-        .field input:not(:disabled) {
-            background: #fff;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
-        }
-
-        .field input:disabled { background: #f1f5f9; color: #64748b; border-color: transparent; }
-
-        .modal-footer {
-            padding: 12px 25px;
-            background: #fff;
-            border-top: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        /* Button Styling */
-        .btn { 
-            padding: 8px 18px; 
-            border-radius: 8px; 
-            font-weight: 700; 
-            font-size: 0.8rem; 
-            cursor: pointer; 
-            border: none; 
-            transition: 0.2s;
-        }
-        
-        .btn-edit { background: #0b1739; color: #fff; }
-        .btn-save { background: #10b981; color: #fff; } /* Green for Save */
-        
-        .btn-cancel { background: #f1f5f9; color: #64748b; }
-
-        /*media (max-width: 700px) {
-            .modal-body { grid-template-columns: 1fr; }
-        }*/
-    </style>
-<body>
-
-<div class="modal-overlay">
-    <div class="modal-window">
-        <header class="modal-header">
-            <div class="header-content">
-                <h1>Account Settings</h1>
-                <p>Manage your profile and academic preferences</p>
-            </div>
-        </header>
-
-        <div class="modal-body">
-            <aside class="identity-pane">
-                <div class="identity-card">
-                    <h2>Lance Buenviaje</h2>
-                    <span class="role-badge">Computer Science Student</span>
-                    
-                    <div class="info-stack">
-                        <div class="info-row"><span>Status</span><strong>Enrolled</strong></div>
-                        <div class="info-row"><span>Member Since</span><strong>Aug 2023</strong></div>
-                        <div class="info-row"><span>University</span><strong>Batangas State</strong></div>
-                    </div>
-                </div>
-            </aside>
-
-            <main class="data-pane">
-                <section class="section-box">
-                    <h3>PERSONAL INFORMATION</h3>
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Full Name</label>
-                            <input type="text" value="Lance Buenviaje" class="profile-input" disabled>
-                        </div>
-                        <div class="field">
-                            <label>Student ID</label>
-                            <input type="text" value="2026-10293-BS" class="profile-input" disabled>
-                        </div>
-                        <div class="field">
-                            <label>Email Address</label>
-                            <input type="email" value="lance.buenviaje@example.com" class="profile-input" disabled>
-                        </div>
-                        <div class="field">
-                            <label>Password</label>
-                            <input type="password" value="********" class="profile-input" disabled>
-                        </div>
-                    </div>
-                </section>
-            </main>
-        </div>
-
-        <footer class="modal-footer">
-            <button class="btn btn-cancel">Close</button>
-            <button class="btn btn-edit" id="toggleBtn" onclick="handleEditToggle()">Edit Profile</button>
-        </footer>
-    </div>
-</div>
-
-<script>
-    let isEditing = false;
-
-    function handleEditToggle() {
-        const btn = document.getElementById('toggleBtn');
-        const inputs = document.querySelectorAll('.profile-input');
-        
-        isEditing = !isEditing;
-
-        if (isEditing) {
-            // Switch to Editing Mode
-            inputs.forEach(input => input.disabled = false);
-            btn.textContent = "Save Changes";
-            btn.className = "btn btn-save";
-        } else {
-            // Switch back to View Mode
-            inputs.forEach(input => input.disabled = true);
-            btn.textContent = "Edit Profile";
-            btn.className = "btn btn-edit";
-            alert("Changes saved successfully!");
+            align-items: flex-start;
+            gap: 16px;
         }
     }
-</script>
 
-</body>
+</style>
+
+<div class="profile-page">
+
+    <div class="profile-container">
+
+        <div class="profile-header">
+
+            <div>
+                <h1>Account Settings</h1>
+                <p>Manage your academic profile and personal information</p>
+            </div>
+
+            <div class="profile-status">
+                ACTIVE STUDENT
+            </div>
+
+        </div>
+
+        <div class="profile-body">
+
+            <aside class="sidebar-card">
+
+                <h2>@FullName</h2>
+
+                <div class="course-badge">
+                    <span>@Program</span>
+                </div>
+
+                <div class="stats-group">
+
+                    <div class="stat-row">
+                        <span>Status</span>
+                        <strong>Enrolled</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Academic Year</span>
+                        <strong>2025 - 2026</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Portal</span>
+                        <strong>ACADEÑO</strong>
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <main class="content-panel">
+
+                <div class="section-title">
+                    PERSONAL INFORMATION
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="field-group">
+                        <label>Full Name</label>
+
+                        <input type="text"
+                               @bind="FullName"
+                               disabled="@(!isEditing)" />
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email Address</label>
+
+                        <input type="email"
+                            @bind="Email"
+                            disabled="@(!isEditing)" />
+                    </div>
+
+                    <div class="field-group">
+                        <label>University</label>
+
+                        <input type="text"
+                            @bind="University"
+                            disabled />
+                    </div>
+
+                    <div class="field-group">
+                        <label>Program</label>
+
+                        <input type="text"
+                            @bind="Program"
+                            disabled />
+                    </div>
+
+                    <div class="field-group full-width">
+                        <label>Password</label>
+
+                        <input type="password"
+                            @bind="Password"
+                            disabled="@(!isEditing)" />
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+        <div class="profile-footer">
+
+            <button class="btn btn-back"
+                    @onclick="CloseProfile">
+                Back to Dashboard
+            </button>
+
+            <button class="btn @(isEditing ? "btn-save" : "btn-edit")"
+                    @onclick="ToggleEdit">
+
+                @(isEditing ? "Save Changes" : "Edit Profile")
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private bool isEditing = false;
+
+    private string FullName = "";
+    private string StudentId = "";
+    private string Email = "";
+    private string Program = "";
+    private string Password = "********";
+    private string University = "";
+
+    protected override void OnInitialized()
+    {
+        if (UserService.CurrentUser != null)
+        {
+            FullName = UserService.CurrentUser.Name ?? "Unknown User";
+            Email = UserService.CurrentUser.Email ?? "No Email";
+            Program = UserService.CurrentUser.Program ?? "No Program";
+
+            University = "Batangas State University"; // or from DB if available
+            StudentId = UserService.CurrentUser.UserID.ToString();
+        }
+    }
+
+    private void ToggleEdit()
+    {
+        if (isEditing)
+        {
+            SaveChanges();
+        }
+
+        isEditing = !isEditing;
+    }
+
+    private void SaveChanges()
+    {
+        if (UserService.CurrentUser != null)
+        {
+            UserService.CurrentUser.Name = FullName;
+            UserService.CurrentUser.Email = Email;
+
+            // DATABASE SAVE HERE IF NEEDED
+        }
+    }
+
+    private void CloseProfile()
+    {
+        NavManager.NavigateTo("/dashboard");
+    }
+
+}

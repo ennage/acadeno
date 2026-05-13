@@ -10,13 +10,13 @@
     padding-right: 0;
     padding-bottom: 5px;
     flex-direction: column;
+    position: relative;
+    z-index: 1000;
 }
 
 .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
+    position: relative;
+    z-index: 1;
 }
 
 /*  BUTTONS */
@@ -79,9 +79,8 @@
     flex-direction: column;
     padding-right: 20px;
     padding-bottom: 10px;
-    pointer-events: none;
     user-select: none;
-}
+}   
 
 .logo {
     font-family: 'Montserrat'; 
@@ -97,6 +96,13 @@
 .user-info { 
     text-align: left;
 }
+
+.main-content {
+    position: relative;
+    z-index: 1;
+}
+
+
 
 /*  FOOTER  */
 
@@ -151,4 +157,65 @@
     font-family: 'Consolas', monospace;
     font-size: 0.75rem;
     pointer-events: none;
+}
+
+.profile-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 14px;
+    margin-top: 18px;
+
+    border: none;
+    border-radius: 16px;
+
+    background: rgba(255,255,255,0.06);
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+    text-align: left;
+}
+
+.profile-btn:hover {
+    background: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+}
+
+.profile-avatar {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.profile-meta {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.profile-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.profile-meta small {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.72rem;
+}
+
+.profile-arrow {
+    opacity: 0.7;
 }
