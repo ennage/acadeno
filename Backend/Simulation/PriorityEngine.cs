@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Acadeno.Backend.Models;
 using Acadeno.Backend.Enums;
-using Acadeno.Backend.Tools; // Required for AppDbContext
+using Acadeno.Backend.Tools;
 
 namespace Acadeno.Backend.Simulation
 {
@@ -16,15 +16,58 @@ namespace Acadeno.Backend.Simulation
             _db = db;
         }
 
+        /// <summary>
+        /// Updates the RiskLevel of all tasks in the list and returns the top priorities.
+        /// </summary>
         public List<BaseTask> GetTopPriorities(int count, List<BaseTask> allTasks)
         {
             if (allTasks == null || !allTasks.Any()) return new List<BaseTask>();
 
+            foreach (var task in allTasks)
+            {
+                // Assign the "Actual" calculated risk level before sorting
+                task.RiskLevel = DetermineActualRisk(task);
+            }
+
             return allTasks
-                .OrderByDescending(t => CalculatePriorityScore(t)) // Highest score first
-                .ThenBy(t => t.DueDate)                     // Then by earliest deadline
+                .Where(t => t.TaskStatus != Status.Completed) // Don't prioritize finished work
+                .OrderByDescending(t => t.RiskLevel)          // Critical first
+                .ThenByDescending(t => CalculatePriorityScore(t)) 
+                .ThenBy(t => t.DueDate)
                 .Take(count)
                 .ToList();
+        }
+
+        public RiskLevel DetermineActualRisk(BaseTask task)
+        {
+            if (task.TaskStatus == Status.Completed) return RiskLevel.Stable;
+
+            var timeRemaining = task.DueDate - DateTime.Now;
+            double days = timeRemaining.TotalDays;
+
+            // 1. Determine "Stakes" (How much does this hurt if I fail?)
+            double categoryWeight = 0;
+            if (task is AcademicTask academic && academic.Type != null)
+            {
+                categoryWeight = academic.Type.Weight;
+            }
+
+            // 2. The Logic Matrix
+            
+            // CRITICAL: Overdue, Due Tomorrow, or a Heavy Exam due very soon
+            if (days <= 1.0 || (days <= 3.0 && categoryWeight >= 30))
+            {
+                return RiskLevel.Critical;
+            }
+
+            // WARNING: Due within the week, or a medium-weight task (Quizzes/Activities)
+            if (days <= 7.0 || categoryWeight >= 15)
+            {
+                return RiskLevel.Warning;
+            }
+
+            // STABLE: Far away or low weight
+            return RiskLevel.Stable;
         }
 
         public double CalculatePriorityScore(BaseTask task)
@@ -32,45 +75,13 @@ namespace Acadeno.Backend.Simulation
             var timeSpan = task.DueDate - DateTime.Now;
             double daysRemaining = timeSpan.TotalDays;
 
-            // 1. Base Weight from Difficulty (1-10 scale) and RiskLevel (Enum value)
-            // High Risk + High Difficulty = High base weight
-            double taskWeight = task.Difficulty + ((int)task.RiskLevel * 2);
+            // Use the newly determined RiskLevel for the score
+            double taskWeight = ((int)task.RiskLevel + 1) * 10; 
 
-            // 2. Factor in Urgency
-            // If the task is overdue, we give it a massive boost
-            if (daysRemaining <= 0)
-            {
-                return 100 + taskWeight; 
-            }
+            if (daysRemaining <= 0) return 200 + taskWeight; // Massive boost for overdue
 
-            // 3. The Formula: Weight divided by Days Remaining
-            // This makes the score grow exponentially as the deadline approaches
-            // We use 0.5 to prevent division by zero and give 'Due Today' a high score
-            return taskWeight / (daysRemaining > 0 ? daysRemaining : 0.5);
-        }
-
-        public List<BaseTask> RankTasks(List<BaseTask> tasks)
-        {
-            return tasks.OrderByDescending(t => CalculatePriorityScore(t)).ToList();
-        }
-
-        public int CalculateRiskLevel(string taskid)
-        {
-            var task = _db.Tasks.Find(taskid);
-            if (task == null) return 1;
-
-            int score = 1;
-            var timeRemaining = task.DueDate - DateTime.Now;
-
-            if (timeRemaining.TotalDays <= 1) score += 3;
-            else if (timeRemaining.TotalDays <= 3) score += 2;
-            else if (timeRemaining.TotalDays <= 7) score += 1;
-
-            if (task.RiskLevel == RiskLevel.Critical) score += 5;
-            else if (task.RiskLevel == RiskLevel.Warning) score += 3;
-            else if (task.RiskLevel == RiskLevel.Stable) score += 1;
-
-            return Math.Clamp(score, 1, 5);
+            // Score increases as daysRemaining approaches 0
+            return taskWeight / (daysRemaining > 0 ? daysRemaining : 0.1);
         }
     }
 }

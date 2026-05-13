@@ -78,6 +78,6 @@ Acadeño is a Blazor MAUI Hybrid App. It uses C# as the "engine" and web technol
 
 ### Members
 ```
-Program Manager: Calabia, Geanne Margarete M.
+Project Manager: Calabia, Geanne Margarete M.
 GUI: Buenviaje, Lance T.
 Logic Developer/Tester: Aguilar, Azelle Ann C.

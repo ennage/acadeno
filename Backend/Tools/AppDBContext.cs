@@ -72,26 +72,6 @@ namespace Acadeno.Backend.Tools
             modelBuilder.Entity<AcademicYear>().ToTable("academicyears");
             modelBuilder.Entity<Term>().ToTable("terms");
             modelBuilder.Entity<Grade>().ToTable("grades");
-
-            // // --- FLUENT API RELATIONSHIPS ---
-
-            // // 1. Link the global Definition to the Course-Specific Task Types
-            // modelBuilder.Entity<AcademicTaskType>()
-            //     .HasOne(type => type.Definition)
-            //     .WithMany(def => def.AcademicTaskTypes)
-            //     .HasForeignKey(type => type.DefID);
-
-            // // 2. Explicitly link Course to Grade (1-to-1)
-            // modelBuilder.Entity<Course>()
-            //     .HasOne(c => c.ActualGrade)
-            //     .WithOne(g => g.Course)
-            //     .HasForeignKey<Grade>(g => g.CourseID); 
-
-            // // 3. Link Tasks to their TaskTypes
-            // modelBuilder.Entity<AcademicTask>()
-            //     .HasOne(t => t.Type)
-            //     .WithMany(type => type.AcademicTasks)
-            //     .HasForeignKey(t => t.TypeID);
         }
     }
 }

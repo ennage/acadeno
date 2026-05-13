@@ -37,6 +37,7 @@ namespace Acadeno
 			builder.Services.AddScoped<TaskService>();
 			builder.Services.AddScoped<TermService>();
 			builder.Services.AddScoped<UserService>();
+			builder.Services.AddScoped<YearService>();
 
 			//	SIMULATION
 			builder.Services.AddScoped<GradeConverter>();

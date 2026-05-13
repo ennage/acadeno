@@ -205,8 +205,8 @@
 
                                 <div class="schedule-entry-bubble" style="top: @(topOffset)px; height: @(height)px;">
                                     <div class="bubble-inner">
-                                        <strong>@entry.Label</strong>
-                                        <span class="sub">@entry.StartTime.ToString("h:mm tt") - @entry.EndTime.ToString("h:mm tt")</span>
+                                        <strong>@(entry.Course?.CourseCode ?? "Unknown Code")</strong>
+                                        <span class="sub">@entry.Session</span>
                                         <span class="loc">@entry.Building @entry.Room</span>
                                     </div>
                                 </div>
@@ -306,7 +306,10 @@
                 .Include("Type")
                 .AsNoTracking()
                 .ToListAsync();
-            var allDbSchedule = await _db.ScheduleEntries.ToListAsync();
+            var allDbSchedule = await _db.ScheduleEntries
+                .Include(s => s.Course)
+                .AsNoTracking()
+                .ToListAsync();
             
             _rawTaskCount = allDbTasks.Count;
             _rawScheduleCount = allDbSchedule.Count;
@@ -353,9 +356,8 @@
     private async Task MarkAsComplete(BaseTask task)
     {
         task.TaskStatus = Status.Completed;
-        _db.Tasks.Update(task);
-        await _db.SaveChangesAsync();
-        await LoadTasks(); 
+        await TaskService.UpdateTaskAsync(task);
+        await LoadTasks();
     }
 
     // ----- COURSE TIMETABLE -----
@@ -378,8 +380,6 @@
         // If the week spans across two different months
         return $"{_startOfWeek.ToString("MMM").ToUpper()} - {endOfWeek.ToString("MMM").ToUpper()} {endOfWeek.Year}";
     }
-
-    
 
     // ----- CLOCK ----- 
     private void GetClock()
