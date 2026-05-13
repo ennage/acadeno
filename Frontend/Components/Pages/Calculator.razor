@@ -87,14 +87,14 @@
 
                                         <div class="score-group">
                                             <input type="number" placeholder="Score" 
-                                                   @bind="task.Score" @bind:after="RecalculateAll" />
+                                                    @bind="task.Score" @bind:after="RecalculateAll" />
                                             <span>/</span>
                                             <input type="number" placeholder="Total" 
-                                                   @bind="task.MaxScore" @bind:after="RecalculateAll" />
+                                                    @bind="task.MaxScore" @bind:after="RecalculateAll" />
                                         </div>
                                         
                                         <input class="computed-score" type="text" 
-                                               value="@(GradeEngine.CalculateTaskPercentage(task).ToString("0.0"))%" readonly />
+                                                value="@(GradeEngine.CalculateTaskPercentage(task).ToString("0.0"))%" readonly />
 
                                         <button class="delete-btn small-delete" 
                                                 @onclick="() => RemoveTask(category, task)" title="Remove Task">×</button>
@@ -122,38 +122,11 @@
                             </button>
                         </div>
 
-                        <div class="final-grade">
-                            <div>
-                                <small>Running Grade (@courseResult.DefinedWeight% of Course Defined)</small>
-                                <h2>@courseResult.RunningPercentage.ToString("0.00")%</h2>
-                            </div>
-                            <div class="grade-letter">
-                                @courseResult.DisplayRunningGrade
-                            </div>
-                        </div>
-
-                        <div class="prediction-box">
-                            <div class="prediction-header">
-                                <strong>🎯 Target Predictor</strong>
-                                <span>@courseResult.UnallocatedWeight% Weight Remaining</span>
-                            </div>
-                            <div class="prediction-inputs">
-                                <input type="text" placeholder="Enter target (e.g., 1.50 or A)" 
-                                       @bind="_activeView.TargetInput" @bind:event="oninput" @bind:after="() => RunPrediction(_activeView)" />
-                            </div>
-                            
-                            @if (!string.IsNullOrWhiteSpace(_activeView.TargetInput))
-                            {
-                                <div class="prediction-message @(_activeView.IsPossible ? "possible" : "impossible")">
-                                    <i class="fas @(_activeView.IsPossible ? "fa-check-circle" : "fa-exclamation-circle")"></i>
-                                    @_activeView.PredictionMessage
-                                </div>
-                            }
-                        </div>
                     </div>
                 }
             </div>
 
+            @* RIGHT COLUMN *@
             <div class="card">
                 <div class="sidebar">
                     <div class="gwa-circle">
@@ -189,8 +162,49 @@
                             </div>
                         </div>
                     </div>
+
+                    @* NEW LOCATION: Course-Specific Results *@
+                    @if (_activeView != null)
+                    {
+                        var courseResult = GradeEngine.CalculateCourseGrade(_activeView.Course.ActualGrade, _selectedScale);
+
+                        <div class="active-course-results" style="margin-top: 30px; padding-top: 25px; border-top: 1px dashed #cbd5e1;">
+                            <h4 style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; margin-bottom: 15px; text-align: center;">Active Course Analysis</h4>
+                            
+                            <div class="final-grade">
+                                <div>
+                                    <small>Running Grade (@courseResult.DefinedWeight% Defined)</small>
+                                    <h2>@courseResult.RunningPercentage.ToString("0.00")%</h2>
+                                </div>
+                                <div class="grade-letter">
+                                    @courseResult.DisplayRunningGrade
+                                </div>
+                            </div>
+
+                            <div class="prediction-box">
+                                <div class="prediction-header">
+                                    <strong>🎯 Target Predictor</strong>
+                                    <span>@courseResult.UnallocatedWeight% Weight Remaining</span>
+                                </div>
+                                <div class="prediction-inputs">
+                                    <input type="text" placeholder="Enter target (e.g., 1.50 or A)" 
+                                            @bind="_activeView.TargetInput" @bind:event="oninput" @bind:after="() => RunPrediction(_activeView)" />
+                                </div>
+                                
+                                @if (!string.IsNullOrWhiteSpace(_activeView.TargetInput))
+                                {
+                                    <div class="prediction-message @(_activeView.IsPossible ? "possible" : "impossible")">
+                                        <i class="fas @(_activeView.IsPossible ? "fa-check-circle" : "fa-exclamation-circle")"></i>
+                                        @_activeView.PredictionMessage
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
                 </div>
             </div>
+            
         </div>
     </div>
 </div>

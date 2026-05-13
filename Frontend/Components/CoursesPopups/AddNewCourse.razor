@@ -154,15 +154,33 @@
 
     private void AddScheduleToList()
     {
-        // Add a copy to the list
+        // Align the Date with the selected Day
+        // Find the most recent Sunday (Day 0), then add the selected Day number
+        // This guarantees that if "Monday", the saved StartTime is actually a Monday
+        DateTime anchorSunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        DateTime correctDate = anchorSunday.AddDays(_activeEntry.Day);
+
+        // Explicitly map the legacy fields (Label/Description) 
+        string safeRoom = string.IsNullOrWhiteSpace(_activeEntry.Room) ? "TBA" : _activeEntry.Room;
+        string safeBuilding = string.IsNullOrWhiteSpace(_activeEntry.Building) ? "TBA" : _activeEntry.Building;
+        string safeSession = string.IsNullOrWhiteSpace(_activeEntry.Session) ? "Lecture" : _activeEntry.Session;
+        string safeCourseName = string.IsNullOrWhiteSpace(_newCourse.Name) ? "New Course" : _newCourse.Name;
+
         _tempSchedules.Add(new ScheduleEntry {
             Day = _activeEntry.Day,
-            StartTime = _uiStartTime,
-            EndTime = _uiEndTime,
-            Room = _activeEntry.Room,
-            Building = _activeEntry.Building,
-            Session = _activeEntry.Session,
-            IsRepeating = _activeEntry.IsRepeating
+            
+            // Apply the mathematically corrected Date + the User's Time
+            StartTime = correctDate.Date.Add(_uiStartTime.TimeOfDay),
+            EndTime = correctDate.Date.Add(_uiEndTime.TimeOfDay),
+            
+            Room = safeRoom,
+            Building = safeBuilding,
+            Session = safeSession,
+            IsRepeating = _activeEntry.IsRepeating,
+
+            // Map to the legacy DB columns 
+            Label = safeSession,
+            Description = safeCourseName
         });
 
         // Smart reset: Advance the day, but keep the Building/Room for convenience
@@ -180,7 +198,6 @@
 
         await OnCourseAdded.InvokeAsync();
         await Close();
-        ResetAll();
     }
 
     private string GetDayName(int day) => day switch {
@@ -196,7 +213,11 @@
         _uiEndTime = DateTime.Today.Date.AddHours(9).AddMinutes(30);
     }
 
-    private async Task Close() { ResetAll(); await OnClose.InvokeAsync(); }
+    private async Task Close() 
+    { 
+        ResetAll(); 
+        await OnClose.InvokeAsync(); 
+    }
 }
 
 <style>
