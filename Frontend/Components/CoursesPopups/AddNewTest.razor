@@ -11,35 +11,36 @@
 {
     <div class="modal-overlay">
         <div class="modal-card">
-
             <div class="modal-header">
                 <h2 class="modal-title">Schedule Test Event</h2>
             </div>
 
             <EditForm Model="_newTask" OnValidSubmit="HandleSubmit">
                 <DataAnnotationsValidator />
-
+                
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Course</label>
-                        <InputSelect @bind-Value="_newTask.CourseID" @bind-Value:after="OnCourseChanged" required>
-                            <option value="" disabled selected>-- Select Course --</option>
-                            @foreach (var course in _availableCourses)
-                            {
-                                <option value="@course.CourseID">@course.Name (@course.CourseCode)</option>
-                            }
-                        </InputSelect>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Test Name</label>
-                        <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Exam" required />
-                    </div>
-
-                    @* NEW: DIFFICULTY & RISK LEVEL *@
-                    <div class="form-row">
+                    @* ROW 1: COURSE & TEST NAME *@
+                    <div class="form-grid-2">
                         <div class="form-group">
-                            <label>Difficulty (1-10)</label>
+                            <label>Course</label>
+                            <InputSelect @bind-Value="_newTask.CourseID" @bind-Value:after="OnCourseChanged" required>
+                                <option value="" disabled selected>-- Select Course --</option>
+                                @foreach (var course in _availableCourses)
+                                {
+                                    <option value="@course.CourseID">@course.Name (@course.CourseCode)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label>Test Name</label>
+                            <InputText @bind-Value="_newTask.Name" placeholder="e.g. Midterm Exam" required />
+                        </div>
+                    </div>
+
+                    @* ROW 2: METRICS (Difficulty, Risk, Room) *@
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Diff (1-10)</label>
                             <InputNumber @bind-Value="_newTask.Difficulty" min="1" max="10" />
                         </div>
                         <div class="form-group">
@@ -51,10 +52,14 @@
                                 }
                             </InputSelect>
                         </div>
+                        <div class="form-group">
+                            <label>Room</label>
+                            <InputText @bind-Value="_tempRoom" placeholder="Room #" />
+                        </div>
                     </div>
 
-                    @* NEW: SCORES ROW *@
-                    <div class="score-row">
+                    @* ROW 3: SCORES *@
+                    <div class="form-grid-3 score-section">
                         <div class="form-group">
                             <label>Target</label>
                             <InputNumber @bind-Value="_newTask.TargetScore" />
@@ -69,38 +74,33 @@
                         </div>
                     </div>
 
-                    @* NEW: DESCRIPTION *@
+                    @* ROW 4: DATES *@
                     <div class="form-group">
-                        <label>Description / Notes</label>
-                        <InputTextArea @bind-Value="_newTask.Description" placeholder="Topics to cover, instructions..." rows="3" />
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
                             <label>Starts At</label>
                             <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_uiStartTime" required />
                         </div>
-                        <div class="form-group">
+                        <div class="form-group no-margin">
                             <label>Ends At</label>
                             <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="_uiEndTime" required />
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Test Type</label>
-                            <InputSelect @bind-Value="_newTask.TypeID" required disabled="@(string.IsNullOrEmpty(_newTask.CourseID))">
-                                <option value="" disabled selected>Select Type</option>
-                                @foreach (var type in FilteredTypes)
-                                {
-                                    <option value="@type.TypeID">@type.Name</option>
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="form-group">
-                            <label>Room</label>
-                            <InputText @bind-Value="_tempRoom" placeholder="e.g. Room 402" />
-                        </div>
+                    @* ROW 5: TYPE & DESCRIPTION *@
+                    <div class="form-group">
+                        <label>Test Type</label>
+                        <InputSelect @bind-Value="_newTask.TypeID" required disabled="@(string.IsNullOrEmpty(_newTask.CourseID))">
+                            <option value="" disabled selected>Select Type</option>
+                            @foreach (var type in FilteredTypes)
+                            {
+                                <option value="@type.TypeID">@type.Name</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="form-group no-margin">
+                        <label>Description / Notes</label>
+                        <InputTextArea @bind-Value="_newTask.Description" placeholder="Topics, instructions..." rows="2" />
                     </div>
                 </div>
 
@@ -112,6 +112,96 @@
         </div>
     </div>
 }
+
+<style>
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+
+    .modal-card {
+        background: #fff; width: 95%; max-width: 580px; border-radius: 20px;
+        padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .modal-header { margin-bottom: 18px; }
+    .modal-title { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin: 0; }
+
+    /* Scrollable body if content is too tall */
+    .modal-body { 
+        max-height: 70vh; 
+        overflow-y: auto; 
+        padding-right: 8px;
+        margin-bottom: 16px;
+    }
+    .form-group { margin-bottom: 14px; }
+    .no-margin { margin-bottom: 0; }
+    
+    label {
+        display: block; font-size: 0.7rem; font-weight: 700;
+        color: #64748b; margin-bottom: 4px; text-transform: uppercase;
+    }
+
+    input, 
+    select, 
+    textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.9rem;
+        color: #1e293b;
+        background: #f8fafc;
+        transition: all 0.2s;
+        
+        /* CRITICAL FIXES */
+        box-sizing: border-box; 
+        min-width: 0; 
+        overflow: hidden; 
+        display: block;   
+    }
+
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        margin-left: 5px;
+    }
+
+    .form-grid-2, .form-grid-3 {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+        grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); /
+    }
+
+    .form-grid-2 { grid-template-columns: 1fr 1fr; }
+    .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    input:focus { border-color: #4f46e5; outline: none; background: #fff; }
+
+    .modal-footer { 
+        display: flex; justify-content: flex-end; gap: 10px; 
+        padding-top: 15px; border-top: 1px solid #f1f5f9;
+    }
+
+    .btn {
+        height: 42px; padding: 0 20px; border-radius: 10px;
+        font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    .btn-cancel { background: #fff; border: 1px solid #e2e8f0; color: #64748b; }
+    
+    .btn-submit { 
+        background: #4f46e5; border: none; color: #fff;
+        box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+    }
+
+    /* Custom Scrollbar */
+    .modal-body::-webkit-scrollbar { width: 5px; }
+    .modal-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+</style>
 
 @code {
     [Parameter] public bool IsVisible { get; set; }
@@ -198,145 +288,3 @@
     }
 }
 
-<style>
-    /* OVERLAY */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(30, 41, 59, 0.5);
-        backdrop-filter: blur(5px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        padding: 20px;
-    }
-
-    /* MODAL CARD */
-    .modal-card {
-        background: #ffffff;
-        width: 100%;
-        max-width: 620px;
-        border-radius: 24px;
-        padding: 35px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        font-family: 'Poppins', sans-serif;
-        animation: modalSlideUp 0.35s ease;
-    }
-
-    @@keyframes modalSlideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* HEADER */
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 28px;
-    }
-
-    .modal-title {
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-    }
-
-    /* FORM */
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
-
-    label {
-        display: block;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-family: 'Inter', sans-serif;
-    }
-
-    input,
-    select {
-        width: 100%;
-        padding: 13px 16px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        font-size: 0.95rem;
-        font-family: 'Inter', sans-serif;
-        color: #1e293b;
-        background: #fff;
-        transition: all 0.2s ease;
-        box-sizing: border-box; /* Fixes width overflow */
-    }
-
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-    }
-
-    /* FOOTER */
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 10px;
-    }
-
-    .btn {
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.2s;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .btn-cancel {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        color: #64748b;
-    }
-
-    .btn-cancel:hover {
-        background: #f8fafc;
-    }
-
-    .btn-submit {
-        background: #4f46e5;
-        border: none;
-        color: #fff;
-        box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-    }
-
-    .btn-submit:hover {
-        background: #4338ca;
-        transform: translateY(-1px);
-    }
-
-    .score-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 22px;
-    }
-</style>
