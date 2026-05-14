@@ -1,129 +1,223 @@
+/* =========================================================
+   ABOUT PAGE
+========================================================= */
+
 .about-wrapper {
-    display: flex; 
-    height: 100vh; 
-    overflow: hidden;
+    display: flex;
+    min-height: 100vh;
+    background: #f1f5f9;
 }
-/* About Page Styling */
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* MAIN GRID */
 .about-container {
     display: grid;
-    grid-template-columns: 1fr 350px;
-    gap: 40px;
-    padding: 20px;
-    pointer-events: none;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 32px;
+
+    padding: 36px;
+    align-items: stretch;
 }
 
-.section-title { 
-    font-family: 'Montserrat'; 
-    font-size: 2.5rem; 
-    color: var(--navy); 
-    margin-bottom: 10px; 
-    text-transform: uppercase; 
+/* =========================================================
+   LEFT CONTENT
+========================================================= */
+
+.about-story {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.accent-bar { 
-    width: 60px; 
-    height: 4px; 
-    background: #38bdf8; 
-    margin-bottom: 30px; 
+/* TITLE */
+.section-title {
+    font-family: 'Montserrat';
+    font-size: 2.6rem;
+    font-weight: 700;
+
+    color: var(--navy);
+    text-transform: uppercase;
+
+    margin-bottom: 12px;
 }
 
-.brand-intro { 
-    font-size: 1.25rem; 
-    font-weight: 600; 
-    line-height: 1.6; 
-    margin-bottom: 20px; 
+.accent-bar {
+    width: 64px;
+    height: 4px;
+    background: #38bdf8;
+
+    border-radius: 999px;
+    margin-bottom: 28px;
 }
 
-.brand-body { 
-    line-height: 1.8; 
-    color: #475569; 
-    margin-bottom: 30px; 
+/* TEXT */
+.brand-intro {
+    font-size: 1.28rem;
+    font-weight: 600;
+
+    line-height: 1.7;
+    margin-bottom: 22px;
+
+    color: #0f172a;
 }
 
-.brand-quote {
-    padding: 25px;
-    border-left: 5px solid #38bdf8;
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    font-size: 1.1rem;
-    font-style: italic;
-}
+.brand-body {
+    line-height: 1.9;
+    color: #475569;
 
-/* Sidebar Cards matching your dashboard's refined widgets */
-.about-sidebar { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 20px; 
-}
-
-.about-card {
-    background: var(--navy);
-    padding: 41.2px;
-    border-radius: 12px;
-    color: white;
-    border: 1px solid #1e3a8a;
-}
-
-.about-card h3 { 
-    color: #38bdf8; 
-    margin-top: 0; 
-    font-family: 'Montserrat'; 
+    margin-bottom: 28px;
     font-size: 1rem;
 }
 
-.about-card p { 
-    font-size: 0.95rem; 
-    color: #e2e8f0; 
-    line-height: 1.5; 
-    margin: 0;
+/* MAIN WHITE CARD */
+.brand-quote {
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+
+    padding: 28px;
+    flex: 1;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 
+.brand-quote em {
+    display: block;
+
+    font-size: 1.08rem;
+    color: #334155;
+
+    margin-bottom: 28px;
+}
+
+/* =========================================================
+   CORE VALUES
+========================================================= */
+
 .core-values {
-    margin-top: 5px;
-    padding-top: 30px;
     border-top: 1px solid #e2e8f0;
+    padding-top: 28px;
 }
 
 .core-values h3 {
     font-family: 'Montserrat';
+
+    font-size: 2rem;
+    font-style: italic;
+    font-weight: 500;
+
     color: var(--navy);
-    margin-bottom: 25px;
+
+    margin-bottom: 24px;
 }
 
+/* VALUE GRID */
 .values-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 18px;
 }
 
+/* VALUE CARD */
 .value-item {
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+
+    border: 1px solid #dbe4f0;
+    border-radius: 14px;
+
+    padding: 22px;
+
+    transition: 0.25s ease;
+}
+
+.value-item:hover {
+    transform: translateY(-2px);
+    border-color: #38bdf8;
 }
 
 .value-item h4 {
-    margin-top: 0;
-    color: #38bdf8;
+    margin: 0 0 12px;
+
     font-family: 'Montserrat';
+    font-size: 1.7rem;
+    font-style: italic;
+    font-weight: 500;
+
+    color: #38bdf8;
 }
 
 .value-item p {
-    font-size: 0.9rem;
+    margin: 0;
+
+    font-size: 0.95rem;
+    line-height: 1.7;
+
     color: #64748b;
-    line-height: 1.5;
-    margin-bottom: 0;
 }
 
-.about-container {
-    display: grid;
-    grid-template-columns: 1fr 350px;
-    grid-template-rows: auto auto;
-    gap: 40px;
-    padding: 40px;
-    align-content: start;
+/* =========================================================
+   RIGHT SIDEBAR
+========================================================= */
+
+.about-sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 20px;
+
 }
 
+/* BLUE BOXES */
+.about-card {
+    background: linear-gradient(180deg, #06153f, #0b1f57);
+    flex: 1;
+    border-radius: 20px;
+
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.about-card h3 {
+    margin: 0 0 14px;
+
+    color: #38bdf8;
+
+    font-family: 'Montserrat';
+    font-size: 1.05rem;
+
+    letter-spacing: 0.08em;
+}
+
+.about-card p {
+    margin: 0;
+
+    color: #e2e8f0;
+
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .about-container {
+        grid-template-columns: 1fr;
+    }
+
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+}
