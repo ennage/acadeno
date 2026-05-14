@@ -173,7 +173,7 @@
                                 <h4 class="results-title">Active Course Analysis</h4>
                                 
                                 <button class="btn-save-official" @onclick="SaveOfficialWeights">
-                                    💾 Save Official Weights
+                                    Save Official Weights
                                 </button>
                             </div>
 
@@ -185,28 +185,36 @@
                             }
                             
                             <div class="final-grade">
-                                <div>
-                                    <small>Running Grade (@courseResult.DefinedWeight% Defined)</small>
-                                    <h2>@courseResult.RunningPercentage.ToString("0.00")%</h2>
+
+                                <div class="final-grade-info">
+                                    <small>
+                                        Running Grade (@courseResult.DefinedWeight% Defined)
+                                    </small>
+
+                                    <h2>
+                                        @courseResult.RunningPercentage.ToString("0.00")%
+                                    </h2>
                                 </div>
+
                                 <div class="grade-letter">
                                     @courseResult.DisplayRunningGrade
                                 </div>
+
                             </div>
 
                             <div class="prediction-box">
                                 <div class="prediction-header">
-                                    <strong>🎯 Target Predictor</strong>
+                                    <strong>Target Predictor</strong>
                                     <span>@courseResult.UnallocatedWeight% Weight Remaining</span>
                                 </div>
                                 <div class="prediction-inputs">
-                                    <input type="text" placeholder="Enter target (e.g., 1.50 or A)" 
+                                    <input type="text" placeholder="Enter target (e.g., 1-5.00 or A)" 
                                             @bind="_activeView.TargetInput" @bind:event="oninput" @bind:after="() => RunPrediction(_activeView)" />
                                 </div>
                                 
                                 @if (!string.IsNullOrWhiteSpace(_activeView.TargetInput))
                                 {
-                                    <div class="prediction-message @(_activeView.IsPossible ? "possible" : "impossible")">
+                                    <div class="prediction-message @(_activeView.IsPossible ? "possi    ble" : "impossible")">
                                         <i class="fas @(_activeView.IsPossible ? "fa-check-circle" : "fa-exclamation-circle")"></i>
                                         @_activeView.PredictionMessage
                                     </div>

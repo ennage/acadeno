@@ -2,14 +2,38 @@
 @inject NavigationManager NavManager
 @inject UserService UserService
 
+@code {
+    private void GoToProfile()
+    {
+        NavManager.NavigateTo("/profile");
+    }
+}
+
 <aside class="sidebar">
     <div class="sidebar-header">
-        <div class="logo"> ACADEÑO </div>
+        <div class="logo">ACADEÑO</div>
+
         <div class="user-info">
-                <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
-                <p>@UserService.CurrentUser?.Program</p>
+            <h2>@(UserService.CurrentUser?.Name ?? "Guest")</h2>
+            <p>@UserService.CurrentUser?.Program</p>
+
+            <button type="button"
+                    class="profile-btn"
+                    @onclick="GoToProfile">
+
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+
+                <div class="profile-meta">
+                    <span class="profile-label">View Profile</span>
+                    <small>Account Settings</small>
+                </div>
+
+            </button>
         </div>
     </div>
+
 
     @* --- SIDEBAR --- *@
     <nav class="sidebar-nav">

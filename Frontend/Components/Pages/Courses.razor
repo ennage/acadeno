@@ -242,12 +242,12 @@
                                 <h2 class="section-title">Homeworks</h2>
                                 <button class="btn-add" title="Add New Homework" @onclick="OpenAddNewHomeworkModal" disabled="@(string.IsNullOrEmpty(_selectedTermId))">+</button>
                             </div>
-                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all &rsaquo;</a>
+                            <a href="javascript:void(0)" class="accent-link" @onclick="OpenViewAllHomeworkModal">View all homeworks &rsaquo;</a>
                         </div>
                         
                         @if (_homeworks != null && _homeworks.Any())
                         {
-                            @foreach (var hw in _homeworks.Take(2))
+                            @foreach (var hw in _homeworks.Take(3))
                             {
                                 var colorClass = GetColorByIndex(_homeworks.IndexOf(hw));
 
