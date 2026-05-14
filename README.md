@@ -52,24 +52,16 @@
 ‎ ‎ ‎ ‎ Acadeño is designed to be completely empty on first launch, allowing the user to construct a personalized academic environment from the ground up.
 
 #### 01. Establish the Timeline
-```bash
-Navigate to settings to create your Academic Year and Term. Because Acadeño is strictly relational, nothing can exist without a timeframe. Setting this up first ensures all future tasks and courses are properly categorized and easily archived when the semester ends.
-```
+> Navigate to settings to create your Academic Year and Term. Because Acadeño is strictly relational, nothing can exist without a timeframe. Setting this up first ensures all future tasks and courses are properly categorized and easily archived when the semester ends.
 
 #### 02. Build the Syllabi
-```bash
-Go to the Courses Page to log your current subjects. Here, you don't just enter a course name; you define its DNA. Use the Syllabus Customizer to input the exact grading weights defined by your professor (e.g., Exams: 40%, Quizzes: 30%, Lab: 30%).
-```
+> Go to the Courses Page to log your current subjects. Here, you don't just enter a course name; you define its DNA. Use the Syllabus Customizer to input the exact grading weights defined by your professor (e.g., Exams: 40%, Quizzes: 30%, Lab: 30%).
 
 #### 03. Offload Your Brain
-```bash
-Switch to the Tasks Page to input your assignments. Enter your upcoming homework, projects, and test dates. You only need to provide the raw data (the due date and the course); the Priority Engine will instantly take over and rank them by urgency.
-```
+> Switch to the Tasks Page to input your assignments. Enter your upcoming homework, projects, and test dates. You only need to provide the raw data (the due date and the course); the Priority Engine will instantly take over and rank them by urgency.
 
 #### 04. Execute and Simulate
-```bash
-Return to the Dashboard for daily execution. Your Dashboard will now display a live, prioritized list of what needs your attention today. As the term progresses, jump into the Grade Simulator to safely test "What-If" scenarios and track your exact standing.
-```
+> Return to the Dashboard for daily execution. Your Dashboard will now display a live, prioritized list of what needs your attention today. As the term progresses, jump into the Grade Simulator to safely test "What-If" scenarios and track your exact standing.
 
   ‎  
 ### 🏗️ The Architecture
