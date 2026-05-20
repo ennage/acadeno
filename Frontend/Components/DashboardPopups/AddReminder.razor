@@ -73,13 +73,13 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Select Course (@_userCourses.Count found)</label>
-                                    <select class="input-field" @bind="_courseId">
-                                        <option value="">SELECT</option>
-                                        @foreach (var course in _userCourses)
-                                        {
-                                            <option value="@course.CourseID">@course.CourseCode: @course.Name</option>
-                                        }
-                                    </select>
+                                        <select class="input-field" value="@_courseId" @onchange="OnCourseSelected">
+                                            <option value="">SELECT</option>
+                                            @foreach (var course in _userCourses)
+                                            {
+                                                <option value="@course.CourseID">@course.CourseCode: @course.Name</option>
+                                            }
+                                        </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Task Type</label>
@@ -151,10 +151,6 @@
                     .AsNoTracking()
                     .Where(c => c.UserID == userId)
                     .ToListAsync();
-                
-                _taskTypes = await _db.AcademicTaskTypes
-                    .AsNoTracking()
-                    .ToListAsync();
 
                 _debugStatus = _userCourses.Any() 
                     ? $"Loaded {_userCourses.Count} courses." 
@@ -163,6 +159,32 @@
             catch (Exception ex)
             {
                 _debugStatus = $"LOAD ERROR: {ex.Message}";
+            }
+        }
+    }
+
+    private async Task OnCourseSelected(ChangeEventArgs e)
+    {
+        // 1. Update the selected course ID
+        _courseId = e.Value?.ToString() ?? string.Empty;
+        
+        // 2. Reset the task type dropdown since the course changed
+        _selectedTypeId = string.Empty; 
+        _taskTypes.Clear();
+
+        if (!string.IsNullOrEmpty(_courseId))
+        {
+            // 3. Fetch ONLY the categories belonging to this specific course
+            var course = await _db.Courses
+                .Include(c => c.ActualGrade)
+                .ThenInclude(g => g.AcademicTaskTypes)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.CourseID == _courseId);
+
+            if (course?.ActualGrade?.AcademicTaskTypes != null)
+            {
+                // Populate the dropdown with just this course's 4 categories
+                _taskTypes = course.ActualGrade.AcademicTaskTypes.ToList();
             }
         }
     }
